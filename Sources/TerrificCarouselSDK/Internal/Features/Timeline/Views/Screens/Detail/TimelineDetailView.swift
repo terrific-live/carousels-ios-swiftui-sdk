@@ -1,0 +1,168 @@
+//
+//  TimelineDetailView.swift
+//  CarouselDemo
+//
+//  Created by YuriyFpc on 21.01.2026.
+//
+
+import SwiftUI
+
+// MARK: - View
+struct TimelineDetailView: View {
+
+    // MARK: - Static Constants
+    private static let errorFontSize: CGFloat = 14
+
+    // MARK: - Dependencies
+    @ObservedObject private var viewModel: TimelineViewModel
+
+    // MARK: - Configuration
+    private let sizeConfig: DetailSizeConfiguration
+
+    // MARK: - State
+    @State private var isMuted: Bool = true
+
+    // MARK: - Init
+    init(
+        viewModel: TimelineViewModel,
+        sizeConfig: DetailSizeConfiguration = .default
+    ) {
+        self.viewModel = viewModel
+        self.sizeConfig = sizeConfig
+    }
+
+    // MARK: - Body
+    var body: some View {
+        content
+            .background(Color.black)
+            .onAppear {
+                handleOnAppear()
+            }
+            .onDisappear {
+                viewModel.handleDetailViewDisappear()
+            }
+    }
+}
+
+// MARK: - UI Components (Factories)
+private extension TimelineDetailView {
+
+    @ViewBuilder
+    var content: some View {
+        switch viewModel.state {
+        case .idle:
+            Color.clear
+
+        case .loading:
+            loadingView
+
+        case .content:
+            buildAssetList(viewModel.carouselItems)
+
+        case .error(let message):
+            buildErrorView(message: message)
+        }
+    }
+
+    @ViewBuilder
+    func buildAssetList(_ items: [TimelineViewModel.TimelineCarouselItem]) -> some View {
+        PagedCarouselView(
+            selection: $viewModel.currentPageIndex,
+            items: items,
+            scrollDirection: .vertical,
+            onPageChange: handlePageChange(to:)
+        ) { item, isSelected in
+            buildCarouselItemView(item, isSelected: isSelected)
+        }
+    }
+
+    @ViewBuilder
+    func buildCarouselItemView(
+        _ item: TimelineViewModel.TimelineCarouselItem,
+        isSelected: Bool
+    ) -> some View {
+        switch item {
+        case .content(let asset, _):
+            let viewData = viewModel.makeViewData(from: asset)
+            TimelineDetailAssetCard(
+                viewData: viewData,
+                isSelected: isSelected,
+                isLiked: viewModel.isAssetLiked(asset.id),
+                displayDuration: TimelineViewModel.imageDisplayDuration,
+                sizeConfig: sizeConfig,
+                isMuted: $isMuted,
+                onCtaButtonTap: {
+                    handleCtaButtonTap(asset: asset, viewData: viewData)
+                },
+                onProductCtaTap: { url in
+                    handleProductCtaTap(url: url)
+                },
+                onLikeTap: {
+                    handleLikeTap(asset)
+                },
+                onShareTap: {
+                    handleShareTap(asset, viewData: viewData)
+                },
+                onVideoFinished: {
+                    viewModel.handleVideoFinished()
+                }
+            )
+        case .loading:
+            TimelineDetailAssetCardSkeleton()
+        }
+    }
+
+    var loadingView: some View {
+        TimelineDetailAssetCardSkeleton()
+    }
+
+    func buildErrorView(message: String) -> some View {
+        VStack {
+            Image(systemName: "exclamationmark.triangle")
+                .imageScale(.large)
+                .foregroundColor(.red)
+
+            Text(message)
+                .font(.system(size: Self.errorFontSize))
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .padding()
+        .frame(minWidth: UIScreen.main.bounds.width)
+    }
+}
+
+
+// MARK: - Logic & Actions
+private extension TimelineDetailView {
+
+    func handleOnAppear() {
+        viewModel.enableAutoAdvance()
+        viewModel.handleOnAppear()
+    }
+
+    func handlePageChange(to index: Int) {
+        viewModel.handlePageChange(to: index)
+    }
+
+    func handleCtaButtonTap(asset: TimelineAssetDTO, viewData: TimelineAssetData) {
+        viewModel.handleCtaButtonTap(asset: asset, url: viewData.ctaButton?.url)
+    }
+
+    func handleProductCtaTap(url: URL?) {
+        viewModel.handleProductCtaTap(url: url)
+    }
+
+    func handleLikeTap(_ asset: TimelineAssetDTO) {
+        viewModel.handleAssetLiked(asset)
+    }
+
+    func handleShareTap(_ asset: TimelineAssetDTO, viewData: TimelineAssetData) {
+        // Track analytics
+        viewModel.handleAssetShared(asset)
+
+        // Show share sheet
+        let items = ShareHelper.createShareItems(from: viewData)
+        ShareHelper.share(items: items)
+    }
+}

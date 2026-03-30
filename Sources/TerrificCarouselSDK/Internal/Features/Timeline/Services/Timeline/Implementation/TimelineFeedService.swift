@@ -1,0 +1,54 @@
+//
+//  TimelineFeedService.swift
+//  CarouselDemo
+//
+//  Created by YuriyFpc on 25.02.2026.
+//
+
+import Foundation
+import HTTPClient
+
+// MARK: - TimelineFeedService
+/// Real implementation of TimelineService for Feed (horizontal carousel)
+/// Uses Client with interceptor pipeline
+struct TimelineFeedService: TimelineService {
+
+    // MARK: - Dependencies
+    private let client: Client
+    private let configuration: APIConfiguration
+    private let terrificUserId: String
+
+    // MARK: - Init
+    init(
+        client: Client,
+        configuration: APIConfiguration,
+        terrificUserId: String
+    ) {
+        self.client = client
+        self.configuration = configuration
+        self.terrificUserId = terrificUserId
+    }
+
+    // MARK: - TimelineService
+    func fetchAssets(
+        for carouselId: String,
+        page: Int,
+        itemsPerPage: Int,
+        offset: Int
+    ) async throws -> TimelineServiceResult {
+        let request = TimelineFeedAPIRequest(
+            storeId: configuration.storeId,
+            carouselId: configuration.carouselId,
+            numberOfItems: itemsPerPage,
+            offset: offset + (page - 1) * itemsPerPage,
+            shopPageUrl: configuration.shopPageUrl,
+            terrificUserId: terrificUserId
+        )
+
+        let response = try await client.send(request)
+        return TimelineServiceResult(
+            assets: response?.assets ?? [],
+            carouselConfig: response?.carouselConfig
+        )
+    }
+}

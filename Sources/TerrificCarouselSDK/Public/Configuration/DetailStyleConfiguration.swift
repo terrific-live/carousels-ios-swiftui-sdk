@@ -1,13 +1,13 @@
 //
-//  DetailSizeConfiguration.swift
+//  DetailStyleConfiguration.swift
 //  CarouselDemo
 //
 
 import SwiftUI
 
-// MARK: - DetailSizeConfiguration
+// MARK: - DetailStyleConfiguration
 /// Size configuration for the detail (fullscreen) cards
-public struct DetailSizeConfiguration: Equatable, Sendable {
+public struct DetailStyleConfiguration: Equatable, Sendable {
 
     // MARK: - Card
     /// Corner radius of the card
@@ -71,7 +71,7 @@ public struct DetailSizeConfiguration: Equatable, Sendable {
 
     // MARK: - Poll
     /// Configuration for poll elements in detail view
-    public let poll: PollSizeConfiguration
+    public let poll: PollStyleConfiguration
 
     public init(
         cardCornerRadius: CGFloat = 16,
@@ -96,7 +96,7 @@ public struct DetailSizeConfiguration: Equatable, Sendable {
         actionButtonSpacing: CGFloat = 36,
         contentHorizontalPadding: CGFloat = 16,
         bottomInfoPaddingBottom: CGFloat = 24,
-        poll: PollSizeConfiguration = .default
+        poll: PollStyleConfiguration = .default
     ) {
         self.cardCornerRadius = cardCornerRadius
         self.edgePadding = edgePadding
@@ -124,5 +124,5 @@ public struct DetailSizeConfiguration: Equatable, Sendable {
     }
 
     /// Default detail configuration
-    public static let `default` = DetailSizeConfiguration()
+    public static let `default` = DetailStyleConfiguration()
 }

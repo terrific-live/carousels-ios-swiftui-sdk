@@ -14,22 +14,22 @@ struct TimelineCoordinatorView: View {
 
     // MARK: - Dependencies
     @StateObject private var coordinator: TimelineCoordinator
-    private let sizeConfiguration: CarouselSizeConfiguration
+    private let styleConfiguration: CarouselStyleConfiguration
 
     // MARK: - Init
     init(
         coordinator: TimelineCoordinator,
-        sizeConfiguration: CarouselSizeConfiguration = .default
+        sizeConfiguration: CarouselStyleConfiguration = .default
     ) {
         _coordinator = StateObject(wrappedValue: coordinator)
-        self.sizeConfiguration = sizeConfiguration
+        self.styleConfiguration = sizeConfiguration
     }
 
     // MARK: - Body
     var body: some View {
         TimelineFeedView(
             viewModel: coordinator.feedViewModel,
-            sizeConfig: sizeConfiguration.feed,
+            sizeConfig: styleConfiguration.feed,
             onAssetTap: { offset in
                 coordinator.presentDetail(at: offset)
             }
@@ -37,7 +37,7 @@ struct TimelineCoordinatorView: View {
         .portraitFullScreenCover(isPresented: $coordinator.isDetailPresented) { dismiss in
             TimelineDetailView(
                 viewModel: coordinator.makeDetailViewModel(),
-                sizeConfig: sizeConfiguration.detail
+                styleConfig: styleConfiguration.detail
             )
             .floatingCloseButton(28) {
                 dismiss()

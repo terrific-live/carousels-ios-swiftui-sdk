@@ -19,7 +19,7 @@ struct TimelineDetailAssetCard: View {
     let isSelected: Bool
     let isLiked: Bool
     let displayDuration: TimeInterval
-    let sizeConfig: DetailSizeConfiguration
+    let sizeConfig: DetailStyleConfiguration
     let onCtaButtonTap: (() -> Void)?
     let onProductCtaTap: ((URL?) -> Void)?
     let onLikeTap: (() -> Void)?
@@ -45,7 +45,7 @@ struct TimelineDetailAssetCard: View {
         isSelected: Bool = true,
         isLiked: Bool = false,
         displayDuration: TimeInterval = 10,
-        sizeConfig: DetailSizeConfiguration = .default,
+        sizeConfig: DetailStyleConfiguration = .default,
         isMuted: Binding<Bool> = .constant(true),
         onCtaButtonTap: (() -> Void)? = nil,
         onProductCtaTap: ((URL?) -> Void)? = nil,

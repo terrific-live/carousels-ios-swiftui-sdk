@@ -14,14 +14,14 @@ struct TimelineFeedAssetCard: View {
     // MARK: - Inputs
     let viewData: TimelineAssetData
     let isSelected: Bool
-    let sizeConfig: FeedSizeConfiguration
+    let sizeConfig: FeedStyleConfiguration
     let onProductCtaTap: ((URL?) -> Void)?
 
     // MARK: - Init
     init(
         viewData: TimelineAssetData,
         isSelected: Bool = false,
-        sizeConfig: FeedSizeConfiguration = .default,
+        sizeConfig: FeedStyleConfiguration = .default,
         onProductCtaTap: ((URL?) -> Void)? = nil
     ) {
         self.viewData = viewData

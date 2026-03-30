@@ -7,7 +7,7 @@ import SwiftUI
 
 // MARK: - PollSizeConfiguration
 /// Size configuration for poll elements
-public struct PollSizeConfiguration: Equatable, Sendable {
+public struct PollStyleConfiguration: Equatable, Sendable {
 
     /// Font for the question text
     public let questionFont: CarouselFontDescriptor
@@ -43,10 +43,10 @@ public struct PollSizeConfiguration: Equatable, Sendable {
     }
 
     /// Default poll configuration (detail size)
-    public static let `default` = PollSizeConfiguration()
+    public static let `default` = PollStyleConfiguration()
 
     /// Compact poll configuration (feed size)
-    public static let compact = PollSizeConfiguration(
+    public static let compact = PollStyleConfiguration(
         questionFont: .system(size: 20, weight: .medium),
         optionFont: .system(size: 14, weight: .medium),
         optionSelectedFont: .system(size: 14, weight: .semibold),

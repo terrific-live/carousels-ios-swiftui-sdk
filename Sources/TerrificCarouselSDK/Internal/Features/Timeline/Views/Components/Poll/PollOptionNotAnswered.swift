@@ -10,7 +10,7 @@ import SwiftUI
 // MARK: - PollOptionNotAnswered
 struct PollOptionNotAnswered: View {
     let text: String
-    let sizeConfig: PollSizeConfiguration
+    let sizeConfig: PollStyleConfiguration
     let isInteractive: Bool
     let isSelected: Bool
     let onTap: () -> Void

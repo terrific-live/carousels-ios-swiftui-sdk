@@ -13,7 +13,7 @@ struct PollOptionAnswered: View {
     let percentage: Int
     let percentageFraction: Double
     let isSelected: Bool
-    let sizeConfig: PollSizeConfiguration
+    let sizeConfig: PollStyleConfiguration
     let isInteractive: Bool
     let onTap: () -> Void
 

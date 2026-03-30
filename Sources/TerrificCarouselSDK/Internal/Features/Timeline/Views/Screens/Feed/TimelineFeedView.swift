@@ -17,7 +17,7 @@ struct TimelineFeedView: View {
     @ObservedObject private var viewModel: TimelineViewModel
 
     // MARK: - Configuration
-    private let sizeConfig: FeedSizeConfiguration
+    private let sizeConfig: FeedStyleConfiguration
 
     // MARK: - Callbacks
     private let onAssetTap: ((Int) -> Void)?
@@ -25,7 +25,7 @@ struct TimelineFeedView: View {
     // MARK: - Init
     init(
         viewModel: TimelineViewModel,
-        sizeConfig: FeedSizeConfiguration = .default,
+        sizeConfig: FeedStyleConfiguration = .default,
         onAssetTap: ((Int) -> Void)? = nil
     ) {
         self.viewModel = viewModel

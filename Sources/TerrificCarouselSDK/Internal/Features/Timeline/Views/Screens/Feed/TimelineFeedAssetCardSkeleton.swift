@@ -11,13 +11,13 @@ import SwiftUI
 struct TimelineFeedAssetCardSkeleton: View {
 
     // MARK: - Configuration
-    let sizeConfig: FeedSizeConfiguration
+    let sizeConfig: FeedStyleConfiguration
 
     // MARK: - State
     @State private var shimmerOffset: CGFloat = -500
 
     // MARK: - Init
-    init(sizeConfig: FeedSizeConfiguration = .default) {
+    init(sizeConfig: FeedStyleConfiguration = .default) {
         self.sizeConfig = sizeConfig
     }
 
@@ -103,7 +103,7 @@ struct TimelineFeedAssetCardSkeleton: View {
 struct TimelineFeedSkeletonCarousel: View {
 
     // MARK: - Configuration
-    let sizeConfig: FeedSizeConfiguration
+    let sizeConfig: FeedStyleConfiguration
     let showNameLabel: Bool
     private let cardCount: Int = 3
 
@@ -111,7 +111,7 @@ struct TimelineFeedSkeletonCarousel: View {
     @State private var shimmerOffset: CGFloat = -500
 
     // MARK: - Init
-    init(sizeConfig: FeedSizeConfiguration = .default, showNameLabel: Bool = true) {
+    init(sizeConfig: FeedStyleConfiguration = .default, showNameLabel: Bool = true) {
         self.sizeConfig = sizeConfig
         self.showNameLabel = showNameLabel
     }

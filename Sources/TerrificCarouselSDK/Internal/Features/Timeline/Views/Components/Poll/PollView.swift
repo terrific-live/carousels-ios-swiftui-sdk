@@ -14,12 +14,12 @@ enum PollDisplayMode {
 // MARK: - PollView
 struct PollView: View {
     @ObservedObject var viewModel: PollViewModel
-    let sizeConfig: PollSizeConfiguration
+    let sizeConfig: PollStyleConfiguration
     let displayMode: PollDisplayMode
 
     init(
         viewModel: PollViewModel,
-        sizeConfig: PollSizeConfiguration = .default,
+        sizeConfig: PollStyleConfiguration = .default,
         displayMode: PollDisplayMode = .interactive
     ) {
         self.viewModel = viewModel

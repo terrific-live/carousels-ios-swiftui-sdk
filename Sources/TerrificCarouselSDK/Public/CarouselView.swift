@@ -20,7 +20,7 @@ import SwiftUI
 ///         carouselId: "carousel456",
 ///         shopPageUrl: nil
 ///     ),
-///     sizeConfiguration: .default,
+///     styleConfiguration: .default,
 ///     onAnalyticsEvent: { event in
 ///         print("Event: \(event)")
 ///     }
@@ -30,26 +30,26 @@ public struct CarouselView: View {
 
     // MARK: - Private
     private let coordinator: TimelineCoordinator
-    private let sizeConfiguration: CarouselSizeConfiguration
+    private let styleConfiguration: CarouselStyleConfiguration
 
     // MARK: - Public Init
     public init(
         apiConfiguration: APIConfiguration,
-        sizeConfiguration: CarouselSizeConfiguration = .default,
+        styleConfiguration: CarouselStyleConfiguration = .default,
         onAnalyticsEvent: ((CarouselAnalyticsEvent) -> Void)? = nil
     ) {
         let factory = CarouselFactory(configuration: apiConfiguration)
         self.coordinator = factory.makeTimelineCoordinator(
             onAnalyticsEvent: onAnalyticsEvent
         )
-        self.sizeConfiguration = sizeConfiguration
+        self.styleConfiguration = styleConfiguration
     }
 
     // MARK: - Body
     public var body: some View {
         TimelineCoordinatorView(
             coordinator: coordinator,
-            sizeConfiguration: sizeConfiguration
+            sizeConfiguration: styleConfiguration
         )
     }
 }

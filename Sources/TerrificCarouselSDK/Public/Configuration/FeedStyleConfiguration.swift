@@ -1,13 +1,13 @@
 //
-//  FeedSizeConfiguration.swift
+//  FeedStyleConfiguration.swift
 //  CarouselDemo
 //
 
 import SwiftUI
 
-// MARK: - FeedSizeConfiguration
+// MARK: - FeedStyleConfiguration
 /// Size configuration for the feed (horizontal carousel) cards
-public struct FeedSizeConfiguration: Equatable, Sendable {
+public struct FeedStyleConfiguration: Equatable, Sendable {
 
     // MARK: - Carousel Layout
     /// Width of each carousel item
@@ -65,7 +65,7 @@ public struct FeedSizeConfiguration: Equatable, Sendable {
 
     // MARK: - Poll
     /// Configuration for poll elements in feed
-    public let poll: PollSizeConfiguration
+    public let poll: PollStyleConfiguration
 
     public init(
         carouselItemWidth: CGFloat = 240,
@@ -89,7 +89,7 @@ public struct FeedSizeConfiguration: Equatable, Sendable {
         carouselNameColor: Color = .white,
         carouselNameBottomPadding: CGFloat = 24,
         carouselNameHorizontalPadding: CGFloat = 16,
-        poll: PollSizeConfiguration = .compact
+        poll: PollStyleConfiguration = .compact
     ) {
         self.carouselItemWidth = carouselItemWidth
         self.carouselItemHeight = carouselItemHeight
@@ -116,5 +116,5 @@ public struct FeedSizeConfiguration: Equatable, Sendable {
     }
 
     /// Default feed configuration
-    public static let `default` = FeedSizeConfiguration()
+    public static let `default` = FeedStyleConfiguration()
 }

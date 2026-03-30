@@ -17,7 +17,7 @@ struct TimelineDetailView: View {
     @ObservedObject private var viewModel: TimelineViewModel
 
     // MARK: - Configuration
-    private let sizeConfig: DetailSizeConfiguration
+    private let styleConfig: DetailStyleConfiguration
 
     // MARK: - State
     @State private var isMuted: Bool = true
@@ -25,10 +25,10 @@ struct TimelineDetailView: View {
     // MARK: - Init
     init(
         viewModel: TimelineViewModel,
-        sizeConfig: DetailSizeConfiguration = .default
+        styleConfig: DetailStyleConfiguration = .default
     ) {
         self.viewModel = viewModel
-        self.sizeConfig = sizeConfig
+        self.styleConfig = styleConfig
     }
 
     // MARK: - Body
@@ -89,7 +89,7 @@ private extension TimelineDetailView {
                 isSelected: isSelected,
                 isLiked: viewModel.isAssetLiked(asset.id),
                 displayDuration: TimelineViewModel.imageDisplayDuration,
-                sizeConfig: sizeConfig,
+                sizeConfig: styleConfig,
                 isMuted: $isMuted,
                 onCtaButtonTap: {
                     handleCtaButtonTap(asset: asset, viewData: viewData)

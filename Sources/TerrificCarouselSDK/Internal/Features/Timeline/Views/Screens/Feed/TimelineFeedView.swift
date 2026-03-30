@@ -74,6 +74,7 @@ private extension TimelineFeedView {
                viewModel.carouselConfig.showName == true {
                 Text(carouselName)
                     .font(sizeConfig.carouselNameFont.toFont())
+                    .foregroundColor(sizeConfig.carouselNameColor)
                     .padding(.horizontal, sizeConfig.carouselNameHorizontalPadding)
                     .padding(.bottom, sizeConfig.carouselNameBottomPadding)
             }

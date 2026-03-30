@@ -56,6 +56,8 @@ public struct FeedSizeConfiguration: Equatable, Sendable {
     // MARK: - Carousel Name Label
     /// Font for carousel name label
     public let carouselNameFont: CarouselFontDescriptor
+    /// Color for carousel name label
+    public let carouselNameColor: Color
     /// Bottom padding below carousel name label
     public let carouselNameBottomPadding: CGFloat
     /// Horizontal padding for carousel name label
@@ -84,6 +86,7 @@ public struct FeedSizeConfiguration: Equatable, Sendable {
         bottomInfoPaddingHorizontal: CGFloat = 12,
         bottomInfoPaddingBottom: CGFloat = 12,
         carouselNameFont: CarouselFontDescriptor = .system(size: 22, weight: .bold),
+        carouselNameColor: Color = .white,
         carouselNameBottomPadding: CGFloat = 24,
         carouselNameHorizontalPadding: CGFloat = 16,
         poll: PollSizeConfiguration = .compact
@@ -106,6 +109,7 @@ public struct FeedSizeConfiguration: Equatable, Sendable {
         self.bottomInfoPaddingHorizontal = bottomInfoPaddingHorizontal
         self.bottomInfoPaddingBottom = bottomInfoPaddingBottom
         self.carouselNameFont = carouselNameFont
+        self.carouselNameColor = carouselNameColor
         self.carouselNameBottomPadding = carouselNameBottomPadding
         self.carouselNameHorizontalPadding = carouselNameHorizontalPadding
         self.poll = poll

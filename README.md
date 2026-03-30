@@ -98,4 +98,3 @@ CarouselView(
     }
 )
 ```
-If you want, I can also make a **more visually rich version** with **headers, tables, and code blocks** that’s ideal for GitHub README styling. Do you want me to do that?

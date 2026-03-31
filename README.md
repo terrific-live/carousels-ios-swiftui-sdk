@@ -114,3 +114,26 @@ CarouselView(
     }
 )
 ```
+
+---
+
+## Running the Example App
+
+The SDK includes a fully functional example app demonstrating all features.
+
+### Steps to Run
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/terrific-live/carousels-ios-swiftui-sdk.git
+   cd carousels-ios-swiftui-sdk
+   ```
+
+2. **Open the example project:**
+   ```bash
+   open Example/CarouselDemo/CarouselDemo.xcodeproj
+   ```
+
+3. **Build and run** the `CarouselDemo` target on a simulator or device.
+
+The example app references the SDK as a local package, so any changes to the SDK source will be reflected immediately when you rebuild.

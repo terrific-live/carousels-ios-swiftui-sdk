@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xcodebuild:*)",
+      "Bash(tree:*)",
+      "Bash(swift build:*)",
+      "Bash(swift test:*)",
+      "Bash(xcrun simctl:*)",
+      "Bash(find:*)",
+      "Bash(git mv:*)",
+      "Bash(git rm:*)",
+      "Bash(done)",
+      "Bash(git -C /Users/yuriyfpc/Desktop/Companies/AppReal/TerrificCarouselSDK status)"
+    ]
+  }
+}

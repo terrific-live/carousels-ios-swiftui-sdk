@@ -1,0 +1,61 @@
+{
+  "configurations" : [
+    {
+      "id" : "093BD744-E066-4138-94A0-7AABE1AAEC69",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "enabled" : false,
+      "target" : {
+        "containerPath" : "container:CarouselDemo.xcodeproj",
+        "identifier" : "8295E5A52F17C3AB002D6069",
+        "name" : "CarouselDemoTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:LocalPackages\/MediaPlayback",
+        "identifier" : "MediaPlaybackTests",
+        "name" : "MediaPlaybackTests"
+      }
+    },
+    {
+      "enabled" : false,
+      "target" : {
+        "containerPath" : "container:CarouselDemo.xcodeproj",
+        "identifier" : "8295E5AF2F17C3AB002D6069",
+        "name" : "CarouselDemoUITests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:LocalPackages\/Pagination",
+        "identifier" : "PaginationTests",
+        "name" : "PaginationTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:LocalPackages\/ImageLoader",
+        "identifier" : "ImageLoaderTests",
+        "name" : "ImageLoaderTests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:LocalPackages\/HTTPClient",
+        "identifier" : "HTTPClientTests",
+        "name" : "HTTPClientTests"
+      }
+    }
+  ],
+  "version" : 1
+}

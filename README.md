@@ -61,9 +61,8 @@ Defines how the SDK connects to your backend.
 
 ```swift
 let apiConfiguration = APIConfiguration(
-    storeId: "uO5g9yzOTkR39JFG3ORP",
-    carouselId: "doS2DpZV4YIoYjR2YYQc",
-    baseURL: "https://terrific-staging-polls.web.app"
+    storeId: <store_Id>,
+    carouselId: <carousel_Id>
 )
 ```
 
@@ -101,9 +100,8 @@ let onAnalyticsEvent: (AnalyticsEvent) -> Void = { event in
 ```swift
 CarouselView(
     apiConfiguration: APIConfiguration(
-        storeId: "uO5g9yzOTkR39JFG3ORP",
-        carouselId: "doS2DpZV4YIoYjR2YYQc",
-        baseURL: "https://terrific-staging-polls.web.app"
+        storeId: <store_Id>,
+        carouselId: <carousel_Id>
     ),
     styleConfiguration: .default,
     onAnalyticsEvent: { event in

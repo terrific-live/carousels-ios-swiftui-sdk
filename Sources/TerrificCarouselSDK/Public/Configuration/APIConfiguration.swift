@@ -17,12 +17,12 @@ public struct APIConfiguration {
 
     // MARK: - Public Init with URL string
     public init(
-        baseURL: String,
         storeId: String,
         carouselId: String,
-        shopPageUrl: String?
+        baseURL: String? = nil,
+        shopPageUrl: String? = nil
     ) {
-        self.baseURL = URL(string: baseURL)!
+        self.baseURL = baseURL.flatMap { URL(string: $0) } ?? URL(string: "https://terrific-live-polls.web.app")!
         self.storeId = storeId
         self.carouselId = carouselId
         self.shopPageUrl = shopPageUrl

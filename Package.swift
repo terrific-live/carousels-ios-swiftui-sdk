@@ -25,7 +25,10 @@ let package = Package(
                 "MediaPlayback",
                 "Pagination"
             ],
-            path: "Sources/TerrificCarouselSDK"
+            path: "Sources/TerrificCarouselSDK",
+            resources: [
+                .copy("PrivacyInfo.xcprivacy")
+            ]
         ),
 
         // MARK: - Internal Targets

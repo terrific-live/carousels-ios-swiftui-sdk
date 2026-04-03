@@ -2,12 +2,26 @@
 
 ## Requirements
 
-* **Swift:** 5.0
+* **Xcode:** 15.0+
+* **Swift:** 5.0+
 * **Minimum OS versions:**
 
   * iOS 17
   * macOS 14
   * tvOS 17
+
+---
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Integration Guide](Documentation/INTEGRATION.md) | Detailed setup, SwiftUI/UIKit patterns |
+| [Style Configuration](Documentation/STYLING.md) | All style properties for feed, detail, poll, fonts |
+| [Analytics Events](Documentation/ANALYTICS.md) | Complete analytics events reference |
+| [Privacy & Data Collection](Documentation/PRIVACY.md) | Privacy manifest, App Store labels, data collection |
+| [GDPR Compliance](Documentation/GDPR.md) | Consent integration, user rights, data processing |
+| [Performance Impact](Documentation/PERFORMANCE.md) | Memory, network, battery usage and optimization |
 
 ---
 
@@ -61,8 +75,8 @@ Defines how the SDK connects to your backend.
 
 ```swift
 let apiConfiguration = APIConfiguration(
-    storeId: <store_Id>,
-    carouselId: <carousel_Id>
+    storeId: "your_store_id",
+    carouselId: "your_carousel_id"
 )
 ```
 
@@ -85,7 +99,7 @@ For custom styling (sizes, fonts, colors), see [Style Configuration Details](#st
 Use this closure to listen for analytics events:
 
 ```swift
-let onAnalyticsEvent: (AnalyticsEvent) -> Void = { event in
+let onAnalyticsEvent: (CarouselAnalyticsEvent) -> Void = { event in
     switch event {
     case .assetLiked(asset: _):
         debugPrint("Track asset liked event")
@@ -102,8 +116,8 @@ let onAnalyticsEvent: (AnalyticsEvent) -> Void = { event in
 ```swift
 CarouselView(
     apiConfiguration: APIConfiguration(
-        storeId: <store_Id>,
-        carouselId: <carousel_Id>
+        storeId: "your_store_id",
+        carouselId: "your_carousel_id"
     ),
     styleConfiguration: .default,
     onAnalyticsEvent: { event in
@@ -144,97 +158,57 @@ The example app references the SDK as a local package, so any changes to the SDK
 
 ## Style Configuration Details
 
-This section provides detailed information about customizing the carousel appearance.
+> **Important:** The `CarouselView` determines its own size based on `styleConfiguration`. Do **NOT** wrap it in a `.frame()` modifier.
 
-> **Important:** The `CarouselView` determines its own size based on `styleConfiguration`. Do **NOT** wrap it in a `.frame()` modifier. All sizing should be done through `styleConfiguration` properties.
+For complete styling documentation, see [Style Configuration Guide](Documentation/STYLING.md).
 
-### Structure
+### Quick Reference
 
 ```swift
 CarouselStyleConfiguration
-├── feed: FeedStyleConfiguration      // Horizontal carousel (feed view)
-└── detail: DetailStyleConfiguration  // Fullscreen vertical view
+├── feed: FeedStyleConfiguration      // Horizontal carousel
+│   └── poll: PollStyleConfiguration  // Poll styling in feed
+└── detail: DetailStyleConfiguration  // Fullscreen view
+    └── poll: PollStyleConfiguration  // Poll styling in detail
 ```
 
-### Key Size Properties (Feed)
-
-The total height of the carousel is determined by these properties in `FeedStyleConfiguration`:
+### Total Height Calculation
 
 | Property | Default | Description |
 |----------|---------|-------------|
-| `carouselItemHeight` | 420 | Height of each carousel card |
-| `carouselNameFont` | System 22 bold | Font for the carousel title label |
+| `carouselNameFont.size` | 22 | Height of the carousel title label |
 | `carouselNameBottomPadding` | 24 | Space below the carousel title |
+| `carouselItemHeight` | 420 | Height of each carousel card |
 
-**Total carousel height** ≈ `carouselNameFont.size` + `carouselNameBottomPadding` + `carouselItemHeight`
+**Total Height** = `carouselNameFont.size` + `carouselNameBottomPadding` + `carouselItemHeight` = **466 points** (default)
 
-### Custom Configuration Example
+### Example
 
 ```swift
-let customFeedStyle = FeedStyleConfiguration(
-    carouselItemWidth: 280,
-    carouselItemHeight: 500,
-    carouselItemSpacing: 20,
-    cardCornerRadius: 12,
-    titleFont: .system(size: 20, weight: .bold),
-    subtitleFont: .system(size: 14, weight: .regular),
-    carouselNameFont: .system(size: 24, weight: .heavy),
-    carouselNameColor: .black,
-    carouselNameBottomPadding: 16
+let styleConfiguration = CarouselStyleConfiguration(
+    feed: FeedStyleConfiguration(
+        carouselItemWidth: 280,
+        carouselItemHeight: 500,
+        cardCornerRadius: 12,
+        titleFont: .system(size: 20, weight: .bold)
+    )
 )
 
-let styleConfiguration = CarouselStyleConfiguration(
-    feed: customFeedStyle
+CarouselView(
+    apiConfiguration: config,
+    styleConfiguration: styleConfiguration
 )
 ```
 
-### Using Custom Fonts
+---
 
-To use a custom font, the font must be bundled in your app (added to Info.plist under "Fonts provided by application").
+## Support
 
-```swift
-// Using custom fonts with CarouselFontDescriptor
-let customFeedStyle = FeedStyleConfiguration(
-    carouselItemWidth: 260,
-    carouselItemHeight: 450,
-    // Custom font for title - include weight variant in font name
-    titleFont: .custom("Avenir-Heavy", size: 18),
-    // Custom font for subtitle
-    subtitleFont: .custom("Avenir-Medium", size: 14),
-    // Custom font for carousel name label
-    carouselNameFont: .custom("Avenir-Black", size: 24),
-    carouselNameColor: .primary
-)
+- **Documentation**: See [Documentation](#documentation) section above
+- **Issues**: [GitHub Issues](https://github.com/terrific-live/carousels-ios-swiftui-sdk/issues)
 
-let styleConfiguration = CarouselStyleConfiguration(
-    feed: customFeedStyle
-)
-```
+---
 
-> **Note:** For custom fonts, include the weight variant in the font name (e.g., `"Avenir-Heavy"`, `"Montserrat-Bold"`). The font file must be added to your app bundle and registered in Info.plist.
+## License
 
-### All FeedStyleConfiguration Properties
-
-| Property | Type | Default | Description |
-|----------|------|---------|-------------|
-| `carouselItemWidth` | CGFloat | 240 | Card width |
-| `carouselItemHeight` | CGFloat | 420 | Card height |
-| `carouselItemSpacing` | CGFloat | 18 | Space between cards |
-| `carouselHorizontalPadding` | CGFloat | 16 | Edge padding |
-| `cardCornerRadius` | CGFloat | 16 | Card corner radius |
-| `cardSpacing` | CGFloat | 8 | Space between card and products |
-| `timestampFont` | CarouselFontDescriptor | System 14 semibold | Timestamp font |
-| `timestampPaddingHorizontal` | CGFloat | 10 | Timestamp horizontal padding |
-| `timestampPaddingVertical` | CGFloat | 6 | Timestamp vertical padding |
-| `timestampCornerRadius` | CGFloat | 8 | Timestamp badge corner radius |
-| `timestampTopMargin` | CGFloat | 12 | Timestamp top margin |
-| `timestampHorizontalMargin` | CGFloat | 12 | Timestamp horizontal margin |
-| `titleFont` | CarouselFontDescriptor | System 18 bold | Title font |
-| `subtitleFont` | CarouselFontDescriptor | System 16 regular | Subtitle font |
-| `titleSubtitleSpacing` | CGFloat | 4 | Space between title and subtitle |
-| `bottomInfoPaddingHorizontal` | CGFloat | 12 | Bottom info horizontal padding |
-| `bottomInfoPaddingBottom` | CGFloat | 12 | Bottom info bottom padding |
-| `carouselNameFont` | CarouselFontDescriptor | System 22 bold | Carousel label font |
-| `carouselNameColor` | Color | .white | Carousel label color |
-| `carouselNameBottomPadding` | CGFloat | 24 | Space below carousel label |
-| `carouselNameHorizontalPadding` | CGFloat | 16 | Carousel label horizontal padding |
+Copyright (c) Terrific. All rights reserved.

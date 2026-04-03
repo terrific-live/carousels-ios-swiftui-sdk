@@ -140,6 +140,9 @@ public extension MediaPlayerViewModel {
         pendingPlay = false
         progress = 0
 
+        // Reset URL so handleLoad will reload when returning to this card
+        url = nil
+
         // Remove time observer
         if let token = timeObserverToken, let player = player {
             player.removeTimeObserver(token)

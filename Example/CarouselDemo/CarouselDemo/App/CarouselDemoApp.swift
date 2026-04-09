@@ -12,6 +12,7 @@ import TerrificCarouselSDK
 struct CarouselDemoApp: App {
 
     @State private var selectedConfiguration: APIConfiguration?
+    @StateObject private var analyticsStore = AnalyticsEventStore()
 
     var body: some Scene {
         WindowGroup {
@@ -23,16 +24,21 @@ struct CarouselDemoApp: App {
                     timelineView(for: configuration)
                 } else {
                     EnvironmentSelectionView { configuration in
+                        analyticsStore.clear()
                         selectedConfiguration = configuration
                     }
                 }
+            }
+            .onAppear {
+                CarouselDebugConfiguration.isHTTPLoggingEnabled = true
+                CarouselDebugConfiguration.isVideoLoggingEnabled = true
             }
         }
     }
 
     @ViewBuilder
     private func timelineView(for configuration: APIConfiguration) -> some View {
-        VStack {
+        VStack(spacing: 0) {
             // Back button
             HStack {
                 Button(action: {
@@ -55,14 +61,11 @@ struct CarouselDemoApp: App {
                 apiConfiguration: configuration,
                 styleConfiguration: .default,
                 onAnalyticsEvent: { event in
-                    switch event {
-                    case .assetLiked(asset: _):
-                        debugPrint("Track asset liked event")
-                    default:
-                        break
-                    }
+                    analyticsStore.add(event)
                 }
             )
+
+            AnalyticsEventsView(store: analyticsStore)
         }
     }
 }

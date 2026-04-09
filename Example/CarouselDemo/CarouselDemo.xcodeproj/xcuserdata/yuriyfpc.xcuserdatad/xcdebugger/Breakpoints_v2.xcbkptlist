@@ -1326,10 +1326,10 @@
             filePath = "CarouselDemo/App/CarouselDemoApp.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "68"
-            endingLineNumber = "68"
-            landmarkName = "CarouselDemoApp"
-            landmarkType = "14">
+            startingLineNumber = "70"
+            endingLineNumber = "70"
+            landmarkName = "timelineView(for:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

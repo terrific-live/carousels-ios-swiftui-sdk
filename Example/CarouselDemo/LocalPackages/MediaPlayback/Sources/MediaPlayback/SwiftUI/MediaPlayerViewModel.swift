@@ -31,6 +31,10 @@ public final class MediaPlayerViewModel: ObservableObject {
     @Published
     public private(set) var progress: Double = 0
 
+    /// Indicates if video has valid duration (false means broken/invalid video)
+    @Published
+    public private(set) var hasValidPlayback: Bool = false
+
     /// Controls whether video is muted
     @Published
     public var isMuted: Bool = true {
@@ -129,6 +133,7 @@ public extension MediaPlayerViewModel {
         // Reset ViewModel-owned state (not derived from engine)
         showVideo = false
         pendingPlay = false
+        hasValidPlayback = false
 
         // Stop engine - this triggers state change to .paused
         engine.handlePause()
@@ -139,6 +144,7 @@ public extension MediaPlayerViewModel {
         showVideo = false
         pendingPlay = false
         progress = 0
+        hasValidPlayback = false
 
         // Remove time observer
         if let token = timeObserverToken, let player = player {
@@ -235,6 +241,7 @@ private extension MediaPlayerViewModel {
 
         self.player = newPlayer
         progress = 0
+        hasValidPlayback = false
 
         // Apply mute state and add time observer
         if let player = newPlayer {
@@ -259,6 +266,13 @@ private extension MediaPlayerViewModel {
             let currentTime = time.seconds
             let totalDuration = duration.seconds
             let newProgress = min(max(currentTime / totalDuration, 0), 1)
+
+            // Mark as valid playback only when video actually makes progress (> 0)
+            // This ensures broken videos that have valid duration but can't decode are detected
+            if !self.hasValidPlayback && newProgress > 0.01 {
+                self.hasValidPlayback = true
+                self.log("✅ Video has valid playback: progress=\(newProgress), duration=\(totalDuration)s")
+            }
 
             if abs(self.progress - newProgress) > 0.001 {
                 self.progress = newProgress

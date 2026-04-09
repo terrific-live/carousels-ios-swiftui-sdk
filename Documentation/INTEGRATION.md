@@ -8,7 +8,6 @@ This guide provides detailed instructions for integrating TerrificCarouselSDK in
 - [Installation](#installation)
 - [Basic Setup](#basic-setup)
 - [Configuration Options](#configuration-options)
-- [Handling Analytics Events](#handling-analytics-events)
 - [Lifecycle Management](#lifecycle-management)
 - [Troubleshooting](#troubleshooting)
 
@@ -174,61 +173,17 @@ let customStyle = CarouselStyleConfiguration(
 ### Analytics Callback
 
 ```swift
-let onAnalyticsEvent: (CarouselAnalyticsEvent) -> Void = { event in
-    switch event {
-    case .carouselViewed(let carouselId):
-        Analytics.track("carousel_viewed", properties: ["id": carouselId])
-
-    case .assetViewed(let asset):
-        Analytics.track("asset_viewed", properties: ["id": asset.id])
-
-    case .assetLiked(let asset):
-        Analytics.track("asset_liked", properties: ["id": asset.id])
-
-    case .assetShared(let asset):
-        Analytics.track("asset_shared", properties: ["id": asset.id])
-
-    case .ctaTapped(let asset, let url):
-        Analytics.track("cta_tapped", properties: [
-            "asset_id": asset.id,
-            "url": url?.absoluteString ?? ""
-        ])
-
-    case .productCtaTapped(let product, let url):
-        Analytics.track("product_cta_tapped", properties: [
-            "product_id": product.id,
-            "url": url?.absoluteString ?? ""
-        ])
+CarouselView(
+    apiConfiguration: config,
+    onAnalyticsEvent: { event in
+        // Handle analytics events
+        // See ANALYTICS.md for complete event reference
+        print("Event: \(event)")
     }
-}
+)
 ```
----
 
-## Handling Analytics Events
-
-### All Available Events
-
-```swift
-public enum CarouselAnalyticsEvent {
-    /// Carousel became visible to the user
-    case carouselViewed(carouselId: String)
-
-    /// Individual asset was viewed
-    case assetViewed(asset: AssetInfo)
-
-    /// User liked an asset
-    case assetLiked(asset: AssetInfo)
-
-    /// User shared an asset
-    case assetShared(asset: AssetInfo)
-
-    /// User tapped the main CTA button
-    case ctaTapped(asset: AssetInfo, url: URL?)
-
-    /// User tapped a product CTA
-    case productCtaTapped(product: ProductInfo, url: URL?)
-}
-```
+For complete analytics events reference, see [Analytics Events](ANALYTICS.md).
 
 ---
 

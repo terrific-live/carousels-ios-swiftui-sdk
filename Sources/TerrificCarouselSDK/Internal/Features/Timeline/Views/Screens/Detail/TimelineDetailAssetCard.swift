@@ -38,6 +38,8 @@ struct TimelineDetailAssetCard: View {
     private var progress: Double = 0
     @State
     private var timerTask: Task<Void, Never>?
+    @State
+    private var hasValidVideo: Bool = false
 
     // MARK: - Init
     init(
@@ -131,22 +133,29 @@ struct TimelineDetailAssetCard: View {
     }
 
     // MARK: - Progress Bar
+    @ViewBuilder
     private var progressBar: some View {
-        GeometryReader { geometry in
-            ZStack(alignment: .leading) {
-                // Background
-                Rectangle()
-                    .fill(Color.white.opacity(0.3))
-                    .frame(height: sizeConfig.progressBarHeight)
+        // Hide progress bar for video/ad types until video is actually playing
+        // Show progress bar for image and poll types (timer-based)
+        if (viewData.mediaType == .video || viewData.mediaType == .ad) && !hasValidVideo {
+            EmptyView()
+        } else {
+            GeometryReader { geometry in
+                ZStack(alignment: .leading) {
+                    // Background
+                    Rectangle()
+                        .fill(Color.white.opacity(0.3))
+                        .frame(height: sizeConfig.progressBarHeight)
 
-                // Progress
-                Rectangle()
-                    .fill(Color.white)
-                    .frame(width: geometry.size.width * progress, height: sizeConfig.progressBarHeight)
-                    .animation(.linear(duration: 0.1), value: progress)
+                    // Progress
+                    Rectangle()
+                        .fill(Color.white)
+                        .frame(width: geometry.size.width * progress, height: sizeConfig.progressBarHeight)
+                        .animation(.linear(duration: 0.1), value: progress)
+                }
             }
+            .frame(height: sizeConfig.progressBarHeight)
         }
-        .frame(height: sizeConfig.progressBarHeight)
     }
 
     // MARK: - Poll Content
@@ -201,9 +210,13 @@ struct TimelineDetailAssetCard: View {
             isMuted: $isMuted,
             onVideoFinished: onVideoFinished,
             onVideoProgress: { videoProgress in
+                // Only update progress from video for video type assets
                 if viewData.mediaType == .video {
                     progress = videoProgress
                 }
+            },
+            onVideoValidityChanged: { isValid in
+                hasValidVideo = isValid
             },
             imageContent: { size in
                 CachedAsyncImage(url: viewData.imageURL) { image in
@@ -236,12 +249,14 @@ private extension TimelineDetailAssetCard {
             startTimerIfNeeded()
         } else {
             stopTimer()
+            hasValidVideo = false
         }
     }
 
     func startTimerIfNeeded() {
-        // Only start timer for non-video content
-        guard viewData.mediaType != .video else { return }
+        // Start timer only for image and poll content
+        // Video and ad types rely on video playback for progress
+        guard viewData.mediaType == .image || viewData.mediaType == .poll else { return }
 
         stopTimer()
         progress = 0
@@ -410,18 +425,18 @@ private extension TimelineDetailAssetCard {
             }
 
             // CTA Button
-            if let ctaTitle = viewData.ctaButton?.text {
+            if let ctaButton = viewData.ctaButton {
                 Button(action: {
                     onCtaButtonTap?()
                 }) {
-                    Text(ctaTitle)
+                    Text(ctaButton.text)
                         .font(sizeConfig.ctaButtonFont.toFont())
-                        .foregroundColor(.white)
+                        .foregroundColor(ctaButton.textColor)
                         .padding(.horizontal, sizeConfig.ctaButtonPaddingHorizontal)
                         .padding(.vertical, sizeConfig.ctaButtonPaddingVertical)
                         .background(
                             Capsule()
-                                .fill(Color.blue)
+                                .fill(ctaButton.backgroundColor)
                         )
                 }
                 .padding(.top, 4)

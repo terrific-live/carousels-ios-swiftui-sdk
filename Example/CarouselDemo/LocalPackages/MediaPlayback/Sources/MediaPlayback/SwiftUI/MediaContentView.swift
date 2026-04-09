@@ -18,6 +18,7 @@ public struct MediaContentView<ImageContent: View>: View {
     let isSelected: Bool
     let onVideoFinished: (() -> Void)?
     let onVideoProgress: ((Double) -> Void)?
+    let onVideoValidityChanged: ((Bool) -> Void)?
     @Binding var isMuted: Bool
 
     // MARK: - State
@@ -32,6 +33,7 @@ public struct MediaContentView<ImageContent: View>: View {
         isMuted: Binding<Bool> = .constant(true),
         onVideoFinished: (() -> Void)? = nil,
         onVideoProgress: ((Double) -> Void)? = nil,
+        onVideoValidityChanged: ((Bool) -> Void)? = nil,
         @ViewBuilder imageContent: @escaping (CGSize) -> ImageContent
     ) {
         self.imageContent = imageContent
@@ -41,6 +43,7 @@ public struct MediaContentView<ImageContent: View>: View {
         self._isMuted = isMuted
         self.onVideoFinished = onVideoFinished
         self.onVideoProgress = onVideoProgress
+        self.onVideoValidityChanged = onVideoValidityChanged
     }
 
     // MARK: - Body
@@ -74,6 +77,9 @@ public struct MediaContentView<ImageContent: View>: View {
         }
         .onChange(of: viewModel.progress) { _, newProgress in
             onVideoProgress?(newProgress)
+        }
+        .onChange(of: viewModel.hasValidPlayback) { _, hasValid in
+            onVideoValidityChanged?(hasValid)
         }
         .onChange(of: isMuted) { _, newValue in
             viewModel.isMuted = newValue

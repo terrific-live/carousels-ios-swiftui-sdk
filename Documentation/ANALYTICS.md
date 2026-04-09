@@ -12,8 +12,7 @@ This document provides a complete reference for all analytics events emitted by 
   - [Detail View Events](#detail-view-events)
   - [User Action Events](#user-action-events)
 - [Data Types](#data-types)
-- [Integration Examples](#integration-examples)
-- [Best Practices](#best-practices)
+- [Event Summary Table](#event-summary-table)
 
 ---
 

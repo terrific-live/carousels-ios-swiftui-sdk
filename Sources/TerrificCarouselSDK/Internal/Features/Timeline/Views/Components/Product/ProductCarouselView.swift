@@ -8,6 +8,8 @@ import SwiftUI
 struct ProductCarouselView: View {
     // MARK: - Constants
     private let animationDuration: Double = 0.4
+    /// Multiplier for creating pseudo-infinite scroll
+    private let infiniteScrollMultiplier = 30
 
     // MARK: - Inputs
     let products: [ProductData]
@@ -36,15 +38,49 @@ struct ProductCarouselView: View {
     @State private var isAnimating: Bool = false
     @State private var timer: Timer?
 
+    // MARK: - Display Item for unique IDs
+    private struct DisplayProduct: Identifiable {
+        let id: String
+        let index: Int
+        let product: ProductData
+    }
+
     // MARK: - Computed Properties
     /// Size configuration based on display mode
     private var sizeConfiguration: ProductViewSizeConfiguration {
         displayMode == .compact ? .feed : .detail
     }
 
-    /// Next product index (wraps around)
+    /// Expanded products array for pseudo-infinite scroll (products x 20)
+    private var expandedProducts: [DisplayProduct] {
+        guard products.count > 1 else {
+            return products.enumerated().map {
+                DisplayProduct(id: "0_\($0)", index: $0, product: $1)
+            }
+        }
+
+        var result: [DisplayProduct] = []
+        for multiplier in 0..<infiniteScrollMultiplier {
+            for (index, product) in products.enumerated() {
+                let globalIndex = multiplier * products.count + index
+                result.append(DisplayProduct(
+                    id: "\(multiplier)_\(index)",
+                    index: globalIndex,
+                    product: product
+                ))
+            }
+        }
+        return result
+    }
+
+    /// Total count of expanded products
+    private var expandedCount: Int {
+        products.count > 1 ? products.count * infiniteScrollMultiplier : products.count
+    }
+
+    /// Next product index in expanded array
     private var nextIndex: Int {
-        (currentIndex + 1) % products.count
+        (currentIndex + 1) % expandedCount
     }
 
     // MARK: - Body
@@ -90,32 +126,67 @@ private extension ProductCarouselView {
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 0) {
-                    ForEach(products) { product in
+                    ForEach(expandedProducts) { item in
                         ProductView(
-                            viewData: product,
+                            viewData: item.product,
                             displayMode: displayMode,
                             onCtaTap: onCtaTap
                         )
                         .frame(width: width)
-                        .id(product.id)
+                        .id(item.index)
+                        .background(
+                            GeometryReader { geo in
+                                Color.clear
+                                    .preference(
+                                        key: ProductScrollOffsetKey.self,
+                                        value: [item.index: geo.frame(in: .named("ProductCarousel")).minX]
+                                    )
+                            }
+                        )
                     }
                 }
             }
+            .coordinateSpace(name: "ProductCarousel")
             .scrollTargetBehavior(.paging)
-            .onChange(of: currentIndex) { _, newIndex in
+            .onPreferenceChange(ProductScrollOffsetKey.self) { offsets in
+                updateCurrentIndexFromScroll(offsets, width: width)
+            }
+            .onChange(of: currentIndex) { oldIndex, newIndex in
+                // Only scroll programmatically if this is an auto-scroll (timer-driven)
+                // Check if the change is from auto-scroll (sequential increment)
+                guard isAnimating else { return }
                 withAnimation(.easeInOut(duration: animationDuration)) {
-                    proxy.scrollTo(products[newIndex].id, anchor: .leading)
+                    proxy.scrollTo(newIndex, anchor: .leading)
                 }
             }
+        }
+    }
+
+    func updateCurrentIndexFromScroll(_ offsets: [Int: CGFloat], width: CGFloat) {
+        guard !isAnimating, !offsets.isEmpty else { return }
+
+        // Find the item closest to the leading edge
+        let closestItem = offsets.min { abs($0.value) < abs($1.value) }
+        guard let (index, offset) = closestItem else { return }
+
+        // Only update when item is settled (within 10% of width)
+        guard abs(offset) < width * 0.1 else { return }
+
+        // Update currentIndex to match scroll position
+        if currentIndex != index {
+            currentIndex = index
         }
     }
 
     // MARK: - Timer Management
     func startTimer() {
         guard products.count > 1 else { return }
+        stopTimer()
 
         timer = Timer.scheduledTimer(withTimeInterval: autoScrollInterval, repeats: true) { _ in
-            advanceToNext()
+            DispatchQueue.main.async {
+                self.advanceToNext()
+            }
         }
     }
 
@@ -134,6 +205,15 @@ private extension ProductCarouselView {
         DispatchQueue.main.asyncAfter(deadline: .now() + animationDuration + 0.05) {
             isAnimating = false
         }
+    }
+}
+
+// MARK: - Preference Key for Scroll Position
+private struct ProductScrollOffsetKey: PreferenceKey {
+    static var defaultValue: [Int: CGFloat] = [:]
+
+    static func reduce(value: inout [Int: CGFloat], nextValue: () -> [Int: CGFloat]) {
+        value.merge(nextValue()) { _, new in new }
     }
 }
 

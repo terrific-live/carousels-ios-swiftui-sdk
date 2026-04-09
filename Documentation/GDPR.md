@@ -33,7 +33,7 @@ TerrificCarouselSDK is designed with privacy in mind. The SDK:
 
 | Aspect | Details |
 |--------|---------|
-| SDK Analytics Controller | Terrific Live |
+| SDK Analytics Controller | Terrific |
 | Your Analytics Controller | Your organization (if using callback) |
 | Data Type | Pseudonymous (UUID-linked, no personal identity) |
 
@@ -45,7 +45,7 @@ TerrificCarouselSDK is designed with privacy in mind. The SDK:
 
 | Data Flow | Data Controller | Data Processor | Legal Basis |
 |-----------|-----------------|----------------|-------------|
-| SDK → Terrific servers | Terrific Live | - | Legitimate interest |
+| SDK → Terrific servers | Terrific | - | Legitimate interest |
 | SDK → Your analytics (via callback) | You (app developer) | Your analytics provider | Your choice (consent or legitimate interest) |
 
 ### SDK Analytics (to Terrific)
@@ -75,7 +75,7 @@ For analytics you receive via `onAnalyticsEvent` callback:
 
 ### Terrific's Responsibilities
 
-Terrific Live, as Controller for SDK analytics:
+Terrific, as Controller for SDK analytics:
 
 - Collects pseudonymous data (UUID-linked, no personal identifiers)
 - Does not share data with third parties for advertising

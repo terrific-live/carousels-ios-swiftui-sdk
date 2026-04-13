@@ -29,6 +29,9 @@ struct MultiItemHorizontalCarousel<Item: Identifiable, ItemContent: View, Loadin
     // MARK: - State
     @State
     private var itemVisibilities: [Int: CGFloat] = [:]
+    /// Tracks if scroll is happening from programmatic change (vs user swipe)
+    @State
+    private var isProgrammaticScroll: Bool = false
 
     // MARK: - Init
     init(
@@ -57,39 +60,61 @@ struct MultiItemHorizontalCarousel<Item: Identifiable, ItemContent: View, Loadin
 
     var body: some View {
         GeometryReader { geometry in
-            ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(alignment: .top, spacing: spacing) {
-                    ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-                        let isSelected = index == currentPageIndex
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    LazyHStack(alignment: .top, spacing: spacing) {
+                        ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                            let isSelected = index == currentPageIndex
 
-                        itemContent(item, isSelected)
-                            .frame(width: itemWidth, height: itemHeight)
-                            .background(
-                                VisibilityReporter(
-                                    index: index,
-                                    coordinateSpace: "MultiItemCarouselSpace",
-                                    containerWidth: geometry.size.width
+                            itemContent(item, isSelected)
+                                .frame(width: itemWidth, height: itemHeight)
+                                .id(index)
+                                .background(
+                                    VisibilityReporter(
+                                        index: index,
+                                        coordinateSpace: "MultiItemCarouselSpace",
+                                        containerWidth: geometry.size.width
+                                    )
                                 )
-                            )
+                        }
+
+                        if showLoadingView {
+                            loadingView()
+                                .frame(width: itemWidth, height: itemHeight)
+                                .id(items.count)
+                                .background(
+                                    VisibilityReporter(
+                                        index: items.count,
+                                        coordinateSpace: "MultiItemCarouselSpace",
+                                        containerWidth: geometry.size.width
+                                    )
+                                )
+                        }
+                    }
+                    .padding(.horizontal, horizontalPadding)
+                }
+                .coordinateSpace(name: "MultiItemCarouselSpace")
+                .onPreferenceChange(ItemVisibilityPreferenceKey.self) { visibilities in
+                    handleVisibilityUpdate(visibilities)
+                }
+                .onChange(of: currentPageIndex) { oldValue, newValue in
+                    // Only scroll programmatically if this is an external change
+                    // (not from user scrolling which already updates visibility)
+                    guard !isProgrammaticScroll else {
+                        isProgrammaticScroll = false
+                        return
                     }
 
-                    if showLoadingView {
-                        loadingView()
-                            .frame(width: itemWidth, height: itemHeight)
-                            .background(
-                                VisibilityReporter(
-                                    index: items.count,
-                                    coordinateSpace: "MultiItemCarouselSpace",
-                                    containerWidth: geometry.size.width
-                                )
-                            )
+                    // Check if the item is already mostly visible
+                    let targetVisibility = itemVisibilities[newValue] ?? 0
+                    let isAlreadyVisible = targetVisibility > itemWidth * 0.8
+
+                    guard !isAlreadyVisible else { return }
+
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        proxy.scrollTo(newValue, anchor: .center)
                     }
                 }
-                .padding(.horizontal, horizontalPadding)
-            }
-            .coordinateSpace(name: "MultiItemCarouselSpace")
-            .onPreferenceChange(ItemVisibilityPreferenceKey.self) { visibilities in
-                handleVisibilityUpdate(visibilities)
             }
         }
     }
@@ -110,6 +135,8 @@ struct MultiItemHorizontalCarousel<Item: Identifiable, ItemContent: View, Loadin
         // Only update if selection changed
         guard currentPageIndex != mostVisibleIndex else { return }
 
+        // Mark as programmatic scroll to prevent onChange from scrolling again
+        isProgrammaticScroll = true
         currentPageIndex = mostVisibleIndex
         onPageChange?(mostVisibleIndex)
     }

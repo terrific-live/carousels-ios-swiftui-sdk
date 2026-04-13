@@ -15,7 +15,7 @@ struct CarouselConfigDTO: Codable, Equatable {
     /// Whether to auto-play the carousel
     let carouselAutoPlay: Bool?
     /// Auto-play interval in seconds
-    let carouselAutoPlayInterval: Int?
+    let carouselAutoPlayInterval: Double?
     /// Carousel name/title to display
     let name: String?
     /// Whether to show timestamp labels on assets
@@ -101,7 +101,7 @@ extension CarouselConfigDTO {
         timestampFormat: nil,
         showName: false,
         carouselAutoPlay: false,
-        carouselAutoPlayInterval: 4,
+        carouselAutoPlayInterval: 4.0,
         name: nil,
         showTimestamps: true
     )

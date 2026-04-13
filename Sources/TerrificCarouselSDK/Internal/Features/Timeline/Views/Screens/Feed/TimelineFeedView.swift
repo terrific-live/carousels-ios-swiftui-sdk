@@ -22,6 +22,9 @@ struct TimelineFeedView: View {
     // MARK: - Callbacks
     private let onAssetTap: ((Int) -> Void)?
 
+    // MARK: - State
+    @State private var autoAdvanceTask: Task<Void, Never>?
+
     // MARK: - Init
     init(
         viewModel: TimelineViewModel,
@@ -38,6 +41,15 @@ struct TimelineFeedView: View {
         content
             .onAppear {
                 handleOnAppear()
+                // Restart auto-advance when view reappears (e.g., returning from detail)
+                handleCurrentItemChanged(to: viewModel.currentPageIndex)
+            }
+            .onDisappear {
+                autoAdvanceTask?.cancel()
+                autoAdvanceTask = nil
+            }
+            .onChange(of: viewModel.currentPageIndex) { _, newIndex in
+                handleCurrentItemChanged(to: newIndex)
             }
     }
 }
@@ -110,6 +122,9 @@ private extension TimelineFeedView {
                 sizeConfig: sizeConfig,
                 onProductCtaTap: { url in
                     handleProductCtaTap(url: url)
+                },
+                onVideoFinished: {
+                    handleVideoFinished()
                 }
             )
             .onTapGesture {
@@ -152,6 +167,8 @@ private extension TimelineFeedView {
     }
 
     func handlePageChange(to index: Int) {
+        // Note: Auto-advance cancellation and restart is handled by handleCurrentItemChanged
+        // which is triggered via onChange(of: currentPageIndex)
         viewModel.handlePageChange(to: index)
     }
 
@@ -180,5 +197,102 @@ private extension TimelineFeedView {
 
     func handleAssetAppeared(_ asset: TimelineAssetDTO) {
         viewModel.handleAssetAppeared(asset)
+    }
+
+    func handleCurrentItemChanged(to index: Int) {
+        print("🔄 [AutoAdvance] handleCurrentItemChanged to index: \(index)")
+
+        // Cancel any existing auto-advance task when item changes
+        autoAdvanceTask?.cancel()
+        autoAdvanceTask = nil
+
+        // Only auto-advance if carouselAutoPlay is enabled
+        guard viewModel.carouselConfig.carouselAutoPlay == true else { return }
+
+        // Get current asset to check media type
+        guard let asset = getCurrentAsset(at: index) else {
+            print("🔄 [AutoAdvance] No asset at index \(index)")
+            return
+        }
+        print("🔄 [AutoAdvance] Asset type: \(asset.type)")
+
+        // Determine if we should start timer immediately or wait for video to finish
+        let shouldStartTimerImmediately: Bool
+        switch asset.type {
+        case .image, .poll:
+            // Images and polls never have video preview - start timer immediately
+            shouldStartTimerImmediately = true
+        case .video:
+            // Videos always wait for video playback to finish
+            shouldStartTimerImmediately = false
+        case .ad:
+            // Ads: start timer immediately if no video preview, otherwise wait for video
+            shouldStartTimerImmediately = asset.media?.videoPreviewUrl == nil
+        }
+
+        if shouldStartTimerImmediately {
+            startAutoAdvanceTimer()
+        }
+    }
+
+    func handleVideoFinished() {
+        print("🎬 [AutoAdvance] handleVideoFinished called")
+
+        // Cancel any existing auto-advance task
+        autoAdvanceTask?.cancel()
+
+        // Only auto-advance if carouselAutoPlay is enabled
+        // TODO: Uncomment after testing
+        // guard viewModel.carouselConfig.carouselAutoPlay == true else { return }
+
+        // Start auto-advance timer after video finishes
+        startAutoAdvanceTimer()
+    }
+
+    func startAutoAdvanceTimer() {
+        // Get the interval (default to 4 seconds if not specified)
+        let interval = viewModel.carouselConfig.carouselAutoPlayInterval ?? 4.0
+        print("⏱️ [AutoAdvance] Starting timer with interval: \(interval)s")
+
+        autoAdvanceTask = Task {
+            do {
+                try await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))
+                if !Task.isCancelled {
+                    print("⏱️ [AutoAdvance] Timer fired, advancing...")
+                    await MainActor.run {
+                        advanceToNextItem()
+                    }
+                } else {
+                    print("⏱️ [AutoAdvance] Timer was cancelled")
+                }
+            } catch {
+                print("⏱️ [AutoAdvance] Timer error: \(error)")
+            }
+        }
+    }
+
+    func advanceToNextItem() {
+        let nextIndex = viewModel.currentPageIndex + 1
+        let itemCount = viewModel.carouselItems.count
+        print("➡️ [AutoAdvance] advanceToNextItem: current=\(viewModel.currentPageIndex), next=\(nextIndex), count=\(itemCount)")
+
+        // Only advance if there's a next item
+        guard nextIndex < itemCount else {
+            print("➡️ [AutoAdvance] No more items to advance to")
+            return
+        }
+
+        viewModel.currentPageIndex = nextIndex
+        print("➡️ [AutoAdvance] Advanced to index \(nextIndex)")
+    }
+
+    func getCurrentAsset(at index: Int) -> TimelineAssetDTO? {
+        let items = viewModel.carouselItems
+        guard index < items.count else { return nil }
+
+        if case .content(let asset, _) = items[index] {
+            return asset
+        }
+        return nil
     }
 }

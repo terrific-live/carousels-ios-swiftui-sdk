@@ -20,6 +20,10 @@ struct TimelineDetailAPIRequest: Request {
     let offset: Int
     let shopPageUrl: String?
     let terrificUserId: String
+    /// Anchor for cursor-based pagination. Nil for first page, then use value from previous response.
+    let anchor: String?
+    /// Asset ID to start from when opening detail view
+    let startAssetId: String?
 
     var path: EndpointPath? {
         "/api/v1/stores/\(storeId)/display/\(carouselId)"
@@ -39,6 +43,14 @@ struct TimelineDetailAPIRequest: Request {
 
         if offset > 0 {
             params["offset"] = offset
+        }
+
+        if let anchor = anchor {
+            params["anchor"] = anchor
+        }
+
+        if let startAssetId = startAssetId {
+            params["start-asset-id"] = startAssetId
         }
 
         return params

@@ -34,7 +34,9 @@ struct TimelineDetailService: TimelineService {
         for carouselId: String,
         page: Int,
         itemsPerPage: Int,
-        offset: Int
+        offset: Int,
+        anchor: String?,
+        startAssetId: String?
     ) async throws -> TimelineServiceResult {
         let request = TimelineDetailAPIRequest(
             storeId: configuration.storeId,
@@ -42,13 +44,16 @@ struct TimelineDetailService: TimelineService {
             numberOfItems: itemsPerPage,
             offset: offset + (page - 1) * itemsPerPage,
             shopPageUrl: configuration.shopPageUrl,
-            terrificUserId: terrificUserId
+            terrificUserId: terrificUserId,
+            anchor: anchor,
+            startAssetId: startAssetId
         )
 
         let response = try await client.send(request)
         return TimelineServiceResult(
             assets: response?.assets ?? [],
-            carouselConfig: response?.carouselConfig
+            carouselConfig: response?.carouselConfig,
+            anchor: response?.anchor
         )
     }
 }

@@ -55,6 +55,7 @@ final class TimelineViewModel: ObservableObject {
     // MARK: - Inputs
     private let carouselId: String
     private let initialOffset: Int
+    private let startAssetId: String?
 
     // MARK: - Asset View Tracking
     /// Tracks which assets have been viewed to avoid duplicate events
@@ -78,6 +79,10 @@ final class TimelineViewModel: ObservableObject {
     /// Tracks when the timeline detail view was opened
     private var timelineDetailsOpenedTime: Date?
 
+    // MARK: - Cursor-Based Pagination
+    /// Anchor for cursor-based pagination (used by detail view)
+    private var currentAnchor: String?
+
     // MARK: - Analytic Delegate
     weak var analyticDelegate: TimelineViewModelAnalyticDelegate?
 
@@ -92,18 +97,21 @@ final class TimelineViewModel: ObservableObject {
     ///   - pagination: Paginator for managing pagination state
     ///   - carouselId: Timeline identifier
     ///   - initialOffset: Starting offset in the timeline (default 0). Used by Detail to start at tapped item.
+    ///   - startAssetId: Asset ID to start from (for detail view, sent only on first page)
     ///   - pollViewModelStore: Shared store for poll state. Pass from Feed to Detail for state sharing.
     init(
         timelineService: TimelineService,
         pagination: Paginator<TimelineAssetDTO>,
         carouselId: String = "default",
         initialOffset: Int = 0,
+        startAssetId: String? = nil,
         pollViewModelStore: PollViewModelStore = PollViewModelStore()
     ) {
         self.timelineService = timelineService
         self.pagination = pagination
         self.carouselId = carouselId
         self.initialOffset = initialOffset
+        self.startAssetId = startAssetId
         self.pollViewModelStore = pollViewModelStore
 
         bindAutoAdvance()
@@ -135,6 +143,7 @@ extension TimelineViewModel {
     func loadFirstPage() {
         state = .loading
         pagination.reset()
+        currentAnchor = nil  // Reset anchor for first page
 
         Task {
             await loadNextPage(isFirstPage: true)
@@ -355,11 +364,16 @@ private extension TimelineViewModel {
 
         do {
             try await pagination.loadNextPage { page, itemsPerPage in
+                // Pass startAssetId only for first page request
+                let startAssetIdForRequest = isFirstPage ? self.startAssetId : nil
+
                 let result = try await self.timelineService.fetchAssets(
                     for: self.carouselId,
                     page: page,
                     itemsPerPage: itemsPerPage,
-                    offset: self.initialOffset
+                    offset: self.initialOffset,
+                    anchor: self.currentAnchor,
+                    startAssetId: startAssetIdForRequest
                 )
 
                 // Store carouselConfig from first page response
@@ -367,6 +381,11 @@ private extension TimelineViewModel {
                     await MainActor.run {
                         self.carouselConfig = config
                     }
+                }
+
+                // Store anchor for next page request
+                await MainActor.run {
+                    self.currentAnchor = result.anchor
                 }
 
                 return result.assets

@@ -13,6 +13,8 @@ import ImageLoader
 struct TimelineResponseDTO: Codable, Equatable {
     let assets: [TimelineAssetDTO]
     let carouselConfig: CarouselConfigDTO?
+    /// Anchor for cursor-based pagination (contains encoded viewed assets)
+    let anchor: String?
 }
 
 // MARK: - TimelineAssetDTO

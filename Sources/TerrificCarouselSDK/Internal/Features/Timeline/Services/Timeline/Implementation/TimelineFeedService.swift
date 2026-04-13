@@ -34,8 +34,11 @@ struct TimelineFeedService: TimelineService {
         for carouselId: String,
         page: Int,
         itemsPerPage: Int,
-        offset: Int
+        offset: Int,
+        anchor: String?,
+        startAssetId: String?
     ) async throws -> TimelineServiceResult {
+        // Note: Feed service uses offset-based pagination, not anchor/startAssetId
         let request = TimelineFeedAPIRequest(
             storeId: configuration.storeId,
             carouselId: configuration.carouselId,
@@ -48,7 +51,8 @@ struct TimelineFeedService: TimelineService {
         let response = try await client.send(request)
         return TimelineServiceResult(
             assets: response?.assets ?? [],
-            carouselConfig: response?.carouselConfig
+            carouselConfig: response?.carouselConfig,
+            anchor: response?.anchor
         )
     }
 }

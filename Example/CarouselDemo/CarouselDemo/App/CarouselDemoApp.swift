@@ -30,7 +30,7 @@ struct CarouselDemoApp: App {
                 }
             }
             .onAppear {
-                CarouselDebugConfiguration.isHTTPLoggingEnabled = false
+                CarouselDebugConfiguration.isHTTPLoggingEnabled = true
                 CarouselDebugConfiguration.isVideoLoggingEnabled = false
             }
         }

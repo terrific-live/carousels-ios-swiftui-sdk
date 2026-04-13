@@ -18,12 +18,13 @@ final class TimelineCoordinator: ObservableObject {
     // MARK: - Configuration
     private enum Config {
         static let feedItemsPerPage = 20
-        static let detailItemsPerPage = 20 // backend returns 20 no matter what you request
+        static let detailItemsPerPage = 10 // backend returns 20 items on 1 request no matter what you set, than 10 items per page
     }
 
     // MARK: - Navigation State
     @Published var isDetailPresented: Bool = false
     @Published private(set) var selectedAssetOffset: Int = 0
+    private var selectedAssetId: String?
 
     // MARK: - Dependencies (Owned)
     private let feedService: TimelineService
@@ -116,7 +117,7 @@ final class TimelineCoordinator: ObservableObject {
         return viewModel
     }
 
-    /// Creates a new Detail ViewModel with the current offset
+    /// Creates a new Detail ViewModel with the current offset and start asset ID
     func makeDetailViewModel() -> TimelineViewModel {
         let pagination = Paginator<TimelineAssetDTO>(itemsPerPage: Config.detailItemsPerPage)
         let viewModel = TimelineViewModel(
@@ -124,6 +125,7 @@ final class TimelineCoordinator: ObservableObject {
             pagination: pagination,
             carouselId: carouselId,
             initialOffset: selectedAssetOffset,
+            startAssetId: selectedAssetId,
             pollViewModelStore: pollViewModelStore
         )
         viewModel.analyticDelegate = self
@@ -141,6 +143,16 @@ final class TimelineCoordinator: ObservableObject {
         trackCarouselClicked(at: offset)
 
         selectedAssetOffset = offset
+
+        // Extract asset ID from feed view model
+        let carouselItems = feedViewModel.carouselItems
+        if offset < carouselItems.count,
+           case .content(let asset, _) = carouselItems[offset] {
+            selectedAssetId = asset.id
+        } else {
+            selectedAssetId = nil
+        }
+
         isDetailPresented = true
     }
 

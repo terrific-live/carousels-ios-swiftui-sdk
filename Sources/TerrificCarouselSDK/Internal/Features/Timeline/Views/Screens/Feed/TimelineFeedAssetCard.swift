@@ -16,18 +16,21 @@ struct TimelineFeedAssetCard: View {
     let isSelected: Bool
     let sizeConfig: FeedStyleConfiguration
     let onProductCtaTap: ((URL?) -> Void)?
+    let onVideoFinished: (() -> Void)?
 
     // MARK: - Init
     init(
         viewData: TimelineAssetData,
         isSelected: Bool = false,
         sizeConfig: FeedStyleConfiguration = .default,
-        onProductCtaTap: ((URL?) -> Void)? = nil
+        onProductCtaTap: ((URL?) -> Void)? = nil,
+        onVideoFinished: (() -> Void)? = nil
     ) {
         self.viewData = viewData
         self.isSelected = isSelected
         self.sizeConfig = sizeConfig
         self.onProductCtaTap = onProductCtaTap
+        self.onVideoFinished = onVideoFinished
     }
 
     // MARK: - Body
@@ -124,6 +127,7 @@ struct TimelineFeedAssetCard: View {
             videoURL: viewData.videoPreviewURLForFeed,
             configuration: VideoPreviewConfiguration.timelineCard,
             isSelected: isSelected,
+            onVideoFinished: onVideoFinished,
             imageContent: { size in
                 CachedAsyncImage(url: viewData.imageURL) { image in
                     image

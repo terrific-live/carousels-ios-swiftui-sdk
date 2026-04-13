@@ -37,7 +37,7 @@ struct AnalyticsEventItem: Identifiable {
             self.eventName = "assetViewStarted"
             self.details = "position: \(position), asset: \(asset.id)"
 
-        case .assetViewEnded(let asset, let position, let durationMs):
+        case .assetViewEnded(_, let position, let durationMs):
             self.eventName = "assetViewEnded"
             self.details = "position: \(position), duration: \(durationMs)ms"
 
@@ -45,7 +45,7 @@ struct AnalyticsEventItem: Identifiable {
             self.eventName = "timelineOpened"
             self.details = "url: \(parentUrl)"
 
-        case .timelineClosed(let parentUrl, let durationMs):
+        case .timelineClosed(_, let durationMs):
             self.eventName = "timelineClosed"
             self.details = "duration: \(durationMs)ms"
 
@@ -57,11 +57,11 @@ struct AnalyticsEventItem: Identifiable {
             self.eventName = "assetShared"
             self.details = "position: \(position), asset: \(asset.id)"
 
-        case .ctaButtonClicked(let asset, let position, let targetUrl):
+        case .ctaButtonClicked(_, let position, let targetUrl):
             self.eventName = "ctaButtonClicked"
             self.details = "position: \(position), url: \(targetUrl)"
 
-        case .pollVoted(let asset, let position, let pollId, let answer):
+        case .pollVoted(_, let position, let pollId, let answer):
             self.eventName = "pollVoted"
             self.details = "position: \(position), pollId: \(pollId), answer: \(answer)"
         }

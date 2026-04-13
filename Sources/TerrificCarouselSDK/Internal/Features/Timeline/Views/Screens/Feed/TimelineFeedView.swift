@@ -200,8 +200,6 @@ private extension TimelineFeedView {
     }
 
     func handleCurrentItemChanged(to index: Int) {
-        print("🔄 [AutoAdvance] handleCurrentItemChanged to index: \(index)")
-
         // Cancel any existing auto-advance task when item changes
         autoAdvanceTask?.cancel()
         autoAdvanceTask = nil
@@ -211,10 +209,8 @@ private extension TimelineFeedView {
 
         // Get current asset to check media type
         guard let asset = getCurrentAsset(at: index) else {
-            print("🔄 [AutoAdvance] No asset at index \(index)")
             return
         }
-        print("🔄 [AutoAdvance] Asset type: \(asset.type)")
 
         // Determine if we should start timer immediately or wait for video to finish
         let shouldStartTimerImmediately: Bool
@@ -236,8 +232,6 @@ private extension TimelineFeedView {
     }
 
     func handleVideoFinished() {
-        print("🎬 [AutoAdvance] handleVideoFinished called")
-
         // Cancel any existing auto-advance task
         autoAdvanceTask?.cancel()
 
@@ -252,18 +246,14 @@ private extension TimelineFeedView {
     func startAutoAdvanceTimer() {
         // Get the interval (default to 4 seconds if not specified)
         let interval = viewModel.carouselConfig.carouselAutoPlayInterval ?? 4.0
-        print("⏱️ [AutoAdvance] Starting timer with interval: \(interval)s")
 
         autoAdvanceTask = Task {
             do {
                 try await Task.sleep(nanoseconds: UInt64(interval * 1_000_000_000))
                 if !Task.isCancelled {
-                    print("⏱️ [AutoAdvance] Timer fired, advancing...")
                     await MainActor.run {
                         advanceToNextItem()
                     }
-                } else {
-                    print("⏱️ [AutoAdvance] Timer was cancelled")
                 }
             } catch {
                 print("⏱️ [AutoAdvance] Timer error: \(error)")
@@ -274,16 +264,13 @@ private extension TimelineFeedView {
     func advanceToNextItem() {
         let nextIndex = viewModel.currentPageIndex + 1
         let itemCount = viewModel.carouselItems.count
-        print("➡️ [AutoAdvance] advanceToNextItem: current=\(viewModel.currentPageIndex), next=\(nextIndex), count=\(itemCount)")
 
         // Only advance if there's a next item
         guard nextIndex < itemCount else {
-            print("➡️ [AutoAdvance] No more items to advance to")
             return
         }
 
         viewModel.currentPageIndex = nextIndex
-        print("➡️ [AutoAdvance] Advanced to index \(nextIndex)")
     }
 
     func getCurrentAsset(at index: Int) -> TimelineAssetDTO? {

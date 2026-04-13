@@ -20,10 +20,4 @@ extension APIConfiguration {
         carouselId: "X9HIgIk6D3xXDLehqh7U",
         shopPageUrl: "https://www.france.tv/jeux-et-divertissements/"
     )
-
-    nonisolated(unsafe) static let tesVolodimirtStagingConfiguration = APIConfiguration(
-        storeId: "1ihKYs7lmGp0J2cj6Tom",
-        carouselId: "bcl1sZJUxVXzWa64hXLt",
-        baseURL: "https://terrific-staging-polls.web.app",
-    )
 }

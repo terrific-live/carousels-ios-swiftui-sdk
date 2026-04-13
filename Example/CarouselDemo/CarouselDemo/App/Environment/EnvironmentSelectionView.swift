@@ -12,7 +12,6 @@ import TerrificCarouselSDK
 enum APIEnvironmentOption: String, CaseIterable, Identifiable {
     case francTV = "France TV (Production)"
     case test = "Test Store (Staging)"
-    case test2 = "Test Store 2 (Staging)"
 
     var id: String { rawValue }
 
@@ -22,8 +21,6 @@ enum APIEnvironmentOption: String, CaseIterable, Identifiable {
             return .francTVConfiguration
         case .test:
             return .testStoreConfiguration
-        case .test2:
-            return .tesVolodimirtStagingConfiguration
         }
     }
 
@@ -33,8 +30,6 @@ enum APIEnvironmentOption: String, CaseIterable, Identifiable {
             return "Live production environment"
         case .test:
             return "Staging environment for testing"
-        case .test2:
-            return "Staging environment for testing"
         }
     }
 
@@ -43,8 +38,6 @@ enum APIEnvironmentOption: String, CaseIterable, Identifiable {
         case .francTV:
             return "tv"
         case .test:
-            return "testtube.2"
-        case .test2:
             return "testtube.2"
         }
     }

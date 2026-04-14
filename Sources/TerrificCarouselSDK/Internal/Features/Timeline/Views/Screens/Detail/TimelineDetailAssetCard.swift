@@ -80,6 +80,7 @@ struct TimelineDetailAssetCard: View {
                     products: viewData.products,
                     displayMode: .full,
                     isSelected: isSelected,
+                    sizeConfig: sizeConfig.product,
                     onCtaTap: onProductCtaTap
                 )
             }

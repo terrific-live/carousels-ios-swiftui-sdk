@@ -33,12 +33,20 @@ struct TimelineFeedAssetCard: View {
         self.onVideoFinished = onVideoFinished
     }
 
+    // MARK: - Computed Properties
+
+    /// Horizontal padding for asset card when products are present to maintain aspect ratio
+    private var assetCardHorizontalPadding: CGFloat {
+        viewData.products.isEmpty ? 0 : sizeConfig.assetCardHorizontalPaddingForProducts
+    }
+
     // MARK: - Body
 
     var body: some View {
         VStack(spacing: sizeConfig.cardSpacing) {
             // Asset Card
             assetCard
+                .padding(.horizontal, assetCardHorizontalPadding)
 
             // Products Carousel (feed mode - no price, no CTA)
             if !viewData.products.isEmpty {
@@ -46,6 +54,7 @@ struct TimelineFeedAssetCard: View {
                     products: viewData.products,
                     displayMode: .compact,
                     isSelected: isSelected,
+                    sizeConfig: sizeConfig.product,
                     onCtaTap: onProductCtaTap
                 )
             }

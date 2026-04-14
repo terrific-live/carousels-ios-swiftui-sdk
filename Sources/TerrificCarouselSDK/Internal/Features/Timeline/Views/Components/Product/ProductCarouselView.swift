@@ -16,6 +16,7 @@ struct ProductCarouselView: View {
     let displayMode: ProductDisplayMode
     let isSelected: Bool
     let autoScrollInterval: TimeInterval
+    let sizeConfig: ProductViewSizeConfiguration?
     let onCtaTap: ((URL?) -> Void)?
 
     // MARK: - Init
@@ -24,12 +25,14 @@ struct ProductCarouselView: View {
         displayMode: ProductDisplayMode = .full,
         isSelected: Bool = true,
         autoScrollInterval: TimeInterval = 5.0,
+        sizeConfig: ProductViewSizeConfiguration? = nil,
         onCtaTap: ((URL?) -> Void)? = nil
     ) {
         self.products = products
         self.displayMode = displayMode
         self.isSelected = isSelected
         self.autoScrollInterval = autoScrollInterval
+        self.sizeConfig = sizeConfig
         self.onCtaTap = onCtaTap
     }
 
@@ -46,9 +49,9 @@ struct ProductCarouselView: View {
     }
 
     // MARK: - Computed Properties
-    /// Size configuration based on display mode
+    /// Size configuration based on display mode, or custom config if provided
     private var sizeConfiguration: ProductViewSizeConfiguration {
-        displayMode == .compact ? .feed : .detail
+        sizeConfig ?? (displayMode == .compact ? .feed : .detail)
     }
 
     /// Expanded products array for pseudo-infinite scroll (products x 20)
@@ -93,6 +96,7 @@ struct ProductCarouselView: View {
                 ProductView(
                     viewData: products[0],
                     displayMode: displayMode,
+                    sizeConfiguration: sizeConfiguration,
                     onCtaTap: onCtaTap
                 )
             } else {
@@ -130,6 +134,7 @@ private extension ProductCarouselView {
                         ProductView(
                             viewData: item.product,
                             displayMode: displayMode,
+                            sizeConfiguration: sizeConfiguration,
                             onCtaTap: onCtaTap
                         )
                         .frame(width: width)

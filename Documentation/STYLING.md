@@ -9,6 +9,7 @@ This document provides detailed information about customizing the carousel appea
 - [FeedStyleConfiguration](#feedstyleconfiguration)
 - [DetailStyleConfiguration](#detailstyleconfiguration)
 - [PollStyleConfiguration](#pollstyleconfiguration)
+- [ProductViewSizeConfiguration](#productviewsizeconfiguration)
 - [CarouselFontDescriptor](#carouselfontdescriptor)
 - [Examples](#examples)
 
@@ -20,10 +21,12 @@ The SDK uses a hierarchical configuration structure:
 
 ```
 CarouselStyleConfiguration
-├── feed: FeedStyleConfiguration      // Horizontal carousel (feed view)
-│   └── poll: PollStyleConfiguration  // Poll styling in feed
-└── detail: DetailStyleConfiguration  // Fullscreen vertical view
-    └── poll: PollStyleConfiguration  // Poll styling in detail
+├── feed: FeedStyleConfiguration           // Horizontal carousel (feed view)
+│   ├── poll: PollStyleConfiguration       // Poll styling in feed
+│   └── product: ProductViewSizeConfiguration  // Product styling in feed
+└── detail: DetailStyleConfiguration       // Fullscreen vertical view
+    ├── poll: PollStyleConfiguration       // Poll styling in detail
+    └── product: ProductViewSizeConfiguration  // Product styling in detail
 ```
 
 > **Important:** The `CarouselView` determines its own size based on `styleConfiguration`. Do **NOT** wrap it in a `.frame()` modifier. All sizing should be done through `styleConfiguration` properties.
@@ -114,6 +117,20 @@ Controls the horizontal carousel (feed) appearance.
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `poll` | PollStyleConfiguration | `.compact` | Configuration for poll elements in feed |
+
+### Product
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `product` | ProductViewSizeConfiguration | `.feed` | Configuration for product elements in feed |
+
+### Computed Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `assetCardHorizontalPaddingForProducts` | CGFloat | Calculates horizontal padding for asset cards when products are displayed to maintain aspect ratio |
+
+> **Note:** When products are displayed below the asset card in the feed, the card content area becomes shorter. The `assetCardHorizontalPaddingForProducts` computed property calculates the horizontal padding needed to maintain the original aspect ratio of the card.
 
 ### Total Height Calculation
 
@@ -207,6 +224,12 @@ Controls the fullscreen detail view appearance.
 |----------|------|---------|-------------|
 | `poll` | PollStyleConfiguration | `.default` | Configuration for poll elements in detail |
 
+### Product
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `product` | ProductViewSizeConfiguration | `.detail` | Configuration for product elements in detail |
+
 ---
 
 ## PollStyleConfiguration
@@ -231,6 +254,94 @@ let poll = PollStyleConfiguration.default
 
 // Compact (smaller, for feed view)
 let poll = PollStyleConfiguration.compact
+```
+
+---
+
+## ProductViewSizeConfiguration
+
+Controls product element appearance. Has two presets: `.detail` (larger for detail view) and `.feed` (compact for feed view).
+
+### Container
+
+| Property | Type | Detail | Feed | Description |
+|----------|------|--------|------|-------------|
+| `cornerRadius` | CGFloat | 16 | 12 | Corner radius of product container |
+| `horizontalPadding` | CGFloat | 12 | 10 | Horizontal padding inside container |
+| `verticalPadding` | CGFloat | 12 | 10 | Vertical padding inside container |
+| `interItemVerticalSpacing` | CGFloat | 4 | 2 | Vertical spacing between text elements |
+
+### Image
+
+| Property | Type | Detail | Feed | Description |
+|----------|------|--------|------|-------------|
+| `imageSize` | CGFloat | 90 | 50 | Size of product image (width and height) |
+| `imageCornerRadius` | CGFloat | 12 | 8 | Corner radius of product image |
+| `imageTrailingPadding` | CGFloat | 8 | 6 | Padding after image |
+
+### Text
+
+| Property | Type | Detail | Feed | Description |
+|----------|------|--------|------|-------------|
+| `titleFontSize` | CGFloat | 18 | 14 | Font size for product title |
+| `subtitleFontSize` | CGFloat | 15 | 12 | Font size for product subtitle |
+| `priceFontSize` | CGFloat | 16 | 12 | Font size for product price |
+
+### Badge
+
+| Property | Type | Detail | Feed | Description |
+|----------|------|--------|------|-------------|
+| `badgeFontSize` | CGFloat | 12 | 10 | Font size for sponsor badge |
+| `badgeHorizontalPadding` | CGFloat | 10 | 8 | Horizontal padding inside badge |
+| `badgeVerticalPadding` | CGFloat | 4 | 2 | Vertical padding inside badge |
+| `badgeCornerRadius` | CGFloat | 6 | 4 | Corner radius of badge |
+
+### CTA Button
+
+| Property | Type | Detail | Feed | Description |
+|----------|------|--------|------|-------------|
+| `ctaFontSize` | CGFloat | 16 | 12 | Font size for CTA button |
+| `ctaHorizontalPadding` | CGFloat | 12 | 10 | Horizontal padding of CTA button |
+| `ctaVerticalPadding` | CGFloat | 6 | 4 | Vertical padding of CTA button |
+
+### Computed Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `totalHeight` | CGFloat | Total height of product view (`imageSize + verticalPadding * 2`) |
+
+### Presets
+
+```swift
+// Detail mode (larger, for fullscreen detail view)
+let product = ProductViewSizeConfiguration.detail  // totalHeight = 114
+
+// Feed mode (compact, for horizontal carousel)
+let product = ProductViewSizeConfiguration.feed    // totalHeight = 70
+```
+
+### Custom Configuration
+
+```swift
+let customProduct = ProductViewSizeConfiguration(
+    cornerRadius: 14,
+    horizontalPadding: 10,
+    verticalPadding: 10,
+    interItemVerticalSpacing: 3,
+    imageSize: 60,
+    imageCornerRadius: 10,
+    imageTrailingPadding: 8,
+    titleFontSize: 16,
+    subtitleFontSize: 13,
+    priceFontSize: 14,
+    badgeFontSize: 11,
+    badgeHorizontalPadding: 9,
+    badgeVerticalPadding: 3,
+    badgeCornerRadius: 5,
+    ctaFontSize: 14,
+    ctaHorizontalPadding: 11,
+    ctaVerticalPadding: 5
+)
 ```
 
 ---
@@ -324,6 +435,39 @@ let styleConfiguration = CarouselStyleConfiguration(
 )
 ```
 
+### Custom Product Configuration
+
+```swift
+// Custom product sizes for feed
+let customFeedProduct = ProductViewSizeConfiguration(
+    cornerRadius: 14,
+    horizontalPadding: 12,
+    verticalPadding: 12,
+    interItemVerticalSpacing: 3,
+    imageSize: 60,
+    imageCornerRadius: 10,
+    imageTrailingPadding: 8,
+    titleFontSize: 15,
+    subtitleFontSize: 13,
+    priceFontSize: 13,
+    badgeFontSize: 10,
+    badgeHorizontalPadding: 8,
+    badgeVerticalPadding: 3,
+    badgeCornerRadius: 5,
+    ctaFontSize: 13,
+    ctaHorizontalPadding: 10,
+    ctaVerticalPadding: 5
+)
+
+let styleConfiguration = CarouselStyleConfiguration(
+    feed: FeedStyleConfiguration(
+        carouselItemWidth: 260,
+        carouselItemHeight: 450,
+        product: customFeedProduct
+    )
+)
+```
+
 ### Full Custom Configuration
 
 ```swift
@@ -338,7 +482,8 @@ let styleConfiguration = CarouselStyleConfiguration(
         poll: PollStyleConfiguration(
             questionFont: .custom("Montserrat-Medium", size: 18),
             optionFont: .custom("Montserrat-Regular", size: 14)
-        )
+        ),
+        product: .feed  // Use default feed product size
     ),
     detail: DetailStyleConfiguration(
         cardCornerRadius: 12,
@@ -347,7 +492,8 @@ let styleConfiguration = CarouselStyleConfiguration(
         poll: PollStyleConfiguration(
             questionFont: .custom("Montserrat-Medium", size: 24),
             optionFont: .custom("Montserrat-Regular", size: 16)
-        )
+        ),
+        product: .detail  // Use default detail product size
     )
 )
 

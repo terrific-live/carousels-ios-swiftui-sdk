@@ -73,6 +73,10 @@ public struct DetailStyleConfiguration: Equatable, Sendable {
     /// Configuration for poll elements in detail view
     public let poll: PollStyleConfiguration
 
+    // MARK: - Product
+    /// Configuration for product elements in detail view
+    public let product: ProductViewSizeConfiguration
+
     public init(
         cardCornerRadius: CGFloat = 16,
         edgePadding: CGFloat = 16,
@@ -96,7 +100,8 @@ public struct DetailStyleConfiguration: Equatable, Sendable {
         actionButtonSpacing: CGFloat = 36,
         contentHorizontalPadding: CGFloat = 16,
         bottomInfoPaddingBottom: CGFloat = 24,
-        poll: PollStyleConfiguration = .default
+        poll: PollStyleConfiguration = .default,
+        product: ProductViewSizeConfiguration = .detail
     ) {
         self.cardCornerRadius = cardCornerRadius
         self.edgePadding = edgePadding
@@ -121,6 +126,7 @@ public struct DetailStyleConfiguration: Equatable, Sendable {
         self.contentHorizontalPadding = contentHorizontalPadding
         self.bottomInfoPaddingBottom = bottomInfoPaddingBottom
         self.poll = poll
+        self.product = product
     }
 
     /// Default detail configuration

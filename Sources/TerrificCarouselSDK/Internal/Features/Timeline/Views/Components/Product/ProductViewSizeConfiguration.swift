@@ -8,43 +8,82 @@
 import Foundation
 
 // MARK: - Size Configuration
-struct ProductViewSizeConfiguration: Equatable {
+public struct ProductViewSizeConfiguration: Equatable, Sendable {
     // MARK: - Container
-    let cornerRadius: CGFloat
-    let horizontalPadding: CGFloat
-    let verticalPadding: CGFloat
-    let interItemVerticalSpacing: CGFloat
+    public let cornerRadius: CGFloat
+    public let horizontalPadding: CGFloat
+    public let verticalPadding: CGFloat
+    public let interItemVerticalSpacing: CGFloat
 
     // MARK: - Image
-    let imageSize: CGFloat
-    let imageCornerRadius: CGFloat
-    let imageTrailingPadding: CGFloat
+    public let imageSize: CGFloat
+    public let imageCornerRadius: CGFloat
+    public let imageTrailingPadding: CGFloat
 
     // MARK: - Text
-    let titleFontSize: CGFloat
-    let subtitleFontSize: CGFloat
-    let priceFontSize: CGFloat
+    public let titleFontSize: CGFloat
+    public let subtitleFontSize: CGFloat
+    public let priceFontSize: CGFloat
 
     // MARK: - Badge
-    let badgeFontSize: CGFloat
-    let badgeHorizontalPadding: CGFloat
-    let badgeVerticalPadding: CGFloat
-    let badgeCornerRadius: CGFloat
+    public let badgeFontSize: CGFloat
+    public let badgeHorizontalPadding: CGFloat
+    public let badgeVerticalPadding: CGFloat
+    public let badgeCornerRadius: CGFloat
 
     // MARK: - CTA Button
-    let ctaFontSize: CGFloat
-    let ctaHorizontalPadding: CGFloat
-    let ctaVerticalPadding: CGFloat
+    public let ctaFontSize: CGFloat
+    public let ctaHorizontalPadding: CGFloat
+    public let ctaVerticalPadding: CGFloat
 
     // MARK: - Computed
-    var totalHeight: CGFloat {
+    public var totalHeight: CGFloat {
         imageSize + verticalPadding * 2
+    }
+
+    // MARK: - Init
+    public init(
+        cornerRadius: CGFloat,
+        horizontalPadding: CGFloat,
+        verticalPadding: CGFloat,
+        interItemVerticalSpacing: CGFloat,
+        imageSize: CGFloat,
+        imageCornerRadius: CGFloat,
+        imageTrailingPadding: CGFloat,
+        titleFontSize: CGFloat,
+        subtitleFontSize: CGFloat,
+        priceFontSize: CGFloat,
+        badgeFontSize: CGFloat,
+        badgeHorizontalPadding: CGFloat,
+        badgeVerticalPadding: CGFloat,
+        badgeCornerRadius: CGFloat,
+        ctaFontSize: CGFloat,
+        ctaHorizontalPadding: CGFloat,
+        ctaVerticalPadding: CGFloat
+    ) {
+        self.cornerRadius = cornerRadius
+        self.horizontalPadding = horizontalPadding
+        self.verticalPadding = verticalPadding
+        self.interItemVerticalSpacing = interItemVerticalSpacing
+        self.imageSize = imageSize
+        self.imageCornerRadius = imageCornerRadius
+        self.imageTrailingPadding = imageTrailingPadding
+        self.titleFontSize = titleFontSize
+        self.subtitleFontSize = subtitleFontSize
+        self.priceFontSize = priceFontSize
+        self.badgeFontSize = badgeFontSize
+        self.badgeHorizontalPadding = badgeHorizontalPadding
+        self.badgeVerticalPadding = badgeVerticalPadding
+        self.badgeCornerRadius = badgeCornerRadius
+        self.ctaFontSize = ctaFontSize
+        self.ctaHorizontalPadding = ctaHorizontalPadding
+        self.ctaVerticalPadding = ctaVerticalPadding
     }
 
     // MARK: - Presets
 
     /// Detail mode: larger image (80pt), full content
-    static let detail = ProductViewSizeConfiguration(
+    public static let detail = ProductViewSizeConfiguration(
         cornerRadius: 16,
         horizontalPadding: 12,
         verticalPadding: 12,
@@ -65,7 +104,7 @@ struct ProductViewSizeConfiguration: Equatable {
     )
 
     /// Feed mode: smaller image (40pt), compact content
-    static let feed = ProductViewSizeConfiguration(
+    public static let feed = ProductViewSizeConfiguration(
         cornerRadius: 12,
         horizontalPadding: 10,
         verticalPadding: 10,

@@ -67,6 +67,10 @@ public struct FeedStyleConfiguration: Equatable, Sendable {
     /// Configuration for poll elements in feed
     public let poll: PollStyleConfiguration
 
+    // MARK: - Product
+    /// Configuration for product elements in feed
+    public let product: ProductViewSizeConfiguration
+
     public init(
         carouselItemWidth: CGFloat = 240,
         carouselItemHeight: CGFloat = 420,
@@ -89,7 +93,8 @@ public struct FeedStyleConfiguration: Equatable, Sendable {
         carouselNameColor: Color = .white,
         carouselNameBottomPadding: CGFloat = 24,
         carouselNameHorizontalPadding: CGFloat = 16,
-        poll: PollStyleConfiguration = .compact
+        poll: PollStyleConfiguration = .compact,
+        product: ProductViewSizeConfiguration = .feed
     ) {
         self.carouselItemWidth = carouselItemWidth
         self.carouselItemHeight = carouselItemHeight
@@ -113,6 +118,25 @@ public struct FeedStyleConfiguration: Equatable, Sendable {
         self.carouselNameBottomPadding = carouselNameBottomPadding
         self.carouselNameHorizontalPadding = carouselNameHorizontalPadding
         self.poll = poll
+        self.product = product
+    }
+
+    // MARK: - Computed Properties
+
+    /// Calculates horizontal padding for asset cards when products are displayed.
+    /// This maintains the aspect ratio of the card content area when products take vertical space.
+    /// - Returns: The horizontal padding per side to apply to the asset card
+    public var assetCardHorizontalPaddingForProducts: CGFloat {
+        // Total height taken by products area (product height + spacing)
+        let productAreaHeight = product.totalHeight + cardSpacing
+        // Remaining height for asset card content
+        let assetCardHeight = carouselItemHeight - productAreaHeight
+        // Original aspect ratio
+        let aspectRatio = carouselItemWidth / carouselItemHeight
+        // Required width to maintain aspect ratio with reduced height
+        let requiredWidth = assetCardHeight * aspectRatio
+        // Horizontal padding per side
+        return max(0, (carouselItemWidth - requiredWidth) / 2)
     }
 
     /// Default feed configuration

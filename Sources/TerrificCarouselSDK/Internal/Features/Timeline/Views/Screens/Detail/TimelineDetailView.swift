@@ -94,8 +94,8 @@ private extension TimelineDetailView {
                 onCtaButtonTap: {
                     handleCtaButtonTap(asset: asset, viewData: viewData)
                 },
-                onProductCtaTap: { url in
-                    handleProductCtaTap(url: url)
+                onProductCtaTap: { productData, url in
+                    handleProductCtaTap(productData: productData, asset: asset, url: url)
                 },
                 onLikeTap: {
                     handleLikeTap(asset)
@@ -149,8 +149,12 @@ private extension TimelineDetailView {
         viewModel.handleCtaButtonTap(asset: asset, url: viewData.ctaButton?.url)
     }
 
-    func handleProductCtaTap(url: URL?) {
-        viewModel.handleProductCtaTap(url: url)
+    func handleProductCtaTap(productData: ProductData, asset: TimelineAssetDTO, url: URL?) {
+        // Find the ProductDTO from the asset's products using the product ID
+        guard let productDTO = asset.products?.first(where: { $0.id == productData.id }) else {
+            return
+        }
+        viewModel.handleProductCtaTap(product: productDTO, asset: asset, url: url)
     }
 
     func handleLikeTap(_ asset: TimelineAssetDTO) {

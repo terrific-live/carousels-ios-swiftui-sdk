@@ -106,4 +106,12 @@ public enum CarouselAnalyticsEvent: Sendable {
     ///   - pollId: The poll identifier
     ///   - answer: The selected answer text
     case pollVoted(asset: CarouselAsset, position: Int, pollId: String, answer: String)
+
+    /// User clicked on a product CTA button
+    /// - Parameters:
+    ///   - asset: The asset containing the product
+    ///   - product: The product that was clicked
+    ///   - position: Position of the asset
+    ///   - targetUrl: The URL the product CTA navigates to
+    case productClicked(asset: CarouselAsset, product: CarouselProduct, position: Int, targetUrl: String)
 }

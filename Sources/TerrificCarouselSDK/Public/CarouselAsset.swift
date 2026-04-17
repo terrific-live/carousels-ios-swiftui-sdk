@@ -67,3 +67,34 @@ extension CarouselAssetType {
         }
     }
 }
+
+// MARK: - CarouselProduct
+/// Public representation of a product in the carousel.
+/// Exposed to SDK users for analytics callbacks.
+public struct CarouselProduct: Identifiable, Sendable {
+    /// Unique identifier for the product
+    public let id: String
+    /// Product name
+    public let name: String?
+    /// Product description
+    public let description: String?
+    /// External URL for the product
+    public let externalUrl: String?
+    /// Product image URL
+    public let imageUrl: String?
+    /// Product price (formatted)
+    public let price: String?
+}
+
+// MARK: - CarouselProduct Internal Conversion
+extension CarouselProduct {
+    /// Creates a CarouselProduct from internal ProductDTO
+    init(from dto: ProductDTO) {
+        self.id = dto.id ?? ""
+        self.name = dto.name
+        self.description = dto.description
+        self.externalUrl = dto.externalUrl
+        self.imageUrl = dto.imageUrl
+        self.price = dto.formattedPrice
+    }
+}

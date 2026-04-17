@@ -34,6 +34,7 @@ final class TimelineCoordinator: ObservableObject {
     private let likeStorage: LikeStorage?
     private let analyticsService: AnalyticsService?
     private let carouselId: String
+    private let storeId: String
 
     // MARK: - Public Event Handler
     /// Callback for SDK users to observe analytics events
@@ -54,6 +55,7 @@ final class TimelineCoordinator: ObservableObject {
         likeStorage: LikeStorage? = nil,
         analyticsService: AnalyticsService? = nil,
         carouselId: String = "default",
+        storeId: String = "",
         onAnalyticsEvent: ((CarouselAnalyticsEvent) -> Void)? = nil
     ) {
         self.feedService = feedService
@@ -63,6 +65,7 @@ final class TimelineCoordinator: ObservableObject {
         self.likeStorage = likeStorage
         self.analyticsService = analyticsService
         self.carouselId = carouselId
+        self.storeId = storeId
         self.onAnalyticsEvent = onAnalyticsEvent
         self.pollViewModelStore = PollViewModelStore(
             pollService: pollService,
@@ -184,19 +187,14 @@ extension TimelineCoordinator: TimelineViewModelAnalyticDelegate {
             isInitialView: isInitialView
         ))
 
-        Task {
-            do {
-                try await analyticsService?.trackAssetViewed(
-                    carouselId: carouselId,
-                    asset: asset,
-                    position: position,
-                    isInitialView: isInitialView,
-                    externalUserId: nil
-                )
-                AnalyticsLogger.success("AssetViewed")
-            } catch {
-                AnalyticsLogger.error("AssetViewed", errorMessage: "\(error.localizedDescription)")
-            }
+        sendAnalyticsIfEnabled("AssetViewed") { [analyticsService, carouselId] in
+            try await analyticsService?.trackAssetViewed(
+                carouselId: carouselId,
+                asset: asset,
+                position: position,
+                isInitialView: isInitialView,
+                externalUserId: nil
+            )
         }
     }
 
@@ -209,17 +207,12 @@ extension TimelineCoordinator: TimelineViewModelAnalyticDelegate {
 
         emit(.carouselLoaded(assets: assets.map { CarouselAsset(from: $0) }))
 
-        Task {
-            do {
-                try await analyticsService?.trackCarouselLoaded(
-                    carouselId: carouselId,
-                    assets: assets,
-                    externalUserId: nil
-                )
-                AnalyticsLogger.success("CarouselLoaded")
-            } catch {
-                AnalyticsLogger.error("CarouselLoaded", errorMessage: "\(error.localizedDescription)")
-            }
+        sendAnalyticsIfEnabled("CarouselLoaded") { [analyticsService, carouselId] in
+            try await analyticsService?.trackCarouselLoaded(
+                carouselId: carouselId,
+                assets: assets,
+                externalUserId: nil
+            )
         }
     }
 
@@ -229,17 +222,12 @@ extension TimelineCoordinator: TimelineViewModelAnalyticDelegate {
     ) {
         emit(.carouselViewed(assets: assets.map { CarouselAsset(from: $0) }))
 
-        Task {
-            do {
-                try await analyticsService?.trackCarouselViewed(
-                    carouselId: carouselId,
-                    assets: assets,
-                    externalUserId: nil
-                )
-                AnalyticsLogger.success("CarouselViewed")
-            } catch {
-                AnalyticsLogger.error("CarouselViewed", errorMessage: "\(error.localizedDescription)")
-            }
+        sendAnalyticsIfEnabled("CarouselViewed") { [analyticsService, carouselId] in
+            try await analyticsService?.trackCarouselViewed(
+                carouselId: carouselId,
+                assets: assets,
+                externalUserId: nil
+            )
         }
     }
 
@@ -257,17 +245,12 @@ extension TimelineCoordinator: TimelineViewModelAnalyticDelegate {
 
         emit(.assetLiked(asset: CarouselAsset(from: asset)))
 
-        Task {
-            do {
-                try await analyticsService?.trackAssetLiked(
-                    carouselId: carouselId,
-                    asset: asset,
-                    externalUserId: nil
-                )
-                AnalyticsLogger.success("AssetLiked")
-            } catch {
-                AnalyticsLogger.error("AssetLiked", errorMessage: "\(error.localizedDescription)")
-            }
+        sendAnalyticsIfEnabled("AssetLiked") { [analyticsService, carouselId] in
+            try await analyticsService?.trackAssetLiked(
+                carouselId: carouselId,
+                asset: asset,
+                externalUserId: nil
+            )
         }
     }
 
@@ -277,17 +260,12 @@ extension TimelineCoordinator: TimelineViewModelAnalyticDelegate {
     ) {
         emit(.timelineOpened(parentUrl: parentUrl))
 
-        Task {
-            do {
-                try await analyticsService?.trackTimelineOpened(
-                    carouselId: carouselId,
-                    parentUrl: parentUrl,
-                    externalUserId: nil
-                )
-                AnalyticsLogger.success("TimelineOpened")
-            } catch {
-                AnalyticsLogger.error("TimelineOpened", errorMessage: "\(error.localizedDescription)")
-            }
+        sendAnalyticsIfEnabled("TimelineOpened") { [analyticsService, carouselId] in
+            try await analyticsService?.trackTimelineOpened(
+                carouselId: carouselId,
+                parentUrl: parentUrl,
+                externalUserId: nil
+            )
         }
     }
 
@@ -298,18 +276,13 @@ extension TimelineCoordinator: TimelineViewModelAnalyticDelegate {
     ) {
         emit(.assetViewStarted(asset: CarouselAsset(from: asset), position: position))
 
-        Task {
-            do {
-                try await analyticsService?.trackAssetViewStarted(
-                    carouselId: carouselId,
-                    asset: asset,
-                    position: position,
-                    externalUserId: nil
-                )
-                AnalyticsLogger.success("AssetViewStarted")
-            } catch {
-                AnalyticsLogger.error("AssetViewStarted", errorMessage: "\(error.localizedDescription)")
-            }
+        sendAnalyticsIfEnabled("AssetViewStarted") { [analyticsService, carouselId] in
+            try await analyticsService?.trackAssetViewStarted(
+                carouselId: carouselId,
+                asset: asset,
+                position: position,
+                externalUserId: nil
+            )
         }
     }
 
@@ -325,19 +298,14 @@ extension TimelineCoordinator: TimelineViewModelAnalyticDelegate {
             durationMs: viewDurationMs
         ))
 
-        Task {
-            do {
-                try await analyticsService?.trackAssetViewEnded(
-                    carouselId: carouselId,
-                    asset: asset,
-                    position: position,
-                    viewDurationMs: viewDurationMs,
-                    externalUserId: nil
-                )
-                AnalyticsLogger.success("AssetViewEnded")
-            } catch {
-                AnalyticsLogger.error("AssetViewEnded", errorMessage: "\(error.localizedDescription)")
-            }
+        sendAnalyticsIfEnabled("AssetViewEnded") { [analyticsService, carouselId] in
+            try await analyticsService?.trackAssetViewEnded(
+                carouselId: carouselId,
+                asset: asset,
+                position: position,
+                viewDurationMs: viewDurationMs,
+                externalUserId: nil
+            )
         }
     }
 
@@ -348,18 +316,13 @@ extension TimelineCoordinator: TimelineViewModelAnalyticDelegate {
     ) {
         emit(.timelineClosed(parentUrl: parentUrl, durationMs: openDurationMs))
 
-        Task {
-            do {
-                try await analyticsService?.trackTimelineClosed(
-                    carouselId: carouselId,
-                    parentUrl: parentUrl,
-                    openDurationMs: openDurationMs,
-                    externalUserId: nil
-                )
-                AnalyticsLogger.success("TimelineClosed")
-            } catch {
-                AnalyticsLogger.error("TimelineClosed", errorMessage: "\(error.localizedDescription)")
-            }
+        sendAnalyticsIfEnabled("TimelineClosed") { [analyticsService, carouselId] in
+            try await analyticsService?.trackTimelineClosed(
+                carouselId: carouselId,
+                parentUrl: parentUrl,
+                openDurationMs: openDurationMs,
+                externalUserId: nil
+            )
         }
     }
 
@@ -369,25 +332,32 @@ extension TimelineCoordinator: TimelineViewModelAnalyticDelegate {
         at position: Int,
         targetUrl: String
     ) {
+        // Generate unique terrificClickId
+        let terrificClickId = UUID().uuidString.lowercased()
+
+        // Build modified URL with terrificClickId query parameter
+        let modifiedUrl = buildUrlWithTerrificClickId(targetUrl, terrificClickId: terrificClickId)
+
         emit(.ctaButtonClicked(
             asset: CarouselAsset(from: asset),
             position: position,
             targetUrl: targetUrl
         ))
 
-        Task {
-            do {
-                try await analyticsService?.trackCTAButtonClicked(
-                    carouselId: carouselId,
-                    asset: asset,
-                    position: position,
-                    targetUrl: targetUrl,
-                    externalUserId: nil
-                )
-                AnalyticsLogger.success("CTAButtonClicked")
-            } catch {
-                AnalyticsLogger.error("CTAButtonClicked", errorMessage: "\(error.localizedDescription)")
-            }
+        sendAnalyticsIfEnabled("CTAButtonClicked") { [analyticsService, carouselId] in
+            try await analyticsService?.trackCTAButtonClicked(
+                carouselId: carouselId,
+                asset: asset,
+                position: position,
+                targetUrl: targetUrl,
+                terrificClickId: terrificClickId,
+                externalUserId: nil
+            )
+        }
+
+        // Open the modified URL
+        if let url = URL(string: modifiedUrl) {
+            UIApplication.shared.open(url)
         }
     }
 
@@ -398,18 +368,79 @@ extension TimelineCoordinator: TimelineViewModelAnalyticDelegate {
     ) {
         emit(.assetShared(asset: CarouselAsset(from: asset), position: position))
 
-        Task {
-            do {
-                try await analyticsService?.trackAssetShared(
-                    carouselId: carouselId,
-                    asset: asset,
-                    position: position,
-                    externalUserId: nil
-                )
-                AnalyticsLogger.success("AssetShared")
-            } catch {
-                AnalyticsLogger.error("AssetShared", errorMessage: "\(error.localizedDescription)")
+        sendAnalyticsIfEnabled("AssetShared") { [analyticsService, carouselId] in
+            try await analyticsService?.trackAssetShared(
+                carouselId: carouselId,
+                asset: asset,
+                position: position,
+                externalUserId: nil
+            )
+        }
+    }
+
+    func viewModel(
+        _ viewModel: TimelineViewModel,
+        didClickProduct product: ProductDTO,
+        inAsset asset: TimelineAssetDTO,
+        targetUrl: String
+    ) {
+        // Generate unique terrificClickId
+        let terrificClickId = UUID().uuidString.lowercased()
+
+        // Build modified URL with terrificClickId query parameter
+        let modifiedUrl = buildUrlWithTerrificClickId(targetUrl, terrificClickId: terrificClickId)
+
+        emit(.productClicked(
+            asset: CarouselAsset(from: asset),
+            product: CarouselProduct(from: product),
+            position: asset.position,
+            targetUrl: targetUrl
+        ))
+
+        sendAnalyticsIfEnabled("ProductClicked") { [analyticsService, carouselId] in
+            try await analyticsService?.trackProductClicked(
+                carouselId: carouselId,
+                asset: asset,
+                product: product,
+                position: asset.position,
+                terrificClickId: terrificClickId,
+                externalUserId: nil
+            )
+        }
+
+        // Open the modified URL
+        if let url = URL(string: modifiedUrl) {
+            UIApplication.shared.open(url)
+        }
+    }
+
+    /// Track when user clicks on an asset to open detail view
+    /// Called from presentDetail - not a delegate method
+    func trackCarouselClicked(at position: Int) {
+        let carouselItems = feedViewModel.carouselItems
+        let assets = carouselItems.compactMap { item -> TimelineAssetDTO? in
+            if case .content(let asset, _) = item {
+                return asset
             }
+            return nil
+        }
+
+        guard position < assets.count else { return }
+        let clickedAsset = assets[position]
+
+        emit(.carouselClicked(
+            asset: CarouselAsset(from: clickedAsset),
+            position: clickedAsset.position
+        ))
+
+        sendAnalyticsIfEnabled("CarouselClicked") { [analyticsService, carouselId] in
+            try await analyticsService?.trackCarouselClicked(
+                carouselId: carouselId,
+                clickedAsset: clickedAsset,
+                allAssets: assets,
+                position: clickedAsset.position,
+                externalUserId: nil
+            )
         }
     }
 }
@@ -433,21 +464,16 @@ extension TimelineCoordinator: PollViewModelAnalyticDelegate {
             answer: pollAnswer
         ))
 
-        Task {
-            do {
-                try await analyticsService?.trackPollVoted(
-                    carouselId: carouselId,
-                    asset: asset,
-                    position: asset.position,
-                    pollId: pollId,
-                    pollAnswer: pollAnswer,
-                    questionId: questionId,
-                    externalUserId: nil
-                )
-                AnalyticsLogger.success("PollVoted")
-            } catch {
-                AnalyticsLogger.error("PollVoted", errorMessage: "\(error.localizedDescription)")
-            }
+        sendAnalyticsIfEnabled("PollVoted") { [analyticsService, carouselId] in
+            try await analyticsService?.trackPollVoted(
+                carouselId: carouselId,
+                asset: asset,
+                position: asset.position,
+                pollId: pollId,
+                pollAnswer: pollAnswer,
+                questionId: questionId,
+                externalUserId: nil
+            )
         }
     }
 }
@@ -460,38 +486,40 @@ private extension TimelineCoordinator {
         onAnalyticsEvent?(event)
     }
 
-    /// Track when user clicks on an asset to open detail view
-    /// Called from presentDetail - not a delegate method
-    func trackCarouselClicked(at position: Int) {
-        let carouselItems = feedViewModel.carouselItems
-        let assets = carouselItems.compactMap { item -> TimelineAssetDTO? in
-            if case .content(let asset, _) = item {
-                return asset
-            }
-            return nil
-        }
-
-        guard position < assets.count else { return }
-        let clickedAsset = assets[position]
-
-        emit(.carouselClicked(
-            asset: CarouselAsset(from: clickedAsset),
-            position: clickedAsset.position
-        ))
-
+    /// Sends analytics event to service if analytics is enabled
+    /// - Parameters:
+    ///   - eventName: Name of the event for logging
+    ///   - operation: Async operation that sends the analytics
+    func sendAnalyticsIfEnabled(_ eventName: String, operation: @escaping () async throws -> Void) {
         Task {
+            guard AnalyticsConfiguration.isAnalyticsEnabled else {
+                AnalyticsLogger.info("\(eventName) skipped (debug mode)")
+                return
+            }
+
             do {
-                try await analyticsService?.trackCarouselClicked(
-                    carouselId: carouselId,
-                    clickedAsset: clickedAsset,
-                    allAssets: assets,
-                    position: clickedAsset.position,
-                    externalUserId: nil
-                )
-                AnalyticsLogger.success("CarouselClicked")
+                try await operation()
+                AnalyticsLogger.success(eventName)
             } catch {
-                AnalyticsLogger.error("CarouselClicked", errorMessage: "\(error.localizedDescription)")
+                AnalyticsLogger.error(eventName, errorMessage: "\(error.localizedDescription)")
             }
         }
+    }
+
+    /// Builds a URL with terrificClickId query parameter appended
+    /// Format: terrificClickId=<terrificClickId>_<storeId>
+    func buildUrlWithTerrificClickId(_ urlString: String, terrificClickId: String) -> String {
+        guard var urlComponents = URLComponents(string: urlString) else {
+            return urlString
+        }
+
+        let clickIdValue = "\(terrificClickId)_\(storeId)"
+        let queryItem = URLQueryItem(name: "terrificClickId", value: clickIdValue)
+
+        var queryItems = urlComponents.queryItems ?? []
+        queryItems.append(queryItem)
+        urlComponents.queryItems = queryItems
+
+        return urlComponents.url?.absoluteString ?? urlString
     }
 }

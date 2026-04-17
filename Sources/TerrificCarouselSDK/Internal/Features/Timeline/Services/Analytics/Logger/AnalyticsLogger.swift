@@ -24,4 +24,9 @@ public enum AnalyticsLogger {
         guard isEnabled else { return }
         logger.error("❌ Analytic event \(eventName, privacy: .public), \(errorMessage ?? "", privacy: .public) (Failed)")
     }
+
+    static func info(_ message: String) {
+        guard isEnabled else { return }
+        logger.info("ℹ️ \(message, privacy: .public)")
+    }
 }

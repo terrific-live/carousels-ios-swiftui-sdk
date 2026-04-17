@@ -60,6 +60,7 @@ struct AssetBackgroundDTO: Codable, Equatable, Hashable {
     let type: BackgroundTypeDTO?
     let color: BackgroundColorDTO?
     let imageUrl: String?
+    let textColor: String?
 }
 
 // MARK: - BackgroundTypeDTO

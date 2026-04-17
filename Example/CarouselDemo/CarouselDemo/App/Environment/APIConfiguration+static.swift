@@ -20,4 +20,10 @@ extension APIConfiguration {
         carouselId: "X9HIgIk6D3xXDLehqh7U",
         shopPageUrl: "https://www.france.tv/jeux-et-divertissements/"
     )
+
+    nonisolated(unsafe) static let francTVConfiguration2 = APIConfiguration(
+        storeId: "nzRdWaBc1JPk2XN3B9bp",
+        carouselId: "VtfTyGo3DT8xcDZML2H9",
+        shopPageUrl: "https://www.france.tv/jeux-et-divertissements/"
+    )
 }

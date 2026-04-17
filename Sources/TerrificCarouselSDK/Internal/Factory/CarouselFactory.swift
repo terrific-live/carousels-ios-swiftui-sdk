@@ -101,6 +101,7 @@ final class CarouselFactory {
             likeStorage: makeLikeStorage(),
             analyticsService: makeAnalyticsService(),
             carouselId: carouselId ?? configuration.carouselId,
+            storeId: configuration.storeId,
             onAnalyticsEvent: onAnalyticsEvent
         )
     }

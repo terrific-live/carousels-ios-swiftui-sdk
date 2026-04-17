@@ -415,6 +415,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
         asset: TimelineAssetDTO,
         position: Int,
         targetUrl: String,
+        terrificClickId: String,
         externalUserId: String?
     ) async throws {
         // Build sessionId: carouselId~assetId
@@ -439,7 +440,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
             parentUrl: asset.parentUrl ?? "",
             position: position,
             targetUrl: targetUrl,
-            terrificClickId: nil,  // TODO: Add when available
+            terrificClickId: terrificClickId,
             url: targetUrl,
             userAgent: configuration.userAgent
         )
@@ -536,6 +537,67 @@ struct AnalyticsServiceImpl: AnalyticsService {
         )
 
         let request = PollVotedAPIRequest(
+            storeId: configuration.storeId,
+            requestBody: body
+        )
+
+        let _ = try await client.send(request)
+    }
+
+    func trackProductClicked(
+        carouselId: String,
+        asset: TimelineAssetDTO,
+        product: ProductDTO,
+        position: Int,
+        terrificClickId: String,
+        externalUserId: String?
+    ) async throws {
+        // Build sessionId: carouselId~assetId
+        let sessionId = "\(carouselId)~\(asset.id)"
+
+        // Map products to AnalyticCustomProduct (include the clicked product)
+        let customProducts = [
+            AnalyticCustomProduct(
+                name: product.name ?? "",
+                price: product.formattedPrice ?? String(product.price ?? 0),
+                currency: product.currency ?? "",
+                description: product.description ?? "",
+                externalURL: product.externalUrl ?? ""
+            )
+        ]
+
+        let auxData = ProductClickedAuxData(
+            id: product.id ?? "",
+            name: product.name ?? "",
+            description: product.description ?? "",
+            externalURL: product.externalUrl ?? "",
+            imageURL: product.imageUrl ?? "",
+            price: product.formattedPrice ?? "",
+            isCatalog: false,
+            brandName: asset.brandName,
+            campaignName: asset.campaignName,
+            customProducts: customProducts,
+            externalUserId: externalUserId,
+            parentUrl: asset.parentUrl ?? "",
+            position: position,
+            terrificClickId: terrificClickId,
+            userAgent: configuration.userAgent
+        )
+
+        // Use first variant's id if available, otherwise empty string
+        let variantId = product.variants?.first?.id ?? ""
+        let items = [ProductClickedItem(productId: product.id ?? "", variantId: variantId)]
+
+        let body = ProductClickedRequestBody(
+            name: .timelineProductClicked,
+            userId: configuration.userId,
+            sessionId: sessionId,
+            items: items,
+            itemViewSource: "featuredItem",
+            auxData: auxData
+        )
+
+        let request = ProductClickedAPIRequest(
             storeId: configuration.storeId,
             requestBody: body
         )

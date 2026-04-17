@@ -17,7 +17,7 @@ struct ProductCarouselView: View {
     let isSelected: Bool
     let autoScrollInterval: TimeInterval
     let sizeConfig: ProductViewSizeConfiguration?
-    let onCtaTap: ((URL?) -> Void)?
+    let onCtaTap: ((ProductData, URL?) -> Void)?
 
     // MARK: - Init
     init(
@@ -26,7 +26,7 @@ struct ProductCarouselView: View {
         isSelected: Bool = true,
         autoScrollInterval: TimeInterval = 5.0,
         sizeConfig: ProductViewSizeConfiguration? = nil,
-        onCtaTap: ((URL?) -> Void)? = nil
+        onCtaTap: ((ProductData, URL?) -> Void)? = nil
     ) {
         self.products = products
         self.displayMode = displayMode
@@ -129,7 +129,7 @@ private extension ProductCarouselView {
     func carouselContent(width: CGFloat) -> some View {
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 0) {
+                LazyHStack(spacing: 0) {
                     ForEach(expandedProducts) { item in
                         ProductView(
                             viewData: item.product,
@@ -235,8 +235,8 @@ private struct ProductScrollOffsetKey: PreferenceKey {
             displayMode: .full,
             isSelected: true,
             autoScrollInterval: 2.0
-        ) { url in
-            print("CTA: \(url?.absoluteString ?? "nil")")
+        ) { product, url in
+            print("CTA: product=\(product.id), url=\(url?.absoluteString ?? "nil")")
         }
         .padding()
 

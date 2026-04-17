@@ -67,13 +67,16 @@ struct TimelineAssetData: Identifiable {
     /// Call-to-action button data (nil if not visible)
     let ctaButton: CTAButtonData?
 
-    // MARK: - Background Colors
+    // MARK: - Background
 
     /// Primary background color
     let primaryBackgroundColor: Color
 
     /// Secondary background color (for gradients)
     let secondaryBackgroundColor: Color
+
+    /// Background image URL (when background type is .image)
+    let backgroundImageURL: URL?
 
     /// Whether the backend provided a custom background (affects layout)
     let hasCustomBackground: Bool
@@ -102,6 +105,7 @@ struct TimelineAssetData: Identifiable {
         ctaButton: CTAButtonData? = nil,
         primaryBackgroundColor: Color = .black,
         secondaryBackgroundColor: Color = .black,
+        backgroundImageURL: URL? = nil,
         hasCustomBackground: Bool = false,
         products: [ProductData] = []
     ) {
@@ -121,6 +125,7 @@ struct TimelineAssetData: Identifiable {
         self.ctaButton = ctaButton
         self.primaryBackgroundColor = primaryBackgroundColor
         self.secondaryBackgroundColor = secondaryBackgroundColor
+        self.backgroundImageURL = backgroundImageURL
         self.hasCustomBackground = hasCustomBackground
         self.products = products
     }
@@ -219,19 +224,37 @@ extension TimelineAssetData {
             self.ctaButton = nil
         }
 
-        // Background colors - with defaults
-        if let background = asset.background, let bgColor = background.color {
-            self.primaryBackgroundColor = Color(hex: bgColor.primary ?? "#000000")
-            self.secondaryBackgroundColor = Color(hex: bgColor.secondary ?? "#000000")
+        // Background - colors and image
+        if let background = asset.background {
+            // Set colors if available
+            if let bgColor = background.color {
+                self.primaryBackgroundColor = Color(hex: bgColor.primary ?? "#000000")
+                self.secondaryBackgroundColor = Color(hex: bgColor.secondary ?? "#000000")
+            } else {
+                self.primaryBackgroundColor = .black
+                self.secondaryBackgroundColor = .black
+            }
+
+            // Set background image URL if type is .image
+            if background.type == .image, let imageUrlString = background.imageUrl,
+                let backgroundImageURL = URL(string: imageUrlString) {
+                self.backgroundImageURL = backgroundImageURL
+            } else {
+                self.backgroundImageURL = nil
+            }
+
             self.hasCustomBackground = true
         } else {
             self.primaryBackgroundColor = .black
             self.secondaryBackgroundColor = .black
+            self.backgroundImageURL = nil
             self.hasCustomBackground = false
         }
 
         // Products - map from DTO
-        self.products = (asset.products ?? []).map { ProductData(from: $0) }
+        // If mapBrandNameToProductName is true, use asset's brandName as product title
+        let productTitleOverride: String? = (carouselConfig.mapBrandNameToProductName == true) ? asset.brandName : nil
+        self.products = (asset.products ?? []).map { ProductData(from: $0, titleOverride: productTitleOverride) }
     }
 }
 

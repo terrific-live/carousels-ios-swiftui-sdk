@@ -129,12 +129,14 @@ protocol AnalyticsService {
     ///   - asset: The asset containing the CTA button
     ///   - position: The asset position
     ///   - targetUrl: The URL the CTA button navigates to
+    ///   - terrificClickId: Unique click identifier for attribution
     ///   - externalUserId: Optional external user ID if present
     func trackCTAButtonClicked(
         carouselId: String,
         asset: TimelineAssetDTO,
         position: Int,
         targetUrl: String,
+        terrificClickId: String,
         externalUserId: String?
     ) async throws
 
@@ -167,6 +169,23 @@ protocol AnalyticsService {
         pollId: String,
         pollAnswer: String,
         questionId: String,
+        externalUserId: String?
+    ) async throws
+
+    /// Track when user clicks on a product CTA button within a timeline asset
+    /// - Parameters:
+    ///   - carouselId: The carousel identifier
+    ///   - asset: The asset containing the product
+    ///   - product: The product that was clicked
+    ///   - position: The asset position
+    ///   - terrificClickId: Unique click identifier for attribution
+    ///   - externalUserId: Optional external user ID if present
+    func trackProductClicked(
+        carouselId: String,
+        asset: TimelineAssetDTO,
+        product: ProductDTO,
+        position: Int,
+        terrificClickId: String,
         externalUserId: String?
     ) async throws
 }

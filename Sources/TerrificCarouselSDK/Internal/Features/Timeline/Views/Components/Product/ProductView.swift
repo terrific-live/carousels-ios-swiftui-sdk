@@ -12,14 +12,14 @@ struct ProductView: View {
     let viewData: ProductData
     let displayMode: ProductDisplayMode
     let sizeConfiguration: ProductViewSizeConfiguration
-    let onCtaTap: ((URL?) -> Void)?
+    let onCtaTap: ((ProductData, URL?) -> Void)?
 
     // MARK: - Init
     init(
         viewData: ProductData,
         displayMode: ProductDisplayMode = .full,
         sizeConfiguration: ProductViewSizeConfiguration? = nil,
-        onCtaTap: ((URL?) -> Void)? = nil
+        onCtaTap: ((ProductData, URL?) -> Void)? = nil
     ) {
         self.viewData = viewData
         self.displayMode = displayMode
@@ -122,7 +122,7 @@ struct ProductView: View {
 
     private func ctaButton(_ cta: CTAButtonData) -> some View {
         Button(action: {
-            onCtaTap?(cta.url)
+            onCtaTap?(viewData, cta.url)
         }) {
             Text(cta.text)
                 .font(.system(size: sizeConfiguration.ctaFontSize, weight: .semibold))
@@ -140,8 +140,8 @@ struct ProductView: View {
     ProductView(
         viewData: ProductData(from: .sampleFull),
         displayMode: .full
-    ) { url in
-        print("CTA tapped: \(url?.absoluteString ?? "nil")")
+    ) { product, url in
+        print("CTA tapped: product=\(product.id), url=\(url?.absoluteString ?? "nil")")
     }
     .padding()
 }

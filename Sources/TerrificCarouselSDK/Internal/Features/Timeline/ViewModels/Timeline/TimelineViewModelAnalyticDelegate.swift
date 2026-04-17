@@ -78,6 +78,14 @@ protocol TimelineViewModelAnalyticDelegate: AnyObject {
         didShareAsset asset: TimelineAssetDTO,
         at position: Int
     )
+
+    /// Called when user clicks on a product CTA button
+    func viewModel(
+        _ viewModel: TimelineViewModel,
+        didClickProduct product: ProductDTO,
+        inAsset asset: TimelineAssetDTO,
+        targetUrl: String
+    )
 }
 
 // MARK: - Default implementations (optional methods)
@@ -92,4 +100,5 @@ extension TimelineViewModelAnalyticDelegate {
     func viewModel(_ viewModel: TimelineViewModel, didCloseDetailWithParentUrl parentUrl: String, openDurationMs: Int) {}
     func viewModel(_ viewModel: TimelineViewModel, didClickCTAButton asset: TimelineAssetDTO, at position: Int, targetUrl: String) {}
     func viewModel(_ viewModel: TimelineViewModel, didShareAsset asset: TimelineAssetDTO, at position: Int) {}
+    func viewModel(_ viewModel: TimelineViewModel, didClickProduct product: ProductDTO, inAsset asset: TimelineAssetDTO, targetUrl: String) {}
 }

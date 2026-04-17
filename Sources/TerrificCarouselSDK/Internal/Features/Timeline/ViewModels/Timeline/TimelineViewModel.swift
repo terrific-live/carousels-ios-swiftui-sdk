@@ -296,26 +296,34 @@ extension TimelineViewModel {
 
     // MARK: - URL Actions
 
-    /// Opens CTA button URL in Safari and tracks analytics
+    /// Notifies delegate about CTA button tap (coordinator handles URL opening)
     func handleCtaButtonTap(asset: TimelineAssetDTO, url: URL?) {
         guard let url else { return }
 
-        // Track analytics
+        // Notify delegate - coordinator will track analytics and open URL
         analyticDelegate?.viewModel(
             self,
             didClickCTAButton: asset,
             at: asset.position,
             targetUrl: url.absoluteString
         )
-
-        // Open URL
-        UIApplication.shared.open(url)
     }
 
-    /// Opens product CTA URL in Safari
-    func handleProductCtaTap(url: URL?) {
+    /// Notifies delegate about product CTA tap (coordinator handles URL opening)
+    /// - Parameters:
+    ///   - product: The product that was clicked
+    ///   - asset: The asset containing the product
+    ///   - url: The URL to navigate to
+    func handleProductCtaTap(product: ProductDTO, asset: TimelineAssetDTO, url: URL?) {
         guard let url else { return }
-        UIApplication.shared.open(url)
+
+        // Notify delegate - coordinator will track analytics and open URL
+        analyticDelegate?.viewModel(
+            self,
+            didClickProduct: product,
+            inAsset: asset,
+            targetUrl: url.absoluteString
+        )
     }
 
     /// Tracks when user shares an asset

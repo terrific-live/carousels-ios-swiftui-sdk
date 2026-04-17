@@ -21,7 +21,7 @@ struct TimelineDetailAssetCard: View {
     let displayDuration: TimeInterval
     let sizeConfig: DetailStyleConfiguration
     let onCtaButtonTap: (() -> Void)?
-    let onProductCtaTap: ((URL?) -> Void)?
+    let onProductCtaTap: ((ProductData, URL?) -> Void)?
     let onLikeTap: (() -> Void)?
     let onShareTap: (() -> Void)?
     let onVideoFinished: (() -> Void)?
@@ -50,7 +50,7 @@ struct TimelineDetailAssetCard: View {
         sizeConfig: DetailStyleConfiguration = .default,
         isMuted: Binding<Bool> = .constant(true),
         onCtaButtonTap: (() -> Void)? = nil,
-        onProductCtaTap: ((URL?) -> Void)? = nil,
+        onProductCtaTap: ((ProductData, URL?) -> Void)? = nil,
         onLikeTap: (() -> Void)? = nil,
         onShareTap: (() -> Void)? = nil,
         onVideoFinished: (() -> Void)? = nil
@@ -86,13 +86,34 @@ struct TimelineDetailAssetCard: View {
             }
         }
         .padding(viewData.hasCustomBackground ? sizeConfig.edgePadding : 0)
-        .background(
+        .background(backgroundView)
+    }
+
+    // MARK: - Background View
+    @ViewBuilder
+    private var backgroundView: some View {
+        if let backgroundImageURL = viewData.backgroundImageURL {
+            // Background image
+            CachedAsyncImage(url: backgroundImageURL) { image in
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } placeholder: {
+                // Fallback to gradient while loading
+                LinearGradient(
+                    colors: [viewData.primaryBackgroundColor, viewData.secondaryBackgroundColor],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            }
+        } else {
+            // Gradient background (default)
             LinearGradient(
                 colors: [viewData.primaryBackgroundColor, viewData.secondaryBackgroundColor],
                 startPoint: .top,
                 endPoint: .bottom
             )
-        )
+        }
     }
 
     // MARK: - Asset Card
@@ -537,7 +558,7 @@ private struct TruncatableText: View {
         onCtaButtonTap: {
             print("CTA tapped!")
         },
-        onProductCtaTap: { url in
+        onProductCtaTap: { _, url  in
             print("Product CTA: \(url?.absoluteString ?? "nil")")
         },
         onLikeTap: {

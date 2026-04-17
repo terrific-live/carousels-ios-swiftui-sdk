@@ -7,6 +7,19 @@ import Foundation
 
 // MARK: - AnalyticsConfiguration
 struct AnalyticsConfiguration {
+    // MARK: - Static Properties
+
+    /// Controls whether analytics events are sent to the server.
+    /// - Returns: `true` in Release mode, `false` in Debug mode.
+    /// - Note: SDK user callbacks (onAnalyticsEvent) are still called regardless of this setting.
+    static var isAnalyticsEnabled: Bool {
+#if DEBUG
+        return false
+#else
+        return true
+#endif
+    }
+
     let baseURL: URL
     let storeId: String
     let userId: String

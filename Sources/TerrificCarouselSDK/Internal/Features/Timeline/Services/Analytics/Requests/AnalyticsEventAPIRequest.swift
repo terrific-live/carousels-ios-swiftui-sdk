@@ -141,7 +141,7 @@ struct CTAButtonClickedAuxData: Encodable {
     let parentUrl: String
     let position: Int
     let targetUrl: String
-    let terrificClickId: String?
+    let terrificClickId: String
     let url: String
     let userAgent: String
 }
@@ -166,6 +166,68 @@ struct PollVotedAuxData: Encodable {
     let position: Int
     let questionId: String
     let userAgent: String
+}
+
+// MARK: - ProductClicked AuxData
+/// Contains complete product data for the TimelineProductClicked event
+struct ProductClickedAuxData: Encodable {
+    let id: String
+    let name: String
+    let description: String
+    let externalURL: String
+    let imageURL: String
+    let price: String
+    let isCatalog: Bool
+    let brandName: String?
+    let campaignName: String?
+    let customProducts: [AnalyticCustomProduct]
+    let externalUserId: String?
+    let parentUrl: String
+    let position: Int
+    let terrificClickId: String
+    let userAgent: String
+}
+
+// MARK: - ProductClicked Item
+struct ProductClickedItem: Encodable {
+    let productId: String
+    let variantId: String
+}
+
+// MARK: - ProductClicked Request Body (includes items and itemViewSource)
+struct ProductClickedRequestBody<AuxData: Encodable>: Encodable {
+    let name: AnalyticsEventName
+    let userId: String
+    let sessionId: String
+    let items: [ProductClickedItem]
+    let itemViewSource: String
+    let auxData: AuxData
+}
+
+// MARK: - ProductClicked API Request
+struct ProductClickedAPIRequest<AuxData: Encodable>: Request {
+    typealias Response = EmptyResponse
+
+    let storeId: String
+    let requestBody: ProductClickedRequestBody<AuxData>
+
+    var method: HTTPMethod { .post }
+
+    var headers: Headers? {
+        [
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "terrific-store-id": storeId
+        ]
+    }
+
+    var path: EndpointPath? {
+        "/userEvents"
+    }
+
+    var body: Encodable? {
+        requestBody
+    }
 }
 
 // MARK: - PollVoted Request Body (includes pollId and pollAnswer)

@@ -48,8 +48,16 @@ struct BadgeData: Equatable {
 // MARK: - Convenience Initializer from Product (Service Model)
 extension ProductData {
     init(from product: ProductDTO) {
+        self.init(from: product, titleOverride: nil)
+    }
+
+    /// Creates ProductData from ProductDTO with optional title override
+    /// - Parameters:
+    ///   - product: The product DTO
+    ///   - titleOverride: Optional title to use instead of product name (e.g., asset brandName)
+    init(from product: ProductDTO, titleOverride: String?) {
         self.id = product.stableId
-        self.title = product.name ?? ""
+        self.title = titleOverride ?? product.name ?? ""
         self.subtitle = product.description ?? ""
         self.price = product.formattedPrice
         self.imageURL = product.imageUrl.flatMap { URL(string: $0) }

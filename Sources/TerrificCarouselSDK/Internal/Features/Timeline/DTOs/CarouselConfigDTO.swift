@@ -20,6 +20,8 @@ struct CarouselConfigDTO: Codable, Equatable {
     let name: String?
     /// Whether to show timestamp labels on assets
     let showTimestamps: Bool?
+    /// Whether to use asset brandName as product name in ProductView
+    let mapBrandNameToProductName: Bool?
 }
 
 // MARK: - Timestamp Formatting
@@ -103,6 +105,7 @@ extension CarouselConfigDTO {
         carouselAutoPlay: false,
         carouselAutoPlayInterval: 4.0,
         name: nil,
-        showTimestamps: true
+        showTimestamps: true,
+        mapBrandNameToProductName: false
     )
 }

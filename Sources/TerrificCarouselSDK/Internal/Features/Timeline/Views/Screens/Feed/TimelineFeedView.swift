@@ -120,8 +120,8 @@ private extension TimelineFeedView {
                 viewData: viewModel.makeViewData(from: asset),
                 isSelected: isSelected,
                 sizeConfig: sizeConfig,
-                onProductCtaTap: { url in
-                    handleProductCtaTap(url: url)
+                onProductCtaTap: { productData, url in
+                    handleProductCtaTap(productData: productData, asset: asset, url: url)
                 },
                 onVideoFinished: {
                     handleVideoFinished()
@@ -186,9 +186,12 @@ private extension TimelineFeedView {
         }
     }
 
-    func handleProductCtaTap(url: URL?) {
-        guard let url else { return }
-        print("Product CTA tapped: \(url.absoluteString)")
+    func handleProductCtaTap(productData: ProductData, asset: TimelineAssetDTO, url: URL?) {
+        // Find the ProductDTO from the asset's products using the product ID
+        guard let productDTO = asset.products?.first(where: { $0.id == productData.id }) else {
+            return
+        }
+        viewModel.handleProductCtaTap(product: productDTO, asset: asset, url: url)
     }
 
     func handleCarouselViewed() {

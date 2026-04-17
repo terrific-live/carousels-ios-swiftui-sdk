@@ -15,7 +15,7 @@ struct TimelineFeedAssetCard: View {
     let viewData: TimelineAssetData
     let isSelected: Bool
     let sizeConfig: FeedStyleConfiguration
-    let onProductCtaTap: ((URL?) -> Void)?
+    let onProductCtaTap: ((ProductData, URL?) -> Void)?
     let onVideoFinished: (() -> Void)?
 
     // MARK: - Init
@@ -23,7 +23,7 @@ struct TimelineFeedAssetCard: View {
         viewData: TimelineAssetData,
         isSelected: Bool = false,
         sizeConfig: FeedStyleConfiguration = .default,
-        onProductCtaTap: ((URL?) -> Void)? = nil,
+        onProductCtaTap: ((ProductData, URL?) -> Void)? = nil,
         onVideoFinished: (() -> Void)? = nil
     ) {
         self.viewData = viewData
@@ -229,7 +229,7 @@ extension TimelineFeedAssetCard {
                 ProductData(from: .sampleNoBadge)
             ]
         ),
-        onProductCtaTap: { url in
+        onProductCtaTap: { _, url in
             print("Product CTA: \(url?.absoluteString ?? "nil")")
         }
     )

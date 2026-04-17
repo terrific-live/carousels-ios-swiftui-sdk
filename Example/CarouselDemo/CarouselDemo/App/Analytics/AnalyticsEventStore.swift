@@ -64,6 +64,10 @@ struct AnalyticsEventItem: Identifiable {
         case .pollVoted(_, let position, let pollId, let answer):
             self.eventName = "pollVoted"
             self.details = "position: \(position), pollId: \(pollId), answer: \(answer)"
+
+        case .productClicked(asset: _, product: let product, position: let position, targetUrl: let targetUrl):
+            self.eventName = "productClicked"
+            self.details = "position: \(position), product: \(product.name ?? ""), url: \(targetUrl)"
         }
     }
 }

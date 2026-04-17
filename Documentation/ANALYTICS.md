@@ -37,7 +37,7 @@ The SDK emits analytics events for user interactions and carousel lifecycle. The
 │                         ↓                                        │
 │              assetViewed / assetViewStarted                      │
 │                         ↓                                        │
-│         assetLiked / assetShared / ctaButtonClicked / pollVoted │
+│  assetLiked / assetShared / ctaButtonClicked / productClicked / pollVoted │
 │                         ↓                                        │
 │                   assetViewEnded                                 │
 │                         ↓                                        │
@@ -137,6 +137,9 @@ func handleAnalyticsEvent(_ event: CarouselAnalyticsEvent) {
 
     case .pollVoted(let asset, let position, let pollId, let answer):
         handlePollVoted(asset, position: position, pollId: pollId, answer: answer)
+
+    case .productClicked(let asset, let product, let position, let targetUrl):
+        handleProductClicked(asset, product: product, position: position, url: targetUrl)
     }
 }
 ```
@@ -417,6 +420,38 @@ case .pollVoted(let asset, let position, let pollId, let answer):
 
 ---
 
+#### `productClicked`
+
+Fired when user clicks a product CTA button within a timeline asset.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `asset` | `CarouselAsset` | The asset containing the product |
+| `product` | `CarouselProduct` | The clicked product |
+| `position` | `Int` | Position of the asset (0-indexed) |
+| `targetUrl` | `String` | The URL the product CTA navigates to |
+
+```swift
+case .productClicked(let asset, let product, let position, let targetUrl):
+    Analytics.track("product_clicked", properties: [
+        "asset_id": asset.id,
+        "product_id": product.id,
+        "product_name": product.name ?? "",
+        "position": position,
+        "target_url": targetUrl,
+        "price": product.price ?? ""
+    ])
+```
+
+**When fired:** When user taps a CTA button on a product within an asset.
+
+**Server payload:** This event sends additional data to Terrific servers including:
+- `terrificClickId`: Unique UUID for click attribution
+- `itemViewSource`: "featuredItem"
+- Complete product data (name, description, price, image URL, brand, campaign)
+
+---
+
 ## Data Types
 
 ### CarouselAsset
@@ -462,6 +497,32 @@ public enum CarouselAssetType: String, Sendable {
 }
 ```
 
+### CarouselProduct
+
+Public representation of a product within an asset.
+
+```swift
+public struct CarouselProduct: Identifiable, Sendable {
+    /// Unique identifier for the product
+    public let id: String
+
+    /// Product name
+    public let name: String?
+
+    /// Product description
+    public let description: String?
+
+    /// External URL for the product
+    public let externalUrl: String?
+
+    /// Product image URL
+    public let imageUrl: String?
+
+    /// Product price (formatted string)
+    public let price: String?
+}
+```
+
 ---
 
 ## Event Summary Table
@@ -479,4 +540,5 @@ public enum CarouselAssetType: String, Sendable {
 | `assetLiked` | Action | asset |
 | `assetShared` | Action | asset, position |
 | `ctaButtonClicked` | Action | asset, position, targetUrl |
+| `productClicked` | Action | asset, product, position, targetUrl |
 | `pollVoted` | Action | asset, position, pollId, answer |

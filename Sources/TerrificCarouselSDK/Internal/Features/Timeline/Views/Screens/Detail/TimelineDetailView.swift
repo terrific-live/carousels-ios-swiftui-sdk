@@ -21,6 +21,7 @@ struct TimelineDetailView: View {
 
     // MARK: - State
     @State private var isMuted: Bool = true
+    @State private var showSwipeHint: Bool = false
 
     // MARK: - Init
     init(
@@ -35,11 +36,26 @@ struct TimelineDetailView: View {
     var body: some View {
         content
             .background(Color.black)
+            .overlay {
+                if showSwipeHint {
+                    SwipeHintOverlayView(text: viewModel.carouselConfig.swipeUpText) {
+                        showSwipeHint = false
+                    }
+                }
+            }
             .onAppear {
                 handleOnAppear()
             }
             .onDisappear {
                 viewModel.handleDetailViewDisappear()
+            }
+            .onChange(of: viewModel.state) { _, newState in
+                // Show swipe hint when content loads
+                if case .content = newState, !showSwipeHint {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        showSwipeHint = true
+                    }
+                }
             }
     }
 }

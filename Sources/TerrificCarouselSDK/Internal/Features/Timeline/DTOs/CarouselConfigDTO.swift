@@ -22,6 +22,8 @@ struct CarouselConfigDTO: Codable, Equatable {
     let showTimestamps: Bool?
     /// Whether to use asset brandName as product name in ProductView
     let mapBrandNameToProductName: Bool?
+    /// Localized text for swipe up hint animation in vertical carousel
+    let swipeUpText: String?
 }
 
 // MARK: - Timestamp Formatting
@@ -106,6 +108,7 @@ extension CarouselConfigDTO {
         carouselAutoPlayInterval: 4.0,
         name: nil,
         showTimestamps: true,
-        mapBrandNameToProductName: false
+        mapBrandNameToProductName: false,
+        swipeUpText: nil
     )
 }

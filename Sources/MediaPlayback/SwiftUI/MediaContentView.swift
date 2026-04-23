@@ -81,6 +81,12 @@ public struct MediaContentView<ImageContent: View>: View {
         .onChange(of: isMuted) { _, newValue in
             viewModel.isMuted = newValue
         }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+            handleAppWillResignActive()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            handleAppBecameActive()
+        }
     }
 }
 
@@ -153,6 +159,20 @@ private extension MediaContentView {
         log("onDisappear -> handleCleanup (release video buffer)")
         // Always cleanup on disappear to free memory
         viewModel.handleCleanup()
+    }
+
+    func handleAppWillResignActive() {
+        // Pause video when app goes to background
+        guard isSelected && videoURL != nil else { return }
+        log("app will resign active, pausing playback")
+        viewModel.handlePausePlayback()
+    }
+
+    func handleAppBecameActive() {
+        // Resume video playback when app becomes active
+        guard isSelected && videoURL != nil else { return }
+        log("app became active, resuming playback")
+        viewModel.handleResumePlayback()
     }
 
     func log(_ message: String) {

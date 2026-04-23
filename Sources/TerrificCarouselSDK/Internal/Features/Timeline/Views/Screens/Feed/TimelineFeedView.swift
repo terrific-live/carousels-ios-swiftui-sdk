@@ -239,8 +239,7 @@ private extension TimelineFeedView {
         autoAdvanceTask?.cancel()
 
         // Only auto-advance if carouselAutoPlay is enabled
-        // TODO: Uncomment after testing
-        // guard viewModel.carouselConfig.carouselAutoPlay == true else { return }
+        guard viewModel.carouselConfig.carouselAutoPlay == true else { return }
 
         // Start auto-advance timer after video finishes
         startAutoAdvanceTimer()

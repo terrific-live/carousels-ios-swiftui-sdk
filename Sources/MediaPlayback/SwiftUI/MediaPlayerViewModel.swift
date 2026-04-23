@@ -127,6 +127,30 @@ public extension MediaPlayerViewModel {
         }
     }
 
+    /// Pause playback (used when app goes to background)
+    /// Keeps video loaded, just pauses - ready to resume
+    func handlePausePlayback() {
+        log("handlePausePlayback, engine state=\(engine.state)")
+        engine.handlePause()
+    }
+
+    /// Resume playback from current position (doesn't seek to start)
+    /// Use this when returning from background or after interruption
+    func handleResumePlayback() {
+        log("handleResumePlayback, engine state=\(engine.state)")
+
+        // Mark intent to show video
+        showVideo = true
+
+        // Resume through engine - state should be .paused after handlePausePlayback
+        let currentState = engine.state
+        if currentState == .paused {
+            log("resuming from paused state")
+            let result = engine.handlePlay()
+            handleActionResult(result, action: "resume")
+        }
+    }
+
     func handleStopPlayback() {
         log("handleStopPlayback - state=\(engine.state)")
 

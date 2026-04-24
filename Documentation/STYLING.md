@@ -109,6 +109,7 @@ Controls the horizontal carousel (feed) appearance.
 |----------|------|---------|-------------|
 | `carouselNameFont` | CarouselFontDescriptor | System 22 bold | Font for carousel name label |
 | `carouselNameColor` | Color | .white | Color for carousel name label |
+| `carouselNameHeight` | CGFloat | 54 | Height of carousel name label |
 | `carouselNameBottomPadding` | CGFloat | 24 | Bottom padding below carousel name |
 | `carouselNameHorizontalPadding` | CGFloat | 16 | Horizontal padding for carousel name |
 
@@ -138,17 +139,19 @@ The total height of the carousel is determined by these key properties:
 
 | Property | Default | Description |
 |----------|---------|-------------|
-| `carouselNameFont.size` | 22 | Height of the carousel title label |
+| `carouselNameHeight` | 54 | Height of the carousel title label |
 | `carouselNameBottomPadding` | 24 | Space below the carousel title |
 | `carouselItemHeight` | 420 | Height of each carousel card |
 
 **Formula:**
 
 ```
-Total Height = carouselNameFont.size + carouselNameBottomPadding + carouselItemHeight
-             = 22 + 24 + 420
-             = 466 points (default)
+Total Height = carouselNameHeight + carouselNameBottomPadding + carouselItemHeight
+             = 54 + 24 + 420
+             = 498 points (default)
 ```
+
+> **Important:** The `carouselNameHeight` default value 54 (2 lines of default font). For custom `Fonts` and `Sizes`, `carouselNameHeight` should be calculated.
 
 ---
 
@@ -393,6 +396,7 @@ let customFeedStyle = FeedStyleConfiguration(
     subtitleFont: .system(size: 14, weight: .regular),
     carouselNameFont: .system(size: 24, weight: .heavy),
     carouselNameColor: .black,
+    carouselNameHeight: 54,
     carouselNameBottomPadding: 16
 )
 
@@ -410,6 +414,7 @@ let customFeedStyle = FeedStyleConfiguration(
     titleFont: .custom("Avenir-Heavy", size: 18),
     subtitleFont: .custom("Avenir-Medium", size: 14),
     carouselNameFont: .custom("Avenir-Black", size: 24),
+    carouselNameHeight: 54,
     carouselNameColor: .primary
 )
 
@@ -479,6 +484,7 @@ let styleConfiguration = CarouselStyleConfiguration(
         cardCornerRadius: 12,
         titleFont: .custom("Montserrat-Bold", size: 18),
         carouselNameFont: .custom("Montserrat-Black", size: 26),
+        carouselNameHeight: 54,
         poll: PollStyleConfiguration(
             questionFont: .custom("Montserrat-Medium", size: 18),
             optionFont: .custom("Montserrat-Regular", size: 14)

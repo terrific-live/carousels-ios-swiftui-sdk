@@ -10,9 +10,6 @@ import SwiftUI
 // MARK: - View
 struct TimelineFeedView: View {
 
-    // MARK: - Static Constants
-    private static let errorFontSize: CGFloat = 14
-
     // MARK: - Dependencies
     @ObservedObject private var viewModel: TimelineViewModel
 
@@ -59,22 +56,22 @@ private extension TimelineFeedView {
 
     @ViewBuilder
     var content: some View {
-        VStack(spacing: 0) {
-            switch viewModel.state {
-            case .idle:
-                Color.clear
+        switch viewModel.state {
+        case .idle:
+            Color.clear
+                .frame(height: sizeConfig.totalCarouselHeight)
 
-            case .loading:
-                loadingView
+        case .loading:
+            loadingView
+                .frame(height: sizeConfig.totalCarouselHeight)
 
-            case .content:
-                buildAssetList(viewModel.carouselItems)
+        case .content:
+            buildAssetList(viewModel.carouselItems)
+                .frame(height: sizeConfig.totalCarouselHeight)
 
-            case .error(let message):
-                buildErrorView(message: message)
-            }
-
-            Spacer(minLength: 0)
+        case .error:
+            // Hide carousel on error (no height)
+            EmptyView()
         }
     }
 
@@ -87,6 +84,7 @@ private extension TimelineFeedView {
                 Text(carouselName)
                     .font(sizeConfig.carouselNameFont.toFont())
                     .foregroundColor(sizeConfig.carouselNameColor)
+                    .frame(height: sizeConfig.carouselNameHeight, alignment: .bottom)
                     .padding(.horizontal, sizeConfig.carouselNameHorizontalPadding)
                     .padding(.bottom, sizeConfig.carouselNameBottomPadding)
             }
@@ -140,21 +138,6 @@ private extension TimelineFeedView {
 
     var loadingView: some View {
         TimelineFeedSkeletonCarousel(sizeConfig: sizeConfig)
-    }
-
-    func buildErrorView(message: String) -> some View {
-        VStack {
-            Image(systemName: "exclamationmark.triangle")
-                .imageScale(.large)
-                .foregroundColor(.red)
-
-            Text(message)
-                .font(.system(size: Self.errorFontSize))
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-        }
-        .padding()
-        .frame(minWidth: UIScreen.main.bounds.width)
     }
 }
 

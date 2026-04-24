@@ -57,13 +57,15 @@ struct CarouselDemoApp: App {
             }
             .padding(.top, 8)
 
-            CarouselView(
-                apiConfiguration: configuration,
-                styleConfiguration: .default,
-                onAnalyticsEvent: { event in
-                    analyticsStore.add(event)
-                }
-            )
+            ScrollView {
+                CarouselView(
+                    apiConfiguration: configuration,
+                    styleConfiguration: .default,
+                    onAnalyticsEvent: { event in
+                        analyticsStore.add(event)
+                    }
+                )
+            }
 
             AnalyticsEventsView(store: analyticsStore)
         }

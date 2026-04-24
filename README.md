@@ -176,11 +176,13 @@ CarouselStyleConfiguration
 
 | Property | Default | Description |
 |----------|---------|-------------|
-| `carouselNameFont.size` | 22 | Height of the carousel title label |
+| `carouselNameHeight` | 54 | Height of the carousel title label |
 | `carouselNameBottomPadding` | 24 | Space below the carousel title |
 | `carouselItemHeight` | 420 | Height of each carousel card |
 
-**Total Height** = `carouselNameFont.size` + `carouselNameBottomPadding` + `carouselItemHeight` = **466 points** (default)
+**Total Height** = `carouselNameFont.size` + `carouselNameBottomPadding` + `carouselItemHeight` = **498 points** (default)
+
+> **Important:** The `carouselNameHeight` default value 54 (2 lines of default font). For custom `Fonts` and `Sizes`, `carouselNameHeight` should be calculated.
 
 ### Example
 
@@ -190,7 +192,8 @@ let styleConfiguration = CarouselStyleConfiguration(
         carouselItemWidth: 280,
         carouselItemHeight: 500,
         cardCornerRadius: 12,
-        titleFont: .system(size: 20, weight: .bold)
+        titleFont: .system(size: 20, weight: .bold),
+        carouselNameHeight: 54
     )
 )
 

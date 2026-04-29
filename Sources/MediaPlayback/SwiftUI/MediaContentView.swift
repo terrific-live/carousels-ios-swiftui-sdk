@@ -107,20 +107,10 @@ private extension MediaContentView {
     @ViewBuilder
     func buildLoadingOverlay() -> some View {
         if viewModel.isLoading && isSelected {
-            ZStack {
-                Color.black.opacity(0.3)
-
-                VStack(spacing: 12) {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        .scaleEffect(1.5)
-
-                    Text("Loading video...")
-                        .font(.system(size: 14))
-                        .foregroundColor(.white)
-                }
-            }
-            .transition(.opacity)
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                .scaleEffect(1.5)
+                .transition(.opacity)
         }
     }
 }

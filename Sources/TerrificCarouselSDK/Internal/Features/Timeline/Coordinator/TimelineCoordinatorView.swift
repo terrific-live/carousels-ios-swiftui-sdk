@@ -37,7 +37,8 @@ struct TimelineCoordinatorView: View {
         .portraitFullScreenCover(isPresented: $coordinator.isDetailPresented) { dismiss in
             TimelineDetailView(
                 viewModel: coordinator.makeDetailViewModel(),
-                styleConfig: styleConfiguration.detail
+                styleConfig: styleConfiguration.detail,
+                onDismiss: dismiss
             )
             .floatingCloseButton(28) {
                 dismiss()

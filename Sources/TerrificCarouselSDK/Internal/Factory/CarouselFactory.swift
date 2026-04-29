@@ -39,6 +39,10 @@ final class CarouselFactory {
         .production(apiConfig: configuration, terrificUserId: terrificUserId)
     }
 
+    private lazy var errorLoggingClient: ErrorLoggingClient = {
+        ErrorLoggingClient.live(configuration: .current)
+    }()
+
     // MARK: - Init
 
     init(configuration: APIConfiguration) {
@@ -78,6 +82,13 @@ final class CarouselFactory {
         )
     }
 
+    private func makeErrorLoggingService() -> ErrorLoggingService {
+        ErrorLoggingServiceImpl(
+            client: errorLoggingClient.client,
+            configuration: .current
+        )
+    }
+
     private func makePollAnswerStorage() -> PollAnswerStorage {
         UserDefaultsPollAnswerStorage()
     }
@@ -100,6 +111,7 @@ final class CarouselFactory {
             answerStorage: makePollAnswerStorage(),
             likeStorage: makeLikeStorage(),
             analyticsService: makeAnalyticsService(),
+            errorLoggingService: makeErrorLoggingService(),
             carouselId: carouselId ?? configuration.carouselId,
             storeId: configuration.storeId,
             onAnalyticsEvent: onAnalyticsEvent

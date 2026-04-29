@@ -33,14 +33,16 @@ public final class Client: ApiClient {
 }
 
 extension Client {
-    /// Initialise client with `JSONResponseAdapter`, `DefaultRequestAdapter` and `DefaultNetworkTransport`
+    /// Initialise client with adapter chain (JSON -> Text) and `DefaultNetworkTransport`
     public convenience init(base urlString: String, version: String? = nil) {
         let url = URL(string: urlString)
         assert(url != nil, "Invalid URL")
 
         let requestAdapter = DefaultRequestAdapter(base: url, version: version)
-        let responseAdapter = JSONResponseAdapter()
-        self.init(requestAdapter: requestAdapter, responseAdapter: responseAdapter)
+        // Build adapter chain: JSON -> Text
+        let textAdapter = TextResponseAdapter()
+        let jsonAdapter = JSONResponseAdapter(next: textAdapter)
+        self.init(requestAdapter: requestAdapter, responseAdapter: jsonAdapter)
     }
 
     /// Initialise client with `DefaultNetworkTransport` and provided request and response adapters
@@ -52,18 +54,20 @@ extension Client {
         )
     }
 
-    /// Initialize client with custom `NetworkTransport`and default `DefaultRequestAdapter`
+    /// Initialize client with custom `NetworkTransport` and default `DefaultRequestAdapter`
     public convenience init(base urlString: String, version: String?, transport: NetworkTransport) {
         let url = URL(string: urlString)
         assert(url != nil, "Invalid URL")
 
         let requestAdapter = DefaultRequestAdapter(base: url, version: version)
-        let responseAdapter = JSONResponseAdapter()
+        // Build adapter chain: JSON -> Text
+        let textAdapter = TextResponseAdapter()
+        let jsonAdapter = JSONResponseAdapter(next: textAdapter)
 
         self.init(
             transport: transport,
             requestAdapter: requestAdapter,
-            responseAdapter: responseAdapter
+            responseAdapter: jsonAdapter
         )
     }
 }

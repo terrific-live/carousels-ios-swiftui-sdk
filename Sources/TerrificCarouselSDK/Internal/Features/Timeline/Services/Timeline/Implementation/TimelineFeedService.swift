@@ -49,10 +49,15 @@ struct TimelineFeedService: TimelineService {
         )
 
         let response = try await client.send(request)
+        
         return TimelineServiceResult(
             assets: response?.assets ?? [],
             carouselConfig: response?.carouselConfig,
             anchor: response?.anchor
         )
     }
+}
+
+enum TestError: Swift.Error {
+    case test
 }

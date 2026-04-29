@@ -10,26 +10,29 @@ import SwiftUI
 // MARK: - View
 struct TimelineDetailView: View {
 
-    // MARK: - Static Constants
-    private static let errorFontSize: CGFloat = 14
-
     // MARK: - Dependencies
     @ObservedObject private var viewModel: TimelineViewModel
 
     // MARK: - Configuration
     private let styleConfig: DetailStyleConfiguration
 
+    // MARK: - Callbacks
+    private let onDismiss: (() -> Void)?
+
     // MARK: - State
     @State private var isMuted: Bool = true
     @State private var showSwipeHint: Bool = false
+    @State private var showErrorAlert: Bool = false
 
     // MARK: - Init
     init(
         viewModel: TimelineViewModel,
-        styleConfig: DetailStyleConfiguration = .default
+        styleConfig: DetailStyleConfiguration = .default,
+        onDismiss: (() -> Void)? = nil
     ) {
         self.viewModel = viewModel
         self.styleConfig = styleConfig
+        self.onDismiss = onDismiss
     }
 
     // MARK: - Body
@@ -50,12 +53,26 @@ struct TimelineDetailView: View {
                 viewModel.handleDetailViewDisappear()
             }
             .onChange(of: viewModel.state) { _, newState in
-                // Show swipe hint when content loads
-                if case .content = newState, !showSwipeHint {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        showSwipeHint = true
+                switch newState {
+                case .content:
+                    // Show swipe hint when content loads
+                    if !showSwipeHint {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            showSwipeHint = true
+                        }
                     }
+                case .error:
+                    showErrorAlert = true
+                default:
+                    break
                 }
+            }
+            .alert("Erreur", isPresented: $showErrorAlert) {
+                Button("OK") {
+                    onDismiss?()
+                }
+            } message: {
+                Text("Une erreur s'est produite.")
             }
     }
 }
@@ -66,7 +83,7 @@ private extension TimelineDetailView {
     @ViewBuilder
     var content: some View {
         switch viewModel.state {
-        case .idle:
+        case .idle, .error:
             Color.clear
 
         case .loading:
@@ -74,9 +91,6 @@ private extension TimelineDetailView {
 
         case .content:
             buildAssetList(viewModel.carouselItems)
-
-        case .error(let message):
-            buildErrorView(message: message)
         }
     }
 
@@ -130,21 +144,6 @@ private extension TimelineDetailView {
 
     var loadingView: some View {
         TimelineDetailAssetCardSkeleton()
-    }
-
-    func buildErrorView(message: String) -> some View {
-        VStack {
-            Image(systemName: "exclamationmark.triangle")
-                .imageScale(.large)
-                .foregroundColor(.red)
-
-            Text(message)
-                .font(.system(size: Self.errorFontSize))
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-        }
-        .padding()
-        .frame(minWidth: UIScreen.main.bounds.width)
     }
 }
 

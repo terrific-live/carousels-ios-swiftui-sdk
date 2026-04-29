@@ -15,6 +15,15 @@ public struct EmptyResponse: Decodable {
     public init() {}
 }
 
+/// Structure that holds a plain text response
+public struct TextResponse: Decodable {
+    public let text: String
+
+    public init(text: String = "") {
+        self.text = text
+    }
+}
+
 /// Request protocol
 public protocol Request {
     associatedtype Response: Decodable = EmptyResponse

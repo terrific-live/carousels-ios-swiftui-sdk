@@ -48,9 +48,13 @@ final class TimelineViewModel: ObservableObject {
     private let pagination: Paginator<TimelineAssetDTO>
     private let imagePrefetcher = SequentialImagePrefetcher()
     private let timelineService: TimelineService
+    private let errorLoggingService: ErrorLoggingService?
 
     /// Shared store for poll view models - exposed for sharing between Feed and Detail
     let pollViewModelStore: PollViewModelStore
+
+    /// Route for error logging (HorizontalCarousel or VerticalCarousel)
+    private let errorRoute: ErrorRoute
 
     // MARK: - Inputs
     private let carouselId: String
@@ -99,13 +103,17 @@ final class TimelineViewModel: ObservableObject {
     ///   - initialOffset: Starting offset in the timeline (default 0). Used by Detail to start at tapped item.
     ///   - startAssetId: Asset ID to start from (for detail view, sent only on first page)
     ///   - pollViewModelStore: Shared store for poll state. Pass from Feed to Detail for state sharing.
+    ///   - errorLoggingService: Service for logging errors to backend
+    ///   - errorRoute: Route for error logging (HorizontalCarousel or VerticalCarousel)
     init(
         timelineService: TimelineService,
         pagination: Paginator<TimelineAssetDTO>,
         carouselId: String = "default",
         initialOffset: Int = 0,
         startAssetId: String? = nil,
-        pollViewModelStore: PollViewModelStore = PollViewModelStore()
+        pollViewModelStore: PollViewModelStore = PollViewModelStore(),
+        errorLoggingService: ErrorLoggingService? = nil,
+        errorRoute: ErrorRoute = .horizontalCarousel
     ) {
         self.timelineService = timelineService
         self.pagination = pagination
@@ -113,6 +121,8 @@ final class TimelineViewModel: ObservableObject {
         self.initialOffset = initialOffset
         self.startAssetId = startAssetId
         self.pollViewModelStore = pollViewModelStore
+        self.errorLoggingService = errorLoggingService
+        self.errorRoute = errorRoute
 
         bindAutoAdvance()
     }
@@ -425,6 +435,17 @@ private extension TimelineViewModel {
         } catch {
             if isFirstPage {
                 state = .error(error.localizedDescription)
+
+                // Log error to backend
+                errorLoggingService?.logError(
+                    message: error.localizedDescription,
+                    severity: .error,
+                    route: errorRoute,
+                    metadata: [
+                        "carouselId": carouselId,
+                        "errorType": String(describing: type(of: error))
+                    ]
+                )
             }
         }
     }

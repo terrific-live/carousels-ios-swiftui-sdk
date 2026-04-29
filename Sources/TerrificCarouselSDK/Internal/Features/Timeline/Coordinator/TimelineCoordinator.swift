@@ -33,6 +33,7 @@ final class TimelineCoordinator: ObservableObject {
     private let answerStorage: PollAnswerStorage?
     private let likeStorage: LikeStorage?
     private let analyticsService: AnalyticsService?
+    private let errorLoggingService: ErrorLoggingService?
     private let carouselId: String
     private let storeId: String
 
@@ -54,6 +55,7 @@ final class TimelineCoordinator: ObservableObject {
         answerStorage: PollAnswerStorage? = nil,
         likeStorage: LikeStorage? = nil,
         analyticsService: AnalyticsService? = nil,
+        errorLoggingService: ErrorLoggingService? = nil,
         carouselId: String = "default",
         storeId: String = "",
         onAnalyticsEvent: ((CarouselAnalyticsEvent) -> Void)? = nil
@@ -64,6 +66,7 @@ final class TimelineCoordinator: ObservableObject {
         self.answerStorage = answerStorage
         self.likeStorage = likeStorage
         self.analyticsService = analyticsService
+        self.errorLoggingService = errorLoggingService
         self.carouselId = carouselId
         self.storeId = storeId
         self.onAnalyticsEvent = onAnalyticsEvent
@@ -110,7 +113,9 @@ final class TimelineCoordinator: ObservableObject {
             pagination: pagination,
             carouselId: carouselId,
             initialOffset: 0,
-            pollViewModelStore: pollViewModelStore
+            pollViewModelStore: pollViewModelStore,
+            errorLoggingService: errorLoggingService,
+            errorRoute: .horizontalCarousel
         )
         viewModel.analyticDelegate = self
         viewModel.likeStateProvider = { [weak self] assetId in
@@ -129,7 +134,9 @@ final class TimelineCoordinator: ObservableObject {
             carouselId: carouselId,
             initialOffset: selectedAssetOffset,
             startAssetId: selectedAssetId,
-            pollViewModelStore: pollViewModelStore
+            pollViewModelStore: pollViewModelStore,
+            errorLoggingService: errorLoggingService,
+            errorRoute: .verticalCarousel
         )
         viewModel.analyticDelegate = self
         viewModel.likeStateProvider = { [weak self] assetId in

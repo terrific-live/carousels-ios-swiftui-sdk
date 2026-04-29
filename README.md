@@ -205,6 +205,29 @@ CarouselView(
 
 ---
 
+## Error Handling
+
+The SDK handles loading errors gracefully with different behaviors for each carousel type:
+
+### Horizontal Carousel (Feed)
+
+When an error occurs during initial data loading:
+- The carousel is **not displayed** (shows `EmptyView`)
+- No user interaction required
+- The error is logged to the backend for monitoring
+
+### Vertical Carousel (Detail)
+
+When an error occurs during initial data loading:
+- An **alert is displayed** with the message:
+  - Title: "Erreur"
+  - Message: "Une erreur s'est produite."
+- After the user taps **OK**, the vertical carousel closes
+- User returns to the horizontal carousel (feed view)
+- The error is logged to the backend for monitoring
+
+---
+
 ## Support
 
 - **Documentation**: See [Documentation](#documentation) section above

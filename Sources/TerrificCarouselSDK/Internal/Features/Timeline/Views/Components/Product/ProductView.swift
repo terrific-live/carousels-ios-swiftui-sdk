@@ -96,7 +96,7 @@ struct ProductView: View {
                     // Sponsor Badge (compresses if needed)
                     if let badge = viewData.sponsorBadge {
                         badgeView(badge)
-                            .frame(minWidth: 60)
+                            .frame(minWidth: 80)
                             .layoutPriority(0)
                     }
 
@@ -105,7 +105,7 @@ struct ProductView: View {
                     // CTA Button (detail mode only) - takes priority, slightly raised
                     if displayMode == .full, let cta = viewData.ctaButton {
                         ctaButton(cta)
-                            .offset(y: -4)
+                            .offset(y: -10)
                             .layoutPriority(1)
                     }
                 }
@@ -115,7 +115,7 @@ struct ProductView: View {
 
     private func badgeView(_ badge: BadgeData) -> some View {
         Text(badge.text)
-            .lineLimit(2)
+            .lineLimit(1)
             .font(.system(size: sizeConfiguration.badgeFontSize, weight: .medium))
             .foregroundColor(badge.textColor)
             .padding(.horizontal, sizeConfiguration.badgeHorizontalPadding)

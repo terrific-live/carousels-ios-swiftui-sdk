@@ -30,25 +30,16 @@ struct ProductView: View {
 
     // MARK: - Body
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
-            HStack(alignment: .center, spacing: 0) {
-                productImage
-                    .padding(.vertical, sizeConfiguration.verticalPadding)
-                    .padding(.trailing, sizeConfiguration.imageTrailingPadding)
+        HStack(alignment: .center, spacing: 0) {
+            productImage
+                .padding(.vertical, sizeConfiguration.verticalPadding)
+                .padding(.trailing, sizeConfiguration.imageTrailingPadding)
 
-                content
+            content
 
-                Spacer(minLength: 0)
-            }
-            .padding(.horizontal, sizeConfiguration.horizontalPadding)
-
-            // Floating CTA Button (detail mode only) - pinned to bottom trailing
-            if displayMode == .full, let cta = viewData.ctaButton {
-                ctaButton(cta)
-                    .padding(.trailing, sizeConfiguration.horizontalPadding)
-                    .padding(.bottom, sizeConfiguration.verticalPadding)
-            }
+            Spacer(minLength: 0)
         }
+        .padding(.horizontal, sizeConfiguration.horizontalPadding)
         .frame(height: sizeConfiguration.totalHeight)
         .background(viewData.backgroundColor)
         .clipShape(RoundedRectangle(cornerRadius: sizeConfiguration.cornerRadius))
@@ -100,18 +91,31 @@ struct ProductView: View {
                         .lineLimit(1)
                 }
 
-                // Sponsor Badge
-                if let badge = viewData.sponsorBadge {
-                    badgeView(badge)
+                // Badge and CTA row
+                HStack(alignment: .bottom, spacing: 8) {
+                    // Sponsor Badge (compresses if needed)
+                    if let badge = viewData.sponsorBadge {
+                        badgeView(badge)
+                            .frame(minWidth: 80)
+                            .layoutPriority(0)
+                    }
+
+                    Spacer(minLength: 0)
+
+                    // CTA Button (detail mode only) - takes priority, slightly raised
+                    if displayMode == .full, let cta = viewData.ctaButton {
+                        ctaButton(cta)
+                            .offset(y: -10)
+                            .layoutPriority(1)
+                    }
                 }
             }
-
-            Spacer()
         }
     }
 
     private func badgeView(_ badge: BadgeData) -> some View {
         Text(badge.text)
+            .lineLimit(1)
             .font(.system(size: sizeConfiguration.badgeFontSize, weight: .medium))
             .foregroundColor(badge.textColor)
             .padding(.horizontal, sizeConfiguration.badgeHorizontalPadding)

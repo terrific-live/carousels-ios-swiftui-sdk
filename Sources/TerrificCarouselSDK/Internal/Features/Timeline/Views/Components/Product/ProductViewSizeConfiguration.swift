@@ -87,7 +87,7 @@ public struct ProductViewSizeConfiguration: Equatable, Sendable {
         cornerRadius: 16,
         horizontalPadding: 12,
         verticalPadding: 12,
-        interItemVerticalSpacing: 4,
+        interItemVerticalSpacing: 2,
         imageSize: 90,
         imageCornerRadius: 12,
         imageTrailingPadding: 8,

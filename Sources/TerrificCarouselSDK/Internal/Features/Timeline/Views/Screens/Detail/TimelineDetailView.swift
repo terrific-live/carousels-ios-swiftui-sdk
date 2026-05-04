@@ -22,6 +22,7 @@ struct TimelineDetailView: View {
     // MARK: - State
     @State private var isMuted: Bool = true
     @State private var showSwipeHint: Bool = false
+    @State private var hasShownSwipeHint: Bool = false
     @State private var showErrorAlert: Bool = false
 
     // MARK: - Init
@@ -55,8 +56,9 @@ struct TimelineDetailView: View {
             .onChange(of: viewModel.state) { _, newState in
                 switch newState {
                 case .content:
-                    // Show swipe hint when content loads
-                    if !showSwipeHint {
+                    // Show swipe hint only once when content first loads
+                    if !hasShownSwipeHint {
+                        hasShownSwipeHint = true
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                             showSwipeHint = true
                         }

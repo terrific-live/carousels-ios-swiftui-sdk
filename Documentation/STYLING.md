@@ -272,7 +272,7 @@ Controls product element appearance. Has two presets: `.detail` (larger for deta
 | `cornerRadius` | CGFloat | 16 | 12 | Corner radius of product container |
 | `horizontalPadding` | CGFloat | 12 | 10 | Horizontal padding inside container |
 | `verticalPadding` | CGFloat | 12 | 10 | Vertical padding inside container |
-| `interItemVerticalSpacing` | CGFloat | 4 | 2 | Vertical spacing between text elements |
+| `interItemVerticalSpacing` | CGFloat | 2 | 2 | Vertical spacing between text elements |
 
 ### Image
 

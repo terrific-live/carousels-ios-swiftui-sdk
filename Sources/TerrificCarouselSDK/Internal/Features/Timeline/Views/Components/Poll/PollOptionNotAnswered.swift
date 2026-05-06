@@ -9,6 +9,10 @@ import SwiftUI
 
 // MARK: - PollOptionNotAnswered
 struct PollOptionNotAnswered: View {
+    // MARK: - Environment
+    @Environment(\.accessibilityText) private var accessibilityText
+
+    // MARK: - Inputs
     let text: String
     let sizeConfig: PollStyleConfiguration
     let isInteractive: Bool
@@ -24,8 +28,11 @@ struct PollOptionNotAnswered: View {
                 optionContent
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(accessibilityText.pollOptionLabel(text: text))
+            .accessibilityHint(accessibilityText.pollOptionHint(isInteractive: true))
         } else {
             optionContent
+                .accessibilityLabel(accessibilityText.pollOptionLabel(text: text))
         }
     }
 

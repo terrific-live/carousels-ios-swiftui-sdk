@@ -11,6 +11,9 @@ import MediaPlayback
 
 struct TimelineFeedAssetCard: View {
 
+    // MARK: - Environment
+    @Environment(\.accessibilityText) private var accessibilityText
+
     // MARK: - Inputs
     let viewData: TimelineAssetData
     let isSelected: Bool
@@ -59,6 +62,13 @@ struct TimelineFeedAssetCard: View {
                 )
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityText.feedAssetCardLabel(
+            title: viewData.title,
+            subtitle: viewData.subtitle,
+            timestamp: viewData.formattedTimestamp
+        ))
+        .accessibilityHint(accessibilityText.feedAssetCardHint)
     }
 
     // MARK: - Asset Card

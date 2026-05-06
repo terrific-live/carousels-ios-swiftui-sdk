@@ -10,6 +10,9 @@ import SwiftUI
 // MARK: - Single Skeleton Card
 struct TimelineFeedAssetCardSkeleton: View {
 
+    // MARK: - Environment
+    @Environment(\.accessibilityText) private var accessibilityText
+
     // MARK: - Configuration
     let sizeConfig: FeedStyleConfiguration
 
@@ -34,6 +37,8 @@ struct TimelineFeedAssetCardSkeleton: View {
                 shimmerOffset = 500
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityText.loadingLabel)
     }
 
     // MARK: - Asset Card Skeleton
@@ -102,6 +107,9 @@ struct TimelineFeedAssetCardSkeleton: View {
 // MARK: - Carousel Skeleton (Multiple Cards)
 struct TimelineFeedSkeletonCarousel: View {
 
+    // MARK: - Environment
+    @Environment(\.accessibilityText) private var accessibilityText
+
     // MARK: - Configuration
     let sizeConfig: FeedStyleConfiguration
     let showNameLabel: Bool
@@ -147,6 +155,8 @@ struct TimelineFeedSkeletonCarousel: View {
                 shimmerOffset = 500
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityText.loadingLabel)
     }
 }
 

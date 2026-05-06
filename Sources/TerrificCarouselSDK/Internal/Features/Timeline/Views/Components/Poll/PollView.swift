@@ -13,6 +13,10 @@ enum PollDisplayMode {
 
 // MARK: - PollView
 struct PollView: View {
+    // MARK: - Environment
+    @Environment(\.accessibilityText) private var accessibilityText
+
+    // MARK: - Dependencies
     @ObservedObject var viewModel: PollViewModel
     let sizeConfig: PollStyleConfiguration
     let displayMode: PollDisplayMode
@@ -48,6 +52,7 @@ struct PollView: View {
                 .lineLimit(4)
                 .padding(.horizontal, sizeConfig.horizontalPadding)
                 .padding(.bottom, sizeConfig.verticalPadding)
+                .accessibilityLabel(accessibilityText.pollQuestionLabel(question: viewModel.pollData.question))
 
             // Options
             ForEach(viewModel.pollData.options.prefix(4)) { option in

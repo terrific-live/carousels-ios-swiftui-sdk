@@ -10,6 +10,9 @@ import SwiftUI
 // MARK: - TimelineDetailAssetCardSkeleton
 struct TimelineDetailAssetCardSkeleton: View {
 
+    // MARK: - Environment
+    @Environment(\.accessibilityText) private var accessibilityText
+
     // MARK: - Constants
     private let edgePadding: CGFloat = 16
 
@@ -38,6 +41,8 @@ struct TimelineDetailAssetCardSkeleton: View {
                 shimmerOffset = 500
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityText.loadingLabel)
     }
 
     // MARK: - Asset Card Skeleton

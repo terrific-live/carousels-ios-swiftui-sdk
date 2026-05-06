@@ -14,6 +14,9 @@ struct TimelineDetailAssetCard: View {
     private let collapsedLineLimit = 6
     private let expandedLineLimit = 12
 
+    // MARK: - Environment
+    @Environment(\.accessibilityText) private var accessibilityText
+
     // MARK: - Inputs
     let viewData: TimelineAssetData
     let isSelected: Bool
@@ -87,6 +90,11 @@ struct TimelineDetailAssetCard: View {
         }
         .padding(viewData.hasCustomBackground ? sizeConfig.edgePadding : 0)
         .background(backgroundView)
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(accessibilityText.detailAssetLabel(
+            title: viewData.title,
+            subtitle: viewData.subtitle
+        ))
     }
 
     // MARK: - Background View
@@ -260,6 +268,17 @@ struct TimelineDetailAssetCard: View {
                 endPoint: .bottom
             )
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(mediaAccessibilityLabel)
+    }
+
+    private var mediaAccessibilityLabel: String {
+        switch viewData.mediaType {
+        case .video, .ad:
+            return accessibilityText.videoLabel(isMuted: isMuted)
+        case .image, .poll:
+            return accessibilityText.imageLabel(description: nil)
+        }
     }
 }
 
@@ -341,9 +360,11 @@ private extension TimelineDetailAssetCard {
                     .foregroundColor(.white)
             }
             .frame(width: 24, height: 24)
+            .accessibilityLabel(isLiked ? accessibilityText.unlikeButtonLabel : accessibilityText.likeButtonLabel)
 
             shareButton
                 .frame(width: 24, height: 24)
+                .accessibilityLabel(accessibilityText.shareButtonLabel)
 
             // Sound on/off button (only for videos)
             if viewData.mediaType == .video {
@@ -355,6 +376,7 @@ private extension TimelineDetailAssetCard {
                         .foregroundColor(.white)
                 }
                 .frame(width: 24, height: 24)
+                .accessibilityLabel(isMuted ? accessibilityText.unmuteButtonLabel : accessibilityText.muteButtonLabel)
             }
         }
     }
@@ -444,6 +466,7 @@ private extension TimelineDetailAssetCard {
                         .font(sizeConfig.subtitleFont.toFont())
                         .foregroundColor(.white)
                 }
+                .accessibilityLabel(isSubtitleExpanded ? accessibilityText.readLessButtonLabel : accessibilityText.readMoreButtonLabel)
             }
 
             // CTA Button
@@ -462,6 +485,7 @@ private extension TimelineDetailAssetCard {
                         )
                 }
                 .padding(.top, 4)
+                .accessibilityLabel(accessibilityText.ctaButtonLabel(title: ctaButton.text))
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

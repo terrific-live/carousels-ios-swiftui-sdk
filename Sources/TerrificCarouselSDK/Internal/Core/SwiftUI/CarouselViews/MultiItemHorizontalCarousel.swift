@@ -22,7 +22,8 @@ struct MultiItemHorizontalCarousel<Item: Identifiable, ItemContent: View, Loadin
     let itemHeight: CGFloat?
     let spacing: CGFloat
     let horizontalPadding: CGFloat
-    let itemContent: (Item, Bool) -> ItemContent
+    /// Content builder: (item, isSelected, index, totalCount) -> View
+    let itemContent: (Item, Bool, Int, Int) -> ItemContent
     let loadingView: () -> LoadingView
     let onPageChange: ((Int) -> Void)?
 
@@ -43,7 +44,7 @@ struct MultiItemHorizontalCarousel<Item: Identifiable, ItemContent: View, Loadin
         spacing: CGFloat = 12,
         horizontalPadding: CGFloat = 16,
         onPageChange: ((Int) -> Void)? = nil,
-        @ViewBuilder itemContent: @escaping (Item, Bool) -> ItemContent,
+        @ViewBuilder itemContent: @escaping (Item, Bool, Int, Int) -> ItemContent,
         @ViewBuilder loadingView: @escaping () -> LoadingView
     ) {
         self._currentPageIndex = currentPageIndex
@@ -66,7 +67,7 @@ struct MultiItemHorizontalCarousel<Item: Identifiable, ItemContent: View, Loadin
                         ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                             let isSelected = index == currentPageIndex
 
-                            itemContent(item, isSelected)
+                            itemContent(item, isSelected, index, items.count)
                                 .frame(width: itemWidth, height: itemHeight)
                                 .id(index)
                                 .background(
@@ -194,7 +195,7 @@ extension MultiItemHorizontalCarousel where LoadingView == EmptyView {
         spacing: CGFloat = 12,
         horizontalPadding: CGFloat = 16,
         onPageChange: ((Int) -> Void)? = nil,
-        @ViewBuilder itemContent: @escaping (Item, Bool) -> ItemContent
+        @ViewBuilder itemContent: @escaping (Item, Bool, Int, Int) -> ItemContent
     ) {
         self._currentPageIndex = currentPageIndex
         self.items = items
@@ -243,7 +244,7 @@ extension MultiItemHorizontalCarousel where LoadingView == EmptyView {
                     onPageChange: { index in
                         print("Page changed to: \(index)")
                     }
-                ) { item, isSelected in
+                ) { item, isSelected, _, _ in
                     VStack(alignment: .leading, spacing: 8) {
                         RoundedRectangle(cornerRadius: 12)
                             .fill(item.color)

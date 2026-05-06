@@ -23,6 +23,9 @@ public extension View {
 
 private struct CloseButtonOverContentModifier: ViewModifier {
 
+    // MARK: - Environment
+    @Environment(\.accessibilityText) private var accessibilityText
+
     // MARK: - Inputs
     private let closeButtonTopPadding: CGFloat
     private let closeAction: () -> Void
@@ -72,18 +75,7 @@ private extension CloseButtonOverContentModifier {
         .padding(.horizontal, closeButtonTopPadding)
         .padding(.top, closeButtonTopPadding)
         .buttonStyle(.plain)
-        .accessibilityLabel(accessibilityLabel)
-        .accessibilityHint(accessibilityHint)
-    }
-}
-
-// MARK: - Strings & Accessibility
-private extension CloseButtonOverContentModifier {
-    var accessibilityLabel: LocalizedStringKey {
-        LocalizedStringKey("Close screen")
-    }
-
-    var accessibilityHint: LocalizedStringKey {
-        LocalizedStringKey("Dismiss this screen and return to the previous view")
+        .accessibilityLabel(accessibilityText.closeButtonLabel)
+        .accessibilityHint(accessibilityText.closeButtonHint)
     }
 }

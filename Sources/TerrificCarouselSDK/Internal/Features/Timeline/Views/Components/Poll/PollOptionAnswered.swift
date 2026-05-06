@@ -9,6 +9,10 @@ import SwiftUI
 
 // MARK: - PollOptionAnswered
 struct PollOptionAnswered: View {
+    // MARK: - Environment
+    @Environment(\.accessibilityText) private var accessibilityText
+
+    // MARK: - Inputs
     let text: String
     let percentage: Int
     let percentageFraction: Double
@@ -26,8 +30,11 @@ struct PollOptionAnswered: View {
                 optionContent
             }
             .buttonStyle(.plain)
+            .accessibilityLabel(accessibilityText.pollOptionAnsweredLabel(text: text, percentage: percentage, isSelected: isSelected))
+            .accessibilityHint(accessibilityText.pollOptionHint(isInteractive: true))
         } else {
             optionContent
+                .accessibilityLabel(accessibilityText.pollOptionAnsweredLabel(text: text, percentage: percentage, isSelected: isSelected))
         }
     }
 

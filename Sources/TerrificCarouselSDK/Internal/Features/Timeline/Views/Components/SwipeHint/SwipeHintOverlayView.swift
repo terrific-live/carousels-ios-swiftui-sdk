@@ -9,6 +9,9 @@ import SwiftUI
 /// Animation: chevrons move up from bottom one by one → hold → disappear
 struct SwipeHintOverlayView: View {
 
+    // MARK: - Environment
+    @Environment(\.accessibilityText) private var accessibilityText
+
     // MARK: - Configuration
     private let chevronSize: CGFloat = 36
     private let chevronSpacing: CGFloat = -8
@@ -54,6 +57,8 @@ struct SwipeHintOverlayView: View {
         .onAppear {
             startAnimation()
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityText.swipeHintLabel)
     }
 
     // MARK: - Chevrons Stack

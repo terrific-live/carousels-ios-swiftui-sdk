@@ -10,6 +10,9 @@ import SwiftUI
 // MARK: - View
 struct TimelineFeedView: View {
 
+    // MARK: - Environment
+    @Environment(\.accessibilityText) private var accessibilityText
+
     // MARK: - Dependencies
     @ObservedObject private var viewModel: TimelineViewModel
 
@@ -97,10 +100,16 @@ private extension TimelineFeedView {
                 spacing: sizeConfig.carouselItemSpacing,
                 horizontalPadding: sizeConfig.carouselHorizontalPadding,
                 onPageChange: handlePageChange(to:)
-            ) { item, isSelected in
+            ) { item, isSelected, index, total in
                 buildCarouselItemView(item, isSelected: isSelected)
+                    .accessibilityValue(accessibilityText.itemPositionLabel(
+                        current: index + 1,
+                        total: total
+                    ))
             }
             .coordinateSpace(name: "TimelineScrollSpace")
+            .accessibilityLabel(accessibilityText.carouselLabel)
+            .accessibilityHint(accessibilityText.carouselHint)
             .onAppear {
                 handleCarouselViewed()
             }

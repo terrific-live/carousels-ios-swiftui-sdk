@@ -10,6 +10,9 @@ import SwiftUI
 // MARK: - View
 struct TimelineDetailView: View {
 
+    // MARK: - Environment
+    @Environment(\.accessibilityText) private var accessibilityText
+
     // MARK: - Dependencies
     @ObservedObject private var viewModel: TimelineViewModel
 
@@ -106,6 +109,10 @@ private extension TimelineDetailView {
         ) { item, isSelected in
             buildCarouselItemView(item, isSelected: isSelected)
         }
+        .accessibilityValue(accessibilityText.currentPageIndexLabel(
+            current: viewModel.currentPageIndex + 1,
+            total: items.count
+        ))
     }
 
     @ViewBuilder

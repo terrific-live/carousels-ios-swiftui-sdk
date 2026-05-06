@@ -8,6 +8,9 @@ import ImageLoader
 
 struct ProductView: View {
 
+    // MARK: - Environment
+    @Environment(\.accessibilityText) private var accessibilityText
+
     // MARK: - Inputs
     let viewData: ProductData
     let displayMode: ProductDisplayMode
@@ -43,6 +46,12 @@ struct ProductView: View {
         .frame(height: sizeConfiguration.totalHeight)
         .background(viewData.backgroundColor)
         .clipShape(RoundedRectangle(cornerRadius: sizeConfiguration.cornerRadius))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityText.productLabel(
+            title: viewData.title,
+            subtitle: viewData.subtitle,
+            price: displayMode == .full ? viewData.price : nil
+        ))
     }
 
     private var productImage: some View {
@@ -122,6 +131,7 @@ struct ProductView: View {
             .padding(.vertical, sizeConfiguration.badgeVerticalPadding)
             .background(badge.backgroundColor)
             .clipShape(RoundedRectangle(cornerRadius: sizeConfiguration.badgeCornerRadius))
+            .accessibilityLabel(accessibilityText.sponsorBadgeLabel(text: badge.text))
     }
 
     private func ctaButton(_ cta: CTAButtonData) -> some View {
@@ -136,6 +146,7 @@ struct ProductView: View {
                 .background(cta.backgroundColor)
                 .clipShape(Capsule())
         }
+        .accessibilityLabel(accessibilityText.productCtaButtonLabel(title: cta.text))
     }
 }
 

@@ -110,7 +110,7 @@ private extension TimelineFeedView {
             .coordinateSpace(name: "TimelineScrollSpace")
             .accessibilityLabel(accessibilityText.carouselLabel)
             .accessibilityHint(accessibilityText.carouselHint)
-            .onAppear {
+            .onVisibilityThreshold(0.5) {
                 handleCarouselViewed()
             }
         }

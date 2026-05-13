@@ -137,7 +137,7 @@ private extension TimelineFeedView {
             .onTapGesture {
                 handleAssetTap(asset)
             }
-            .onAppear {
+            .onVisibilityThreshold(0.5) {
                 handleAssetAppeared(asset)
             }
         case .loading:

@@ -17,7 +17,7 @@ final class TimelineCoordinator: ObservableObject {
 
     // MARK: - Configuration
     private enum Config {
-        static let feedItemsPerPage = 20
+        static let feedItemsPerPage = 10
         static let detailItemsPerPage = 10 // backend returns 20 items on 1 request no matter what you set, than 10 items per page
     }
 

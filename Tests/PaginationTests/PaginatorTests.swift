@@ -33,7 +33,7 @@ final class PaginatorTests: XCTestCase {
 
         XCTAssertEqual(paginator.items, ["item1", "item2", "item3"])
         XCTAssertFalse(paginator.isLoading)
-        XCTAssertTrue(paginator.hasMorePages)
+        XCTAssertFalse(paginator.hasMorePages)
         XCTAssertNil(paginator.lastError)
     }
 

@@ -66,7 +66,8 @@ struct TimelineFeedAssetCard: View {
         .accessibilityLabel(accessibilityText.feedAssetCardLabel(
             title: viewData.title,
             subtitle: viewData.subtitle,
-            timestamp: viewData.formattedTimestamp
+            mediaType: viewData.mediaType,
+            pollQuestion: viewData.pollViewModel?.pollData.question
         ))
         .accessibilityHint(accessibilityText.feedAssetCardHint)
     }

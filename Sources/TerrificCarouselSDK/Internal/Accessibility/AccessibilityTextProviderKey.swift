@@ -7,7 +7,7 @@ import SwiftUI
 
 // MARK: - Environment Key
 struct AccessibilityTextProviderKey: EnvironmentKey {
-    static let defaultValue: AccessibilityTextProvider = DefaultAccessibilityFrenchTextProvider()
+    static let defaultValue: AccessibilityTextProvider = LocalizedAccessibilityTextProvider()
 }
 
 // MARK: - Environment Values Extension

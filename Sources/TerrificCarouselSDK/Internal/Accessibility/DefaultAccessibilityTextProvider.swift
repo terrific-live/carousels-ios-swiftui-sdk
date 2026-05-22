@@ -36,11 +36,22 @@ struct DefaultAccessibilityTextProvider: AccessibilityTextProvider {
 
     // MARK: - Feed View
 
-    func feedAssetCardLabel(title: String, subtitle: String?, timestamp: String) -> String {
-        if let subtitle {
-            return "\(title). \(subtitle). Posted \(timestamp)"
+    func feedAssetCardLabel(title: String, subtitle: String?, mediaType: AssetMediaType, pollQuestion: String?) -> String {
+        let typeLabel: String
+        switch mediaType {
+        case .image: typeLabel = "Image"
+        case .video: typeLabel = "Video"
+        case .poll: typeLabel = "Poll"
+        case .ad: typeLabel = "Ad"
         }
-        return "\(title). Posted \(timestamp)"
+
+        var label = title
+        if let subtitle { label += ". \(subtitle)" }
+        label += ". \(typeLabel)"
+        if mediaType == .poll, let pollQuestion {
+            label += ". \(pollQuestion)"
+        }
+        return label
     }
 
     var feedAssetCardHint: String { "Tap to open full screen" }

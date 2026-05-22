@@ -1,0 +1,69 @@
+/*
+  Localizable.strings (English)
+  TerrificCarouselSDK
+
+  Accessibility strings for VoiceOver support.
+*/
+
+// MARK: - Carousel Navigation
+
+"accessibility.carousel.label" = "Content carousel";
+"accessibility.carousel.hint" = "Horizontal scrollable list. Swipe left or right to browse more items";
+"accessibility.carousel.item_position" = "Item %lld of %lld";
+
+// MARK: - Feed View
+
+"accessibility.feed.card.label_with_subtitle" = "%@. %@. %@";
+"accessibility.feed.card.label" = "%@. %@";
+"accessibility.feed.card.label_poll_with_subtitle" = "%@. %@. %@. %@";
+"accessibility.feed.card.label_poll" = "%@. %@. %@";
+"accessibility.feed.card.type.image" = "Image";
+"accessibility.feed.card.type.video" = "Video";
+"accessibility.feed.card.type.poll" = "Poll";
+"accessibility.feed.card.type.ad" = "Ad";
+"accessibility.feed.card.hint" = "Tap to open full screen";
+
+// MARK: - Detail View
+
+"accessibility.detail.close.label" = "Close";
+"accessibility.detail.close.hint" = "Dismiss and return to previous view";
+"accessibility.detail.asset.label_with_subtitle" = "%@. %@";
+"accessibility.detail.read_more" = "Read more";
+"accessibility.detail.read_less" = "Read less";
+"accessibility.detail.page_index" = "Page %lld of %lld";
+
+// MARK: - Action Buttons
+
+"accessibility.action.like" = "Like";
+"accessibility.action.unlike" = "Unlike";
+"accessibility.action.share" = "Share";
+"accessibility.action.mute" = "Mute video";
+"accessibility.action.unmute" = "Unmute video";
+
+// MARK: - Polls
+
+"accessibility.poll.question" = "Poll: %@";
+"accessibility.poll.option.hint" = "Tap to vote";
+"accessibility.poll.option.answered" = "%@. %lld percent";
+"accessibility.poll.option.answered_selected" = "Selected. %@. %lld percent";
+
+// MARK: - Products
+
+"accessibility.product.label" = "%@";
+"accessibility.product.label_with_subtitle" = "%@. %@";
+"accessibility.product.label_with_price" = "%@. %@";
+"accessibility.product.label_full" = "%@. %@. %@";
+
+// MARK: - Media
+
+"accessibility.media.image" = "Image";
+"accessibility.media.video.muted" = "Video, muted. Auto advances when finished";
+"accessibility.media.video.with_audio" = "Video, with audio. Auto advances when finished";
+
+// MARK: - Loading States
+
+"accessibility.loading" = "Loading content";
+
+// MARK: - Swipe Hint
+
+"accessibility.swipe_hint" = "Swipe up or down to navigate between items";

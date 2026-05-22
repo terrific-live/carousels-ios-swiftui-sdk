@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 // MARK: - MultiItemHorizontalCarousel
 /// A horizontal carousel that shows multiple items at once.
@@ -33,6 +34,9 @@ struct MultiItemHorizontalCarousel<Item: Identifiable, ItemContent: View, Loadin
     /// Tracks if scroll is happening from programmatic change (vs user swipe)
     @State
     private var isProgrammaticScroll: Bool = false
+    /// Tracks VoiceOver focus so it survives view re-renders triggered by currentPageIndex changes
+    @AccessibilityFocusState
+    private var accessibilityFocusedIndex: Int?
 
     // MARK: - Init
     init(
@@ -70,6 +74,7 @@ struct MultiItemHorizontalCarousel<Item: Identifiable, ItemContent: View, Loadin
                             itemContent(item, isSelected, index, items.count)
                                 .frame(width: itemWidth, height: itemHeight)
                                 .id(index)
+                                .accessibilityFocused($accessibilityFocusedIndex, equals: index)
                                 .background(
                                     VisibilityReporter(
                                         index: index,
@@ -135,6 +140,17 @@ struct MultiItemHorizontalCarousel<Item: Identifiable, ItemContent: View, Loadin
 
         // Only update if selection changed
         guard currentPageIndex != mostVisibleIndex else { return }
+
+        // When VoiceOver is active, skip updating the currentPageIndex binding.
+        // The binding propagates to a @Published property on the parent view model,
+        // triggering a full re-render of the parent view. LazyHStack rebuilds its
+        // accessibility tree during re-render, causing VoiceOver to lose focus and
+        // jump to the first element in the window.
+        // We still fire onPageChange for analytics tracking.
+        if UIAccessibility.isVoiceOverRunning {
+            onPageChange?(mostVisibleIndex)
+            return
+        }
 
         // Mark as programmatic scroll to prevent onChange from scrolling again
         isProgrammaticScroll = true

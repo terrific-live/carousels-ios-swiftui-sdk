@@ -4,6 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "TerrificCarouselSDK",
+    defaultLocalization: "en",
     platforms: [
         .iOS(.v17),
         .macOS(.v14),
@@ -27,7 +28,8 @@ let package = Package(
             ],
             path: "Sources/TerrificCarouselSDK",
             resources: [
-                .copy("PrivacyInfo.xcprivacy")
+                .copy("PrivacyInfo.xcprivacy"),
+                .process("Resources")
             ]
         ),
 

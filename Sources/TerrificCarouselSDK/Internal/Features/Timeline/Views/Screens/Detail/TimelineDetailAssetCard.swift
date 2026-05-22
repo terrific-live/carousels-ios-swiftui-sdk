@@ -91,10 +91,6 @@ struct TimelineDetailAssetCard: View {
         .padding(viewData.hasCustomBackground ? sizeConfig.edgePadding : 0)
         .background(backgroundView)
         .accessibilityElement(children: .contain)
-        .accessibilityLabel(accessibilityText.detailAssetLabel(
-            title: viewData.title,
-            subtitle: viewData.subtitle
-        ))
     }
 
     // MARK: - Background View

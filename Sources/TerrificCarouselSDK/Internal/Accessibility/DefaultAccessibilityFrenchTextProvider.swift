@@ -24,11 +24,22 @@ struct DefaultAccessibilityFrenchTextProvider: AccessibilityTextProvider {
 
     // MARK: - Feed View
 
-    func feedAssetCardLabel(title: String, subtitle: String?, timestamp: String) -> String {
-        if let subtitle {
-            return "\(title). \(subtitle). Publié \(timestamp)"
+    func feedAssetCardLabel(title: String, subtitle: String?, mediaType: AssetMediaType, pollQuestion: String?) -> String {
+        let typeLabel: String
+        switch mediaType {
+        case .image: typeLabel = "Image"
+        case .video: typeLabel = "Vidéo"
+        case .poll: typeLabel = "Sondage"
+        case .ad: typeLabel = "Publicité"
         }
-        return "\(title). Publié \(timestamp)"
+
+        var label = title
+        if let subtitle { label += ". \(subtitle)" }
+        label += ". \(typeLabel)"
+        if mediaType == .poll, let pollQuestion {
+            label += ". \(pollQuestion)"
+        }
+        return label
     }
 
     var feedAssetCardHint: String { "Appuyez pour ouvrir en plein écran" }

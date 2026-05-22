@@ -1,0 +1,69 @@
+/*
+  Localizable.strings (French)
+  TerrificCarouselSDK
+
+  Accessibility strings for VoiceOver support.
+*/
+
+// MARK: - Carousel Navigation
+
+"accessibility.carousel.label" = "Carrousel de contenu";
+"accessibility.carousel.hint" = "Liste déroulante horizontale. Balayez vers la gauche ou la droite pour parcourir plus d'éléments";
+"accessibility.carousel.item_position" = "Élément %lld sur %lld";
+
+// MARK: - Feed View
+
+"accessibility.feed.card.label_with_subtitle" = "%@. %@. %@";
+"accessibility.feed.card.label" = "%@. %@";
+"accessibility.feed.card.label_poll_with_subtitle" = "%@. %@. %@. %@";
+"accessibility.feed.card.label_poll" = "%@. %@. %@";
+"accessibility.feed.card.type.image" = "Image";
+"accessibility.feed.card.type.video" = "Vidéo";
+"accessibility.feed.card.type.poll" = "Sondage";
+"accessibility.feed.card.type.ad" = "Publicité";
+"accessibility.feed.card.hint" = "Appuyez pour ouvrir en plein écran";
+
+// MARK: - Detail View
+
+"accessibility.detail.close.label" = "Fermer";
+"accessibility.detail.close.hint" = "Fermer et revenir à la vue précédente";
+"accessibility.detail.asset.label_with_subtitle" = "%@. %@";
+"accessibility.detail.read_more" = "Lire plus";
+"accessibility.detail.read_less" = "Lire moins";
+"accessibility.detail.page_index" = "Page %lld sur %lld";
+
+// MARK: - Action Buttons
+
+"accessibility.action.like" = "Aimer";
+"accessibility.action.unlike" = "Ne plus aimer";
+"accessibility.action.share" = "Partager";
+"accessibility.action.mute" = "Couper le son";
+"accessibility.action.unmute" = "Activer le son";
+
+// MARK: - Polls
+
+"accessibility.poll.question" = "Sondage : %@";
+"accessibility.poll.option.hint" = "Appuyez pour voter";
+"accessibility.poll.option.answered" = "%@. %lld pourcent";
+"accessibility.poll.option.answered_selected" = "Sélectionné. %@. %lld pourcent";
+
+// MARK: - Products
+
+"accessibility.product.label" = "%@";
+"accessibility.product.label_with_subtitle" = "%@. %@";
+"accessibility.product.label_with_price" = "%@. %@";
+"accessibility.product.label_full" = "%@. %@. %@";
+
+// MARK: - Media
+
+"accessibility.media.image" = "Image";
+"accessibility.media.video.muted" = "Vidéo, son coupé. Avance automatiquement à la fin";
+"accessibility.media.video.with_audio" = "Vidéo, avec le son. Avance automatiquement à la fin";
+
+// MARK: - Loading States
+
+"accessibility.loading" = "Chargement du contenu";
+
+// MARK: - Swipe Hint
+
+"accessibility.swipe_hint" = "Balayez vers le haut ou le bas pour naviguer entre les éléments";

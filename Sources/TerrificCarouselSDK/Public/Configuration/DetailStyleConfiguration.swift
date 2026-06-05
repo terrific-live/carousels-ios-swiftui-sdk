@@ -77,6 +77,12 @@ public struct DetailStyleConfiguration: Equatable, Sendable {
     /// Configuration for product elements in detail view
     public let product: ProductViewSizeConfiguration
 
+    // MARK: - Sponsor Badge
+    /// Height of the sponsor badge overlay
+    public let sponsorBadgeHeight: CGFloat
+    /// Vertical padding inside the sponsor badge (between content and badge edges)
+    public let sponsorBadgeVerticalPadding: CGFloat
+
     public init(
         cardCornerRadius: CGFloat = 16,
         edgePadding: CGFloat = 16,
@@ -101,7 +107,9 @@ public struct DetailStyleConfiguration: Equatable, Sendable {
         contentHorizontalPadding: CGFloat = 16,
         bottomInfoPaddingBottom: CGFloat = 24,
         poll: PollStyleConfiguration = .default,
-        product: ProductViewSizeConfiguration = .detail
+        product: ProductViewSizeConfiguration = .detail,
+        sponsorBadgeHeight: CGFloat = 30,
+        sponsorBadgeVerticalPadding: CGFloat = 6
     ) {
         self.cardCornerRadius = cardCornerRadius
         self.edgePadding = edgePadding
@@ -127,6 +135,8 @@ public struct DetailStyleConfiguration: Equatable, Sendable {
         self.bottomInfoPaddingBottom = bottomInfoPaddingBottom
         self.poll = poll
         self.product = product
+        self.sponsorBadgeHeight = sponsorBadgeHeight
+        self.sponsorBadgeVerticalPadding = sponsorBadgeVerticalPadding
     }
 
     /// Default detail configuration

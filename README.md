@@ -167,9 +167,11 @@ For complete styling documentation, see [Style Configuration Guide](Documentatio
 ```swift
 CarouselStyleConfiguration
 ├── feed: FeedStyleConfiguration      // Horizontal carousel
-│   └── poll: PollStyleConfiguration  // Poll styling in feed
+│   ├── poll: PollStyleConfiguration  // Poll styling in feed
+│   └── sponsorship properties        // Sponsor label, logo, spacing
 └── detail: DetailStyleConfiguration  // Fullscreen view
-    └── poll: PollStyleConfiguration  // Poll styling in detail
+    ├── poll: PollStyleConfiguration  // Poll styling in detail
+    └── sponsorship properties        // Sponsor badge/banner overlay
 ```
 
 ### Total Height Calculation
@@ -180,9 +182,18 @@ CarouselStyleConfiguration
 | `carouselNameBottomPadding` | 24 | Space below the carousel title |
 | `carouselItemHeight` | 420 | Height of each carousel card |
 
-**Total Height** = `carouselNameFont.size` + `carouselNameBottomPadding` + `carouselItemHeight` = **498 points** (default)
+**Base Total Height** = `carouselNameHeight` + `carouselNameBottomPadding` + `carouselItemHeight` = **498 points** (default)
 
-> **Important:** The `carouselNameHeight` default value 54 (2 lines of default font). For custom `Fonts` and `Sizes`, `carouselNameHeight` should be calculated.
+When sponsorship is enabled by the API, additional height is added dynamically:
+
+| Element | Additional Height | Default |
+|---------|-------------------|---------|
+| Sponsor label row | `sponsorLabelHeight + sponsorLabelPadding * 2` | 40 |
+| Sponsor logo | `sponsorLogoHeight + sponsorLogoPadding * 2 + sponsorLogoTopSpacing` | 54 |
+
+**Max Total Height** (all sponsorship) = 498 + 40 + 54 = **592 points** (default)
+
+> **Important:** The `carouselNameHeight` default value 54 (2 lines of default font). For custom `Fonts` and `Sizes`, `carouselNameHeight` should be calculated. See [Style Configuration Guide](Documentation/STYLING.md) for all sponsorship properties.
 
 ### Example
 

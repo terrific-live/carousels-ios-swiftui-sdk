@@ -65,6 +65,22 @@ public struct FeedStyleConfiguration: Equatable, Sendable {
     /// Horizontal padding for carousel name label
     public let carouselNameHorizontalPadding: CGFloat
 
+    // MARK: - Sponsorship
+    /// Height for the sponsor logo image displayed below the carousel
+    public let sponsorLogoHeight: CGFloat
+    /// Font for the sponsor label text displayed above the carousel name
+    public let sponsorLabelFont: CarouselFontDescriptor
+    /// Height allocated for the sponsor label row (label + top logo)
+    public let sponsorLabelHeight: CGFloat
+    /// Color for the sponsor label text
+    public let sponsorLabelColor: Color
+    /// Padding inside the sponsor logo banner (between logo and banner edges)
+    public let sponsorLogoPadding: CGFloat
+    /// Padding inside the sponsor label row (between content and row edges)
+    public let sponsorLabelPadding: CGFloat
+    /// Spacing between carousel items and the sponsor logo banner below
+    public let sponsorLogoTopSpacing: CGFloat
+
     // MARK: - Poll
     /// Configuration for poll elements in feed
     public let poll: PollStyleConfiguration
@@ -96,6 +112,13 @@ public struct FeedStyleConfiguration: Equatable, Sendable {
         carouselNameHeight: CGFloat = 54,
         carouselNameBottomPadding: CGFloat = 24,
         carouselNameHorizontalPadding: CGFloat = 16,
+        sponsorLogoHeight: CGFloat = 30,
+        sponsorLabelFont: CarouselFontDescriptor = .system(size: 14, weight: .regular),
+        sponsorLabelHeight: CGFloat = 24,
+        sponsorLabelColor: Color = .white,
+        sponsorLogoPadding: CGFloat = 8,
+        sponsorLabelPadding: CGFloat = 8,
+        sponsorLogoTopSpacing: CGFloat = 8,
         poll: PollStyleConfiguration = .compact,
         product: ProductViewSizeConfiguration = .feed
     ) {
@@ -121,6 +144,13 @@ public struct FeedStyleConfiguration: Equatable, Sendable {
         self.carouselNameHeight = carouselNameHeight
         self.carouselNameBottomPadding = carouselNameBottomPadding
         self.carouselNameHorizontalPadding = carouselNameHorizontalPadding
+        self.sponsorLogoHeight = sponsorLogoHeight
+        self.sponsorLabelFont = sponsorLabelFont
+        self.sponsorLabelHeight = sponsorLabelHeight
+        self.sponsorLabelColor = sponsorLabelColor
+        self.sponsorLogoPadding = sponsorLogoPadding
+        self.sponsorLabelPadding = sponsorLabelPadding
+        self.sponsorLogoTopSpacing = sponsorLogoTopSpacing
         self.poll = poll
         self.product = product
     }
@@ -132,6 +162,17 @@ public struct FeedStyleConfiguration: Equatable, Sendable {
     /// Formula: carouselItemHeight + carouselNameHeight + carouselNameBottomPadding
     public var totalCarouselHeight: CGFloat {
         carouselItemHeight + carouselNameHeight + carouselNameBottomPadding
+    }
+
+    /// Total height of the carousel including optional sponsorship elements.
+    /// - Parameters:
+    ///   - hasSponsorLabel: Whether the sponsor label row is visible
+    ///   - hasSponsorLogo: Whether the sponsor logo at the bottom is visible
+    public func totalCarouselHeight(hasSponsorLabel: Bool, hasSponsorLogo: Bool) -> CGFloat {
+        var height = totalCarouselHeight
+        if hasSponsorLabel { height += sponsorLabelHeight + sponsorLabelPadding * 2 }
+        if hasSponsorLogo { height += sponsorLogoHeight + sponsorLogoPadding * 2 + sponsorLogoTopSpacing }
+        return height
     }
 
     /// Calculates horizontal padding for asset cards when products are displayed.

@@ -23,10 +23,12 @@ The SDK uses a hierarchical configuration structure:
 CarouselStyleConfiguration
 ├── feed: FeedStyleConfiguration           // Horizontal carousel (feed view)
 │   ├── poll: PollStyleConfiguration       // Poll styling in feed
-│   └── product: ProductViewSizeConfiguration  // Product styling in feed
+│   ├── product: ProductViewSizeConfiguration  // Product styling in feed
+│   └── sponsorship properties             // Sponsor label, logo, spacing
 └── detail: DetailStyleConfiguration       // Fullscreen vertical view
     ├── poll: PollStyleConfiguration       // Poll styling in detail
-    └── product: ProductViewSizeConfiguration  // Product styling in detail
+    ├── product: ProductViewSizeConfiguration  // Product styling in detail
+    └── sponsorship properties             // Sponsor badge/banner overlay
 ```
 
 > **Important:** The `CarouselView` determines its own size based on `styleConfiguration`. Do **NOT** wrap it in a `.frame()` modifier. All sizing should be done through `styleConfiguration` properties.
@@ -113,6 +115,18 @@ Controls the horizontal carousel (feed) appearance.
 | `carouselNameBottomPadding` | CGFloat | 24 | Bottom padding below carousel name |
 | `carouselNameHorizontalPadding` | CGFloat | 16 | Horizontal padding for carousel name |
 
+### Sponsorship (Feed)
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `sponsorLogoHeight` | CGFloat | 30 | Height for the sponsor logo image displayed below the carousel |
+| `sponsorLabelFont` | CarouselFontDescriptor | System 14 regular | Font for the sponsor label text above the carousel name |
+| `sponsorLabelHeight` | CGFloat | 24 | Height allocated for the sponsor label row (label + top logo) |
+| `sponsorLabelColor` | Color | .white | Color for the sponsor label text |
+| `sponsorLogoPadding` | CGFloat | 8 | Padding inside the sponsor logo banner (between logo and banner edges) |
+| `sponsorLabelPadding` | CGFloat | 8 | Padding inside the sponsor label row (between content and row edges) |
+| `sponsorLogoTopSpacing` | CGFloat | 8 | Spacing between carousel items and the sponsor logo banner below |
+
 ### Poll
 
 | Property | Type | Default | Description |
@@ -143,12 +157,30 @@ The total height of the carousel is determined by these key properties:
 | `carouselNameBottomPadding` | 24 | Space below the carousel title |
 | `carouselItemHeight` | 420 | Height of each carousel card |
 
-**Formula:**
+**Base formula (without sponsorship):**
 
 ```
 Total Height = carouselNameHeight + carouselNameBottomPadding + carouselItemHeight
              = 54 + 24 + 420
              = 498 points (default)
+```
+
+**With sponsorship elements**, the height increases dynamically:
+
+| Condition | Additional Height | Formula |
+|-----------|-------------------|---------|
+| Sponsor label row visible | `sponsorLabelHeight + sponsorLabelPadding * 2` | 24 + 8*2 = 40 |
+| Sponsor logo visible | `sponsorLogoHeight + sponsorLogoPadding * 2 + sponsorLogoTopSpacing` | 30 + 8*2 + 8 = 54 |
+
+**Full formula (with all sponsorship):**
+
+```
+Total Height = carouselNameHeight + carouselNameBottomPadding + carouselItemHeight
+             + sponsorLabelHeight + sponsorLabelPadding * 2       (if sponsor label visible)
+             + sponsorLogoHeight + sponsorLogoPadding * 2         (if sponsor logo visible)
+             + sponsorLogoTopSpacing                              (if sponsor logo visible)
+             = 498 + 40 + 54
+             = 592 points (default, all sponsorship enabled)
 ```
 
 > **Important:** The `carouselNameHeight` default value 54 (2 lines of default font). For custom `Fonts` and `Sizes`, `carouselNameHeight` should be calculated.
@@ -220,6 +252,22 @@ Controls the fullscreen detail view appearance.
 |----------|------|---------|-------------|
 | `contentHorizontalPadding` | CGFloat | 16 | Horizontal padding for overlay content |
 | `bottomInfoPaddingBottom` | CGFloat | 24 | Bottom padding of bottom info section |
+
+### Sponsor Badge / Banner (Detail)
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `sponsorBadgeHeight` | CGFloat | 30 | Height of the sponsor badge/banner overlay |
+| `sponsorBadgeVerticalPadding` | CGFloat | 6 | Vertical padding inside the badge (between logo and badge edges) |
+
+The detail view supports two sponsorship overlay types controlled by the API's `adPlacementType` field:
+
+| Type | Layout | Description |
+|------|--------|-------------|
+| `"badge"` | Corner overlay | Small overlay at a corner of the card (top-left, top-center, or top-right) |
+| `"banner"` | Full-width strip | Full-width bar at the top or bottom of the card |
+
+Both types display the sponsor logo with a configurable background color. The overlay is clipped within the card bounds and does not appear on poll assets (polls use their own sponsorship from the `poll` sub-configuration).
 
 ### Poll
 

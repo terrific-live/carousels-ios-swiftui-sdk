@@ -23,6 +23,7 @@ struct TimelineDetailAssetCard: View {
     let isLiked: Bool
     let displayDuration: TimeInterval
     let sizeConfig: DetailStyleConfiguration
+    let sponsorship: SponsorshipDTO?
     let onCtaButtonTap: (() -> Void)?
     let onProductCtaTap: ((ProductData, URL?) -> Void)?
     let onLikeTap: (() -> Void)?
@@ -51,6 +52,7 @@ struct TimelineDetailAssetCard: View {
         isLiked: Bool = false,
         displayDuration: TimeInterval = 10,
         sizeConfig: DetailStyleConfiguration = .default,
+        sponsorship: SponsorshipDTO? = nil,
         isMuted: Binding<Bool> = .constant(true),
         onCtaButtonTap: (() -> Void)? = nil,
         onProductCtaTap: ((ProductData, URL?) -> Void)? = nil,
@@ -63,6 +65,7 @@ struct TimelineDetailAssetCard: View {
         self.isLiked = isLiked
         self.displayDuration = displayDuration
         self.sizeConfig = sizeConfig
+        self.sponsorship = sponsorship
         self._isMuted = isMuted
         self.onCtaButtonTap = onCtaButtonTap
         self.onProductCtaTap = onProductCtaTap
@@ -143,6 +146,12 @@ struct TimelineDetailAssetCard: View {
             // Progress bar at the bottom
             progressBar
         }
+        .overlay(alignment: badgeAlignment) {
+            sponsorBadgeOnlyOverlay
+        }
+        .overlay {
+            sponsorBannerContainerOverlay
+        }
         .clipShape(RoundedRectangle(cornerRadius: viewData.hasCustomBackground ? sizeConfig.cardCornerRadius : 0))
         .clipped()
         .onAppear {
@@ -189,7 +198,11 @@ struct TimelineDetailAssetCard: View {
     private var pollContent: some View {
         if let pollViewModel = viewData.pollViewModel {
             GeometryReader { geometry in
-                VStack {
+                VStack(spacing: 0) {
+                    if shouldShowPollSponsor && pollSponsorPosition == "top" {
+                        pollSponsorView
+                            .padding(.top, sizeConfig.timestampTopMargin * 3)
+                    }
                     Spacer()
                     PollView(
                         viewModel: pollViewModel,
@@ -197,6 +210,10 @@ struct TimelineDetailAssetCard: View {
                         displayMode: .interactive  // Shows actual state, allows interaction
                     )
                     Spacer()
+                    if shouldShowPollSponsor && pollSponsorPosition == "bottom" {
+                        pollSponsorView
+                            .padding(.bottom, sizeConfig.bottomInfoPaddingBottom + sizeConfig.progressBarHeight)
+                    }
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height)
             }
@@ -343,6 +360,7 @@ private extension TimelineDetailAssetCard {
                     .padding(.trailing, sizeConfig.contentHorizontalPadding)
                     .padding(.bottom, sizeConfig.bottomInfoPaddingBottom)
             }
+            .padding(.bottom, bannerBottomInset)
         }
     }
 
@@ -488,6 +506,185 @@ private extension TimelineDetailAssetCard {
         .padding(.leading, sizeConfig.contentHorizontalPadding)
         .padding(.bottom, sizeConfig.bottomInfoPaddingBottom)
         .padding(.top, sizeConfig.bottomInfoPaddingBottom)
+    }
+}
+
+// MARK: - Sponsor Badge / Banner
+private extension TimelineDetailAssetCard {
+
+    var shouldShowSponsorOverlay: Bool {
+        guard sponsorship?.verticalEnabled == true,
+              viewData.mediaType != .poll else { return false }
+        switch sponsorship?.adPlacementType {
+        case "badge": return sponsorship?.badge != nil
+        case "banner": return sponsorship?.banner != nil
+        default: return false
+        }
+    }
+
+    /// Logo URL from either badge or banner data
+    private var sponsorLogoUrl: String? {
+        if sponsorship?.adPlacementType == "badge" {
+            return sponsorship?.badge?.logoUrl
+        }
+        return sponsorship?.banner?.logoUrl
+    }
+
+    /// Background color hex from either badge or banner data
+    private var sponsorBackgroundColor: String {
+        if sponsorship?.adPlacementType == "badge" {
+            return sponsorship?.badge?.backgroundColor ?? "#000000"
+        }
+        return sponsorship?.banner?.backgroundColor ?? "#000000"
+    }
+
+    /// Position string from either badge or banner data
+    private var sponsorPosition: String {
+        if sponsorship?.adPlacementType == "badge" {
+            return sponsorship?.badge?.position ?? "top-left"
+        }
+        return sponsorship?.banner?.position ?? "top"
+    }
+
+    // MARK: Banner helpers
+
+    private var showsTopBanner: Bool {
+        let pos = sponsorship?.banner?.position ?? "top"
+        return pos == "top" || pos == "top-bottom"
+    }
+
+    private var showsBottomBanner: Bool {
+        let pos = sponsorship?.banner?.position ?? "top"
+        return pos == "bottom" || pos == "top-bottom"
+            || sponsorship?.banner?.isBottom == true
+    }
+
+    /// Extra bottom inset for overlay content when a bottom banner is present
+    var bannerBottomInset: CGFloat {
+        guard shouldShowSponsorOverlay,
+              sponsorship?.adPlacementType == "banner",
+              showsBottomBanner else { return 0 }
+        return sizeConfig.sponsorBadgeHeight
+    }
+
+    var badgeAlignment: Alignment {
+        guard shouldShowSponsorOverlay else { return .topLeading }
+        switch sponsorPosition {
+        case "top-center": return .top
+        case "top-right": return .topTrailing
+        default: return .topLeading
+        }
+    }
+
+    // MARK: Badge-only overlay (corner position)
+
+    @ViewBuilder
+    var sponsorBadgeOnlyOverlay: some View {
+        if shouldShowSponsorOverlay && sponsorship?.adPlacementType == "badge" {
+            badgeOverlayView
+        }
+    }
+
+    // MARK: Banner container overlay (full-width, supports top/bottom/top-bottom)
+
+    @ViewBuilder
+    var sponsorBannerContainerOverlay: some View {
+        if shouldShowSponsorOverlay && sponsorship?.adPlacementType == "banner" {
+            VStack {
+                if showsTopBanner {
+                    bannerOverlayView
+                }
+                Spacer()
+                if showsBottomBanner {
+                    bannerOverlayView
+                }
+            }
+        }
+    }
+
+    private var bannerOverlayView: some View {
+        HStack {
+            if let logoUrl = sponsorLogoUrl {
+                CachedAsyncImage(urlString: logoUrl) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                }
+                .frame(height: sizeConfig.sponsorBadgeHeight - sizeConfig.sponsorBadgeVerticalPadding * 2)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, sizeConfig.sponsorBadgeVerticalPadding)
+        .background(Color(hex: sponsorBackgroundColor))
+    }
+
+    // MARK: Badge (corner overlay)
+
+    private var badgeOverlayView: some View {
+        HStack(spacing: 6) {
+            if let logoUrl = sponsorLogoUrl {
+                CachedAsyncImage(urlString: logoUrl) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                }
+                .frame(height: sizeConfig.sponsorBadgeHeight - sizeConfig.sponsorBadgeVerticalPadding * 2)
+            }
+        }
+        .padding(.vertical, sizeConfig.sponsorBadgeVerticalPadding)
+        .padding(.horizontal, 10)
+        .background(Color(hex: sponsorBackgroundColor))
+        .clipShape(badgeShape)
+    }
+
+    private var badgeShape: UnevenRoundedRectangle {
+        let outerRadius = viewData.hasCustomBackground ? sizeConfig.cardCornerRadius : 0
+        let innerRadius: CGFloat = 8
+        switch sponsorPosition {
+        case "top-center":
+            return UnevenRoundedRectangle(
+                bottomLeadingRadius: innerRadius,
+                bottomTrailingRadius: innerRadius
+            )
+        case "top-right":
+            return UnevenRoundedRectangle(
+                bottomLeadingRadius: innerRadius,
+                topTrailingRadius: outerRadius
+            )
+        default: // "top-left"
+            return UnevenRoundedRectangle(
+                topLeadingRadius: outerRadius,
+                bottomTrailingRadius: innerRadius
+            )
+        }
+    }
+
+    // MARK: Poll sponsor
+
+    var shouldShowPollSponsor: Bool {
+        sponsorship?.verticalEnabled == true
+        && sponsorship?.poll != nil
+        && sponsorship?.poll?.logoUrl != nil
+    }
+
+    var pollSponsorPosition: String {
+        sponsorship?.poll?.adPosition ?? "top"
+    }
+
+    @ViewBuilder
+    var pollSponsorView: some View {
+        if let logoUrl = sponsorship?.poll?.logoUrl {
+            HStack {
+                CachedAsyncImage(urlString: logoUrl) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                }
+                .frame(height: sizeConfig.sponsorBadgeHeight - sizeConfig.sponsorBadgeVerticalPadding * 2)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, sizeConfig.sponsorBadgeVerticalPadding)
+        }
     }
 }
 

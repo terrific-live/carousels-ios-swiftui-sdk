@@ -129,6 +129,7 @@ private extension TimelineDetailView {
                 isLiked: viewModel.isAssetLiked(asset.id),
                 displayDuration: TimelineViewModel.imageDisplayDuration,
                 sizeConfig: styleConfig,
+                sponsorship: viewModel.carouselConfig.sponsorship,
                 isMuted: $isMuted,
                 onCtaButtonTap: {
                     handleCtaButtonTap(asset: asset, viewData: viewData)

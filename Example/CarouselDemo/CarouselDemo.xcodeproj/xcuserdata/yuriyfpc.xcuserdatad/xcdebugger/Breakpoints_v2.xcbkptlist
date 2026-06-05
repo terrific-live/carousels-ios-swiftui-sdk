@@ -8,7 +8,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "B0EE7BC0-947C-4071-9620-21828497BE68"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../../Sources/TerrificCarouselSDK/Internal/Features/Timeline/Services/ErrorLogging/Implementation/ErrorLoggingServiceImpl.swift"

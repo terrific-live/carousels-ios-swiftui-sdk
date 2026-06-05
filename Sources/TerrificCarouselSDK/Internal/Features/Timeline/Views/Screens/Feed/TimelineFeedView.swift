@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import ImageLoader
 
 // MARK: - View
 struct TimelineFeedView: View {
@@ -70,7 +71,7 @@ private extension TimelineFeedView {
 
         case .content:
             buildAssetList(viewModel.carouselItems)
-                .frame(height: sizeConfig.totalCarouselHeight)
+                .frame(height: calculatedTotalHeight)
 
         case .error:
             // Hide carousel on error (no height)
@@ -78,9 +79,31 @@ private extension TimelineFeedView {
         }
     }
 
+    /// Total height accounting for sponsorship elements when present
+    private var calculatedTotalHeight: CGFloat {
+        let sponsorship = viewModel.carouselConfig.sponsorship
+        let hasSponsorLabel = sponsorship?.enabled == true && hasSponsorLabelContent(sponsorship)
+        let hasSponsorLogo = sponsorship?.enabled == true && sponsorship?.sideLogoUrl != nil
+        return sizeConfig.totalCarouselHeight(hasSponsorLabel: hasSponsorLabel, hasSponsorLogo: hasSponsorLogo)
+    }
+
+    /// Whether the sponsor label row has content to show (label text or top logo)
+    private func hasSponsorLabelContent(_ sponsorship: SponsorshipDTO?) -> Bool {
+        let hasLabel = sponsorship?.sponsorLabel != nil && !(sponsorship?.sponsorLabel?.isEmpty ?? true)
+        let hasTopLogo = sponsorship?.topLogoUrl != nil
+        return hasLabel || hasTopLogo
+    }
+
     @ViewBuilder
     func buildAssetList(_ items: [TimelineViewModel.TimelineCarouselItem]) -> some View {
         VStack(alignment: .leading, spacing: 0) {
+            // Sponsor label row (above carousel name)
+            if let sponsorship = viewModel.carouselConfig.sponsorship,
+               sponsorship.enabled == true,
+               hasSponsorLabelContent(sponsorship) {
+                sponsorLabelRow(sponsorship: sponsorship)
+            }
+
             // Carousel name label (if showName is true)
             if let carouselName = viewModel.carouselConfig.name,
                viewModel.carouselConfig.showName == true {
@@ -114,7 +137,53 @@ private extension TimelineFeedView {
             .onVisibilityThreshold(0.5) {
                 handleCarouselViewed()
             }
+
+            // Sponsor logo at bottom
+            if let sponsorship = viewModel.carouselConfig.sponsorship,
+               sponsorship.enabled == true,
+               let sideLogoUrl = sponsorship.sideLogoUrl {
+                sponsorLogoView(urlString: sideLogoUrl, backgroundColor: sponsorship.backgroundColor)
+                    .padding(.top, sizeConfig.sponsorLogoTopSpacing)
+            }
         }
+    }
+
+    // MARK: - Sponsorship Views
+
+    @ViewBuilder
+    func sponsorLabelRow(sponsorship: SponsorshipDTO) -> some View {
+        HStack(spacing: 8) {
+            if let label = sponsorship.sponsorLabel, !label.isEmpty {
+                Text(label)
+                    .font(sizeConfig.sponsorLabelFont.toFont())
+                    .foregroundColor(sizeConfig.sponsorLabelColor)
+            }
+            if let topLogoUrl = sponsorship.topLogoUrl {
+                CachedAsyncImage(urlString: topLogoUrl) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                }
+                .frame(height: sizeConfig.sponsorLabelHeight)
+            }
+        }
+        .frame(height: sizeConfig.sponsorLabelHeight, alignment: .leading)
+        .padding(.horizontal, sizeConfig.carouselNameHorizontalPadding)
+        .padding(.vertical, sizeConfig.sponsorLabelPadding)
+    }
+
+    @ViewBuilder
+    func sponsorLogoView(urlString: String, backgroundColor: String?) -> some View {
+        CachedAsyncImage(urlString: urlString) { image in
+            image
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+        }
+        .frame(height: sizeConfig.sponsorLogoHeight)
+        .frame(maxWidth: .infinity, alignment: .center)
+        .padding(sizeConfig.sponsorLogoPadding)
+        .background(backgroundColor.map { Color(hex: $0) } ?? .clear)
+        .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: sizeConfig.cardCornerRadius, bottomTrailingRadius: sizeConfig.cardCornerRadius))
     }
 
     @ViewBuilder

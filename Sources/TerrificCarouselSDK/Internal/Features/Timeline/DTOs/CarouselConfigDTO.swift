@@ -24,6 +24,8 @@ struct CarouselConfigDTO: Codable, Equatable {
     let mapBrandNameToProductName: Bool?
     /// Localized text for swipe up hint animation in vertical carousel
     let swipeUpText: String?
+    /// Sponsorship configuration for carousel branding
+    let sponsorship: SponsorshipDTO?
 }
 
 // MARK: - Timestamp Formatting
@@ -109,6 +111,7 @@ extension CarouselConfigDTO {
         name: nil,
         showTimestamps: true,
         mapBrandNameToProductName: false,
-        swipeUpText: nil
+        swipeUpText: nil,
+        sponsorship: nil
     )
 }

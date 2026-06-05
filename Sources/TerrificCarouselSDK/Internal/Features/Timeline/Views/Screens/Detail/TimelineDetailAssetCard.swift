@@ -145,6 +145,7 @@ struct TimelineDetailAssetCard: View {
 
             // Progress bar at the bottom
             progressBar
+                .padding(.bottom, bannerBottomInset)
         }
         .overlay(alignment: badgeAlignment) {
             sponsorBadgeOnlyOverlay

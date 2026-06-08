@@ -16,6 +16,7 @@ struct TimelineDetailAssetCard: View {
 
     // MARK: - Environment
     @Environment(\.accessibilityText) private var accessibilityText
+    @Environment(\.openURL) private var openURL
 
     // MARK: - Inputs
     let viewData: TimelineAssetData
@@ -29,6 +30,7 @@ struct TimelineDetailAssetCard: View {
     let onLikeTap: (() -> Void)?
     let onShareTap: (() -> Void)?
     let onVideoFinished: (() -> Void)?
+    let onSponsorshipTap: ((_ sponsorshipPlacement: AssetSponsorshipPlacement, _ sponsorshipPosition: SponsorshipPosition?, _ clickPosition: SponsorshipClickPosition?, _ sponsorshipUrl: String?) -> Void)?
 
     // MARK: - Bindings
     @Binding var isMuted: Bool
@@ -58,7 +60,8 @@ struct TimelineDetailAssetCard: View {
         onProductCtaTap: ((ProductData, URL?) -> Void)? = nil,
         onLikeTap: (() -> Void)? = nil,
         onShareTap: (() -> Void)? = nil,
-        onVideoFinished: (() -> Void)? = nil
+        onVideoFinished: (() -> Void)? = nil,
+        onSponsorshipTap: ((_ sponsorshipPlacement: AssetSponsorshipPlacement, _ sponsorshipPosition: SponsorshipPosition?, _ clickPosition: SponsorshipClickPosition?, _ sponsorshipUrl: String?) -> Void)? = nil
     ) {
         self.viewData = viewData
         self.isSelected = isSelected
@@ -72,6 +75,7 @@ struct TimelineDetailAssetCard: View {
         self.onLikeTap = onLikeTap
         self.onShareTap = onShareTap
         self.onVideoFinished = onVideoFinished
+        self.onSponsorshipTap = onSponsorshipTap
     }
 
     // MARK: - Body
@@ -203,6 +207,9 @@ struct TimelineDetailAssetCard: View {
                     if shouldShowPollSponsor && pollSponsorPosition == "top" {
                         pollSponsorView
                             .padding(.top, sizeConfig.timestampTopMargin * 3)
+                            .onTapGesture {
+                                handleSponsorTap(placement: .pollLogo, position: .top, clickPosition: .top, url: pollSponsorRedirectUrl)
+                            }
                     }
                     Spacer()
                     PollView(
@@ -214,6 +221,9 @@ struct TimelineDetailAssetCard: View {
                     if shouldShowPollSponsor && pollSponsorPosition == "bottom" {
                         pollSponsorView
                             .padding(.bottom, sizeConfig.bottomInfoPaddingBottom + sizeConfig.progressBarHeight)
+                            .onTapGesture {
+                                handleSponsorTap(placement: .pollLogo, position: .bottom, clickPosition: .bottom, url: pollSponsorRedirectUrl)
+                            }
                     }
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height)
@@ -547,6 +557,28 @@ private extension TimelineDetailAssetCard {
         return sponsorship?.banner?.position ?? "top"
     }
 
+    /// Analytics position enum mapped from the API position string
+    private var sponsorAnalyticsPosition: SponsorshipPosition? {
+        switch sponsorPosition {
+        case "top", "top-left", "top-center", "top-right": return .top
+        case "bottom": return .bottom
+        case "top-bottom": return .both
+        default: return nil
+        }
+    }
+
+    /// Redirect URL for the current sponsor overlay type
+    private var sponsorRedirectUrl: URL? {
+        let urlString: String?
+        if sponsorship?.adPlacementType == "badge" {
+            urlString = sponsorship?.badge?.clickRedirect ?? sponsorship?.verticalClickRedirect
+        } else {
+            urlString = sponsorship?.banner?.clickRedirect ?? sponsorship?.verticalClickRedirect
+        }
+        guard let urlString else { return nil }
+        return URL(string: urlString)
+    }
+
     // MARK: Banner helpers
 
     private var showsTopBanner: Bool {
@@ -583,6 +615,9 @@ private extension TimelineDetailAssetCard {
     var sponsorBadgeOnlyOverlay: some View {
         if shouldShowSponsorOverlay && sponsorship?.adPlacementType == "badge" {
             badgeOverlayView
+                .onTapGesture {
+                    handleSponsorTap(placement: .badgeLogo, position: sponsorAnalyticsPosition, clickPosition: sponsorPosition.hasPrefix("top") ? .top : .bottom, url: sponsorRedirectUrl)
+                }
         }
     }
 
@@ -594,10 +629,16 @@ private extension TimelineDetailAssetCard {
             VStack {
                 if showsTopBanner {
                     bannerOverlayView
+                        .onTapGesture {
+                            handleSponsorTap(placement: .bannerLogo, position: sponsorAnalyticsPosition, clickPosition: .top, url: sponsorRedirectUrl)
+                        }
                 }
                 Spacer()
                 if showsBottomBanner {
                     bannerOverlayView
+                        .onTapGesture {
+                            handleSponsorTap(placement: .bannerLogo, position: sponsorAnalyticsPosition, clickPosition: .bottom, url: sponsorRedirectUrl)
+                        }
                 }
             }
         }
@@ -670,6 +711,21 @@ private extension TimelineDetailAssetCard {
 
     var pollSponsorPosition: String {
         sponsorship?.poll?.adPosition ?? "top"
+    }
+
+    var pollSponsorRedirectUrl: URL? {
+        guard let urlString = sponsorship?.poll?.clickRedirect else { return nil }
+        return URL(string: urlString)
+    }
+
+    func handleSponsorTap(placement: AssetSponsorshipPlacement, position: SponsorshipPosition?, clickPosition: SponsorshipClickPosition, url: URL?) {
+        onSponsorshipTap?(placement, position, clickPosition, url?.absoluteString)
+        openSponsorRedirect(url)
+    }
+
+    func openSponsorRedirect(_ url: URL?) {
+        guard let url else { return }
+        openURL(url)
     }
 
     @ViewBuilder

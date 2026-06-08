@@ -340,6 +340,33 @@ extension TimelineViewModel {
     func handleAssetShared(_ asset: TimelineAssetDTO) {
         analyticDelegate?.viewModel(self, didShareAsset: asset, at: asset.position)
     }
+
+    /// Tracks when user clicks a sponsorship element in the horizontal carousel
+    func handleCarouselSponsorshipClicked(placement: CarouselSponsorshipPlacement, sponsorshipUrl: String?) {
+        analyticDelegate?.viewModel(
+            self,
+            didClickCarouselSponsorship: placement,
+            sponsorshipUrl: sponsorshipUrl
+        )
+    }
+
+    /// Tracks when user clicks a sponsorship element in the vertical carousel
+    func handleAssetSponsorshipClicked(
+        asset: TimelineAssetDTO,
+        placement: AssetSponsorshipPlacement,
+        position: SponsorshipPosition?,
+        clickPosition: SponsorshipClickPosition?,
+        sponsorshipUrl: String?
+    ) {
+        analyticDelegate?.viewModel(
+            self,
+            didClickAssetSponsorship: asset,
+            sponsorshipPlacement: placement,
+            sponsorshipPosition: position,
+            clickPosition: clickPosition,
+            sponsorshipUrl: sponsorshipUrl
+        )
+    }
 }
 
 // MARK: - Internal Logic

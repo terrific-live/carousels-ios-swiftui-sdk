@@ -86,6 +86,23 @@ protocol TimelineViewModelAnalyticDelegate: AnyObject {
         inAsset asset: TimelineAssetDTO,
         targetUrl: String
     )
+
+    /// Called when user clicks on a sponsorship element in the horizontal carousel
+    func viewModel(
+        _ viewModel: TimelineViewModel,
+        didClickCarouselSponsorship sponsorshipPlacement: CarouselSponsorshipPlacement,
+        sponsorshipUrl: String?
+    )
+
+    /// Called when user clicks on a sponsorship element in the vertical carousel
+    func viewModel(
+        _ viewModel: TimelineViewModel,
+        didClickAssetSponsorship asset: TimelineAssetDTO,
+        sponsorshipPlacement: AssetSponsorshipPlacement,
+        sponsorshipPosition: SponsorshipPosition?,
+        clickPosition: SponsorshipClickPosition?,
+        sponsorshipUrl: String?
+    )
 }
 
 // MARK: - Default implementations (optional methods)
@@ -101,4 +118,6 @@ extension TimelineViewModelAnalyticDelegate {
     func viewModel(_ viewModel: TimelineViewModel, didClickCTAButton asset: TimelineAssetDTO, at position: Int, targetUrl: String) {}
     func viewModel(_ viewModel: TimelineViewModel, didShareAsset asset: TimelineAssetDTO, at position: Int) {}
     func viewModel(_ viewModel: TimelineViewModel, didClickProduct product: ProductDTO, inAsset asset: TimelineAssetDTO, targetUrl: String) {}
+    func viewModel(_ viewModel: TimelineViewModel, didClickCarouselSponsorship sponsorshipPlacement: CarouselSponsorshipPlacement, sponsorshipUrl: String?) {}
+    func viewModel(_ viewModel: TimelineViewModel, didClickAssetSponsorship asset: TimelineAssetDTO, sponsorshipPlacement: AssetSponsorshipPlacement, sponsorshipPosition: SponsorshipPosition?, clickPosition: SponsorshipClickPosition?, sponsorshipUrl: String?) {}
 }

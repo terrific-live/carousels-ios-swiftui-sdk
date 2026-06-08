@@ -188,4 +188,38 @@ protocol AnalyticsService {
         terrificClickId: String,
         externalUserId: String?
     ) async throws
+
+    /// Track when user clicks on a sponsorship element in the horizontal carousel (feed)
+    /// - Parameters:
+    ///   - carouselId: The carousel identifier (used as sessionId)
+    ///   - parentUrl: The parent URL context
+    ///   - externalUserId: Optional external user ID
+    ///   - sponsorshipPlacement: Placement type ("TopLogo" or "SideLogo")
+    ///   - sponsorshipUrl: The sponsorship redirect URL
+    func trackCarouselSponsorshipClicked(
+        carouselId: String,
+        parentUrl: String?,
+        externalUserId: String?,
+        sponsorshipPlacement: CarouselSponsorshipPlacement,
+        sponsorshipUrl: String?
+    ) async throws
+
+    /// Track when user clicks on a sponsorship element in the vertical carousel (detail)
+    /// - Parameters:
+    ///   - carouselId: The carousel identifier
+    ///   - asset: The asset where the sponsorship was clicked
+    ///   - externalUserId: Optional external user ID
+    ///   - sponsorshipPlacement: Placement type (badgeLogo, bannerLogo, or pollLogo)
+    ///   - sponsorshipPosition: Position of the sponsorship (top, bottom, or both)
+    ///   - clickPosition: Where the user clicked (Top or Bottom)
+    ///   - sponsorshipUrl: The sponsorship redirect URL
+    func trackAssetSponsorshipClicked(
+        carouselId: String,
+        asset: TimelineAssetDTO,
+        externalUserId: String?,
+        sponsorshipPlacement: AssetSponsorshipPlacement,
+        sponsorshipPosition: SponsorshipPosition?,
+        clickPosition: SponsorshipClickPosition?,
+        sponsorshipUrl: String?
+    ) async throws
 }

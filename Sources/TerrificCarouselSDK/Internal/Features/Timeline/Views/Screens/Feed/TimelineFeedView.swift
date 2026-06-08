@@ -13,6 +13,7 @@ struct TimelineFeedView: View {
 
     // MARK: - Environment
     @Environment(\.accessibilityText) private var accessibilityText
+    @Environment(\.openURL) private var openURL
 
     // MARK: - Dependencies
     @ObservedObject private var viewModel: TimelineViewModel
@@ -102,6 +103,7 @@ private extension TimelineFeedView {
                sponsorship.enabled == true,
                hasSponsorLabelContent(sponsorship) {
                 sponsorLabelRow(sponsorship: sponsorship)
+                    .onTapGesture { handleCarouselSponsorshipTap(placement: .topLogo, url: sponsorship.clickRedirect) }
             }
 
             // Carousel name label (if showName is true)
@@ -144,6 +146,7 @@ private extension TimelineFeedView {
                let sideLogoUrl = sponsorship.sideLogoUrl {
                 sponsorLogoView(urlString: sideLogoUrl, backgroundColor: sponsorship.backgroundColor)
                     .padding(.top, sizeConfig.sponsorLogoTopSpacing)
+                    .onTapGesture { handleCarouselSponsorshipTap(placement: .sideLogo, url: sponsorship.clickRedirect) }
             }
         }
     }
@@ -258,6 +261,19 @@ private extension TimelineFeedView {
 
     func handleCarouselViewed() {
         viewModel.handleCarouselViewed()
+    }
+
+    func handleCarouselSponsorshipTap(placement: CarouselSponsorshipPlacement, url urlString: String?) {
+        viewModel.handleCarouselSponsorshipClicked(
+            placement: placement,
+            sponsorshipUrl: urlString
+        )
+        openSponsorRedirect(urlString)
+    }
+
+    func openSponsorRedirect(_ urlString: String?) {
+        guard let urlString, let url = URL(string: urlString) else { return }
+        openURL(url)
     }
 
     func handleAssetAppeared(_ asset: TimelineAssetDTO) {

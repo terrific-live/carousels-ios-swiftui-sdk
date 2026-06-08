@@ -68,6 +68,14 @@ struct AnalyticsEventItem: Identifiable {
         case .productClicked(asset: _, product: let product, position: let position, targetUrl: let targetUrl):
             self.eventName = "productClicked"
             self.details = "position: \(position), product: \(product.name ?? ""), url: \(targetUrl)"
+
+        case .carouselSponsorshipClicked(let sponsorshipPlacement, let sponsorshipUrl):
+            self.eventName = "carouselSponsorshipClicked"
+            self.details = "placement: \(sponsorshipPlacement), url: \(sponsorshipUrl ?? "nil")"
+
+        case .assetSponsorshipClicked(_, let sponsorshipPlacement, let sponsorshipPosition, let clickPosition, let sponsorshipUrl):
+            self.eventName = "assetSponsorshipClicked"
+            self.details = "placement: \(sponsorshipPlacement), position: \(sponsorshipPosition ?? "nil"), click: \(clickPosition ?? "nil"), url: \(sponsorshipUrl ?? "nil")"
         }
     }
 }

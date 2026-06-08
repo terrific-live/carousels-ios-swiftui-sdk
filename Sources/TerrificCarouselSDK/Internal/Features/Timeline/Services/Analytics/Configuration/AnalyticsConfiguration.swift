@@ -13,6 +13,7 @@ struct AnalyticsConfiguration {
     /// - Returns: `true` in Release mode, `false` in Debug mode.
     /// - Note: SDK user callbacks (onAnalyticsEvent) are still called regardless of this setting.
     static var isAnalyticsEnabled: Bool {
+        return true
 #if DEBUG
         return false
 #else

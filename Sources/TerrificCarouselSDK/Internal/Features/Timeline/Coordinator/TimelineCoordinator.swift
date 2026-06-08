@@ -421,6 +421,61 @@ extension TimelineCoordinator: TimelineViewModelAnalyticDelegate {
         }
     }
 
+    func viewModel(
+        _ viewModel: TimelineViewModel,
+        didClickCarouselSponsorship sponsorshipPlacement: CarouselSponsorshipPlacement,
+        sponsorshipUrl: String?
+    ) {
+        let parentUrl = feedViewModel.carouselItems.compactMap { item -> String? in
+            if case .content(let asset, _) = item { return asset.parentUrl }
+            return nil
+        }.first
+
+        emit(.carouselSponsorshipClicked(
+            sponsorshipPlacement: sponsorshipPlacement.rawValue,
+            sponsorshipUrl: sponsorshipUrl
+        ))
+
+        sendAnalyticsIfEnabled("CarouselSponsorshipClicked") { [analyticsService, carouselId] in
+            try await analyticsService?.trackCarouselSponsorshipClicked(
+                carouselId: carouselId,
+                parentUrl: parentUrl,
+                externalUserId: nil,
+                sponsorshipPlacement: sponsorshipPlacement,
+                sponsorshipUrl: sponsorshipUrl
+            )
+        }
+    }
+
+    func viewModel(
+        _ viewModel: TimelineViewModel,
+        didClickAssetSponsorship asset: TimelineAssetDTO,
+        sponsorshipPlacement: AssetSponsorshipPlacement,
+        sponsorshipPosition: SponsorshipPosition?,
+        clickPosition: SponsorshipClickPosition?,
+        sponsorshipUrl: String?
+    ) {
+        emit(.assetSponsorshipClicked(
+            asset: CarouselAsset(from: asset),
+            sponsorshipPlacement: sponsorshipPlacement.rawValue,
+            sponsorshipPosition: sponsorshipPosition?.rawValue,
+            clickPosition: clickPosition?.rawValue,
+            sponsorshipUrl: sponsorshipUrl
+        ))
+
+        sendAnalyticsIfEnabled("AssetSponsorshipClicked") { [analyticsService, carouselId] in
+            try await analyticsService?.trackAssetSponsorshipClicked(
+                carouselId: carouselId,
+                asset: asset,
+                externalUserId: nil,
+                sponsorshipPlacement: sponsorshipPlacement,
+                sponsorshipPosition: sponsorshipPosition,
+                clickPosition: clickPosition,
+                sponsorshipUrl: sponsorshipUrl
+            )
+        }
+    }
+
     /// Track when user clicks on an asset to open detail view
     /// Called from presentDetail - not a delegate method
     func trackCarouselClicked(at position: Int) {

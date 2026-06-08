@@ -22,4 +22,6 @@ enum AnalyticsEventName: String, Encodable {
     case timelineAssetShared = "TimelineAssetShared"
     case timelinePollVoted = "TimelinePollVoted"
     case timelineProductClicked = "TimelineProductClicked"
+    case timelineCarouselSponsorshipClicked = "TimelineCarouselSponsorshipClicked"
+    case timelineAssetSponsorshipClicked = "TimelineAssetSponsorshipClicked"
 }

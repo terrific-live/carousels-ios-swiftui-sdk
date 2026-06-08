@@ -114,4 +114,21 @@ public enum CarouselAnalyticsEvent: Sendable {
     ///   - position: Position of the asset
     ///   - targetUrl: The URL the product CTA navigates to
     case productClicked(asset: CarouselAsset, product: CarouselProduct, position: Int, targetUrl: String)
+
+    // MARK: - Sponsorship Events
+
+    /// User clicked on a sponsorship element in the horizontal carousel
+    /// - Parameters:
+    ///   - sponsorshipPlacement: Where the sponsorship was placed ("TopLogo" or "SideLogo")
+    ///   - sponsorshipUrl: The redirect URL
+    case carouselSponsorshipClicked(sponsorshipPlacement: String, sponsorshipUrl: String?)
+
+    /// User clicked on a sponsorship element in the vertical carousel (detail)
+    /// - Parameters:
+    ///   - asset: The asset where the sponsorship was shown
+    ///   - sponsorshipPlacement: Type of sponsorship ("badgeLogo", "bannerLogo", or "pollLogo")
+    ///   - sponsorshipPosition: Position ("top", "bottom", or "both")
+    ///   - clickPosition: Where the user clicked ("Top" or "Bottom")
+    ///   - sponsorshipUrl: The redirect URL
+    case assetSponsorshipClicked(asset: CarouselAsset, sponsorshipPlacement: String, sponsorshipPosition: String?, clickPosition: String?, sponsorshipUrl: String?)
 }

@@ -266,6 +266,48 @@ struct PollVotedAPIRequest<AuxData: Encodable>: Request {
     }
 }
 
+// MARK: - Sponsorship Analytics Enums
+
+enum CarouselSponsorshipPlacement: String, Encodable {
+    case topLogo = "TopLogo"
+    case sideLogo = "SideLogo"
+}
+
+enum AssetSponsorshipPlacement: String, Encodable {
+    case badgeLogo
+    case bannerLogo
+    case pollLogo
+}
+
+enum SponsorshipPosition: String, Encodable {
+    case top
+    case bottom
+    case both
+}
+
+enum SponsorshipClickPosition: String, Encodable {
+    case top = "Top"
+    case bottom = "Bottom"
+}
+
+// MARK: - CarouselSponsorshipClicked AuxData
+struct CarouselSponsorshipClickedAuxData: Encodable {
+    let parentUrl: String?
+    let externalUserId: String?
+    let sponsorshipPlacement: CarouselSponsorshipPlacement
+    let sponsorshipUrl: String?
+}
+
+// MARK: - AssetSponsorshipClicked AuxData
+struct AssetSponsorshipClickedAuxData: Encodable {
+    let parentUrl: String
+    let externalUserId: String?
+    let sponsorshipPlacement: AssetSponsorshipPlacement
+    let sponsorshipPosition: SponsorshipPosition?
+    let clickPosition: SponsorshipClickPosition?
+    let sponsorshipUrl: String?
+}
+
 // MARK: - Generic Request Body
 struct AnalyticsEventRequestBody<AuxData: Encodable>: Encodable {
     let name: AnalyticsEventName

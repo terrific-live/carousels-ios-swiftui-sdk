@@ -145,6 +145,15 @@ private extension TimelineDetailView {
                 },
                 onVideoFinished: {
                     viewModel.handleVideoFinished()
+                },
+                onSponsorshipTap: { placement, position, clickPosition, sponsorshipUrl in
+                    viewModel.handleAssetSponsorshipClicked(
+                        asset: asset,
+                        placement: placement,
+                        position: position,
+                        clickPosition: clickPosition,
+                        sponsorshipUrl: sponsorshipUrl
+                    )
                 }
             )
         case .loading:

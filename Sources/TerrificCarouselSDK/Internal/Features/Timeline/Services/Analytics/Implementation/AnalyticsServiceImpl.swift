@@ -604,4 +604,70 @@ struct AnalyticsServiceImpl: AnalyticsService {
 
         let _ = try await client.send(request)
     }
+
+    func trackCarouselSponsorshipClicked(
+        carouselId: String,
+        parentUrl: String?,
+        externalUserId: String?,
+        sponsorshipPlacement: CarouselSponsorshipPlacement,
+        sponsorshipUrl: String?
+    ) async throws {
+        let sessionId = carouselId
+
+        let auxData = CarouselSponsorshipClickedAuxData(
+            parentUrl: parentUrl,
+            externalUserId: externalUserId,
+            sponsorshipPlacement: sponsorshipPlacement,
+            sponsorshipUrl: sponsorshipUrl
+        )
+
+        let body = AnalyticsEventRequestBody(
+            name: .timelineCarouselSponsorshipClicked,
+            userId: configuration.userId,
+            sessionId: sessionId,
+            auxData: auxData
+        )
+
+        let request = AnalyticsEventAPIRequest(
+            storeId: configuration.storeId,
+            requestBody: body
+        )
+
+        let _ = try await client.send(request)
+    }
+
+    func trackAssetSponsorshipClicked(
+        carouselId: String,
+        asset: TimelineAssetDTO,
+        externalUserId: String?,
+        sponsorshipPlacement: AssetSponsorshipPlacement,
+        sponsorshipPosition: SponsorshipPosition?,
+        clickPosition: SponsorshipClickPosition?,
+        sponsorshipUrl: String?
+    ) async throws {
+        let sessionId = "\(carouselId)~\(asset.id)"
+
+        let auxData = AssetSponsorshipClickedAuxData(
+            parentUrl: asset.parentUrl ?? "",
+            externalUserId: externalUserId,
+            sponsorshipPlacement: sponsorshipPlacement,
+            sponsorshipPosition: sponsorshipPosition,
+            clickPosition: clickPosition,
+            sponsorshipUrl: sponsorshipUrl
+        )
+
+        let body = AnalyticsEventRequestBody(
+            name: .timelineAssetSponsorshipClicked,
+            userId: configuration.userId,
+            sessionId: sessionId,
+            auxData: auxData
+        )
+
+        let request = AnalyticsEventAPIRequest(
+            storeId: configuration.storeId,
+            requestBody: body
+        )
+
+        let _ = try await client.send(request)
+    }
 }

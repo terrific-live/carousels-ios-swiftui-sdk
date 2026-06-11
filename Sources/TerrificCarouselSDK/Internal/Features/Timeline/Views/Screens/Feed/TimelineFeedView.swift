@@ -80,12 +80,24 @@ private extension TimelineFeedView {
         }
     }
 
-    /// Total height accounting for sponsorship elements when present
+    /// Total height accounting for elements actually rendered (name, sponsorship)
     private var calculatedTotalHeight: CGFloat {
         let sponsorship = viewModel.carouselConfig.sponsorship
         let hasSponsorLabel = sponsorship?.enabled == true && hasSponsorLabelContent(sponsorship)
         let hasSponsorLogo = sponsorship?.enabled == true && sponsorship?.sideLogoUrl != nil
-        return sizeConfig.totalCarouselHeight(hasSponsorLabel: hasSponsorLabel, hasSponsorLogo: hasSponsorLogo)
+        let hasCarouselName = viewModel.carouselConfig.name != nil && viewModel.carouselConfig.showName == true
+
+        var height = sizeConfig.carouselItemHeight
+        if hasCarouselName {
+            height += sizeConfig.carouselNameHeight + sizeConfig.carouselNameBottomPadding
+        }
+        if hasSponsorLabel {
+            height += sizeConfig.sponsorLabelHeight + sizeConfig.sponsorLabelPadding * 2
+        }
+        if hasSponsorLogo {
+            height += sizeConfig.sponsorLogoHeight + sizeConfig.sponsorLogoPadding * 2 + sizeConfig.sponsorLogoTopSpacing
+        }
+        return height
     }
 
     /// Whether the sponsor label row has content to show (label text or top logo)

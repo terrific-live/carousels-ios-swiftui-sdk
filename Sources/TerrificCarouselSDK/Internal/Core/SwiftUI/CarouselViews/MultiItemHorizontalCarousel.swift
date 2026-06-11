@@ -130,13 +130,24 @@ struct MultiItemHorizontalCarousel<Item: Identifiable, ItemContent: View, Loadin
         // Store current visibilities
         itemVisibilities = visibilities
 
-        // Find the item with the most visible width
-        guard let mostVisibleEntry = visibilities.max(by: { $0.value < $1.value }),
-              mostVisibleEntry.value > 0 else {
+        // Find the maximum visible width
+        guard let maxVisibility = visibilities.values.max(),
+              maxVisibility > 0 else {
             return
         }
 
-        let mostVisibleIndex = mostVisibleEntry.key
+        // If the current selection is fully (or nearly fully) visible, keep it
+        // This prevents arbitrary jumps when multiple items are equally visible (e.g. iPad)
+        let currentVisibility = visibilities[currentPageIndex] ?? 0
+        if currentVisibility >= maxVisibility * 0.95 {
+            return
+        }
+
+        // Otherwise pick the lowest index among equally most-visible items
+        let mostVisibleIndex = visibilities
+            .filter { $0.value >= maxVisibility * 0.95 }
+            .min(by: { $0.key < $1.key })!
+            .key
 
         // Only update if selection changed
         guard currentPageIndex != mostVisibleIndex else { return }

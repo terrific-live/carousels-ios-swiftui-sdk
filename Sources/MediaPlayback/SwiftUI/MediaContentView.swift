@@ -106,7 +106,7 @@ private extension MediaContentView {
 
     @ViewBuilder
     func buildLoadingOverlay() -> some View {
-        if viewModel.isLoading && isSelected {
+        if viewModel.isLoading && isSelected && configuration.playbackMode == .fullScreen {
             ProgressView()
                 .progressViewStyle(CircularProgressViewStyle(tint: .white))
                 .scaleEffect(1.5)

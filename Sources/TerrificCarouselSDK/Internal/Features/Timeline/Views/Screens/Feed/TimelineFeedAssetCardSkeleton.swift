@@ -113,7 +113,7 @@ struct TimelineFeedSkeletonCarousel: View {
     // MARK: - Configuration
     let sizeConfig: FeedStyleConfiguration
     let showNameLabel: Bool
-    private let cardCount: Int = 3
+    private let cardCount: Int = 6
 
     // MARK: - State
     @State private var shimmerOffset: CGFloat = -500

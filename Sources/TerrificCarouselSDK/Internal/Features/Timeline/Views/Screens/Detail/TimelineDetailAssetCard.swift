@@ -234,7 +234,7 @@ struct TimelineDetailAssetCard: View {
     // MARK: - Poll Overlay (timestamp + action buttons only)
     private var pollOverlay: some View {
         VStack {
-            // Top: Timestamp
+            // Top: Timestamp (polls never have sponsor overlays, no inset needed)
             if viewData.showTimestamp {
                 timestampLabel
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -357,7 +357,7 @@ private extension TimelineDetailAssetCard {
             if viewData.showTimestamp {
                 timestampLabel
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, sizeConfig.timestampTopMargin)
+                    .padding(.top, sizeConfig.timestampTopMargin + topSponsorInset)
                     .padding(.horizontal, sizeConfig.timestampHorizontalMargin)
             }
 
@@ -533,6 +533,25 @@ private extension TimelineDetailAssetCard {
         }
     }
 
+    /// Whether a top sponsor overlay (badge or top banner) is present,
+    /// requiring timestamp and close button to shift down.
+    var hasTopSponsorOverlay: Bool {
+        guard shouldShowSponsorOverlay else { return false }
+        if sponsorship?.adPlacementType == "badge" {
+            // All badge positions are at top (top-left, top-center, top-right)
+            return true
+        }
+        if sponsorship?.adPlacementType == "banner" {
+            return showsTopBanner
+        }
+        return false
+    }
+
+    /// Extra top inset to avoid overlapping with top badge/banner
+    var topSponsorInset: CGFloat {
+        hasTopSponsorOverlay ? sizeConfig.sponsorBadgeHeight : 0
+    }
+
     /// Logo URL from either badge or banner data
     private var sponsorLogoUrl: String? {
         if sponsorship?.adPlacementType == "badge" {
@@ -541,12 +560,12 @@ private extension TimelineDetailAssetCard {
         return sponsorship?.banner?.logoUrl
     }
 
-    /// Background color hex from either badge or banner data
-    private var sponsorBackgroundColor: String {
+    /// Background color hex from either badge or banner data (nil = transparent)
+    private var sponsorBackgroundColor: String? {
         if sponsorship?.adPlacementType == "badge" {
-            return sponsorship?.badge?.backgroundColor ?? "#000000"
+            return sponsorship?.badge?.backgroundColor
         }
-        return sponsorship?.banner?.backgroundColor ?? "#000000"
+        return sponsorship?.banner?.backgroundColor
     }
 
     /// Position string from either badge or banner data
@@ -657,7 +676,7 @@ private extension TimelineDetailAssetCard {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, sizeConfig.sponsorBadgeVerticalPadding)
-        .background(Color(hex: sponsorBackgroundColor))
+        .background(sponsorBackgroundColor.map { Color(hex: $0) } ?? .clear)
     }
 
     // MARK: Badge (corner overlay)
@@ -675,7 +694,7 @@ private extension TimelineDetailAssetCard {
         }
         .padding(.vertical, sizeConfig.sponsorBadgeVerticalPadding)
         .padding(.horizontal, 10)
-        .background(Color(hex: sponsorBackgroundColor))
+        .background(sponsorBackgroundColor.map { Color(hex: $0) } ?? .clear)
         .clipShape(badgeShape)
     }
 

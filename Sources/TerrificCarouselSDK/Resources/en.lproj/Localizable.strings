@@ -64,6 +64,14 @@
 
 "accessibility.loading" = "Loading content";
 
+// MARK: - Error View
+
+"error.title" = "We couldn't load\nthis content";
+"error.subtitle" = "Please try again in a moment.";
+"error.retry_button" = "Try Again";
+"accessibility.error.label" = "Error loading content. We couldn't load this content. Please try again in a moment.";
+"accessibility.error.retry_hint" = "Tap to reload content";
+
 // MARK: - Swipe Hint
 
 "accessibility.swipe_hint" = "Swipe up or down to navigate between items";

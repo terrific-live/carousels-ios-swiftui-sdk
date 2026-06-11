@@ -72,7 +72,7 @@ private extension CloseButtonOverContentModifier {
         .foregroundStyle(Color(white: 0.75))
         .frame(width: 44, height: 44)
         .contentShape(.circle)
-        .padding(.horizontal, closeButtonTopPadding)
+        .padding(.horizontal, 28)
         .padding(.top, closeButtonTopPadding)
         .buttonStyle(.plain)
         .accessibilityLabel(accessibilityText.closeButtonLabel)

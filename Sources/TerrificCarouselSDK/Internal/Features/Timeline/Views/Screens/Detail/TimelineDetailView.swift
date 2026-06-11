@@ -26,7 +26,6 @@ struct TimelineDetailView: View {
     @State private var isMuted: Bool = true
     @State private var showSwipeHint: Bool = false
     @State private var hasShownSwipeHint: Bool = false
-    @State private var showErrorAlert: Bool = false
 
     // MARK: - Init
     init(
@@ -43,6 +42,9 @@ struct TimelineDetailView: View {
     var body: some View {
         content
             .background(Color.black)
+            .floatingCloseButton(28 + closeButtonTopInset) {
+                onDismiss?()
+            }
             .overlay {
                 if showSwipeHint {
                     SwipeHintOverlayView(text: viewModel.carouselConfig.swipeUpText) {
@@ -66,18 +68,9 @@ struct TimelineDetailView: View {
                             showSwipeHint = true
                         }
                     }
-                case .error:
-                    showErrorAlert = true
                 default:
                     break
                 }
-            }
-            .alert("Erreur", isPresented: $showErrorAlert) {
-                Button("OK") {
-                    onDismiss?()
-                }
-            } message: {
-                Text("Une erreur s'est produite.")
             }
     }
 }
@@ -88,7 +81,7 @@ private extension TimelineDetailView {
     @ViewBuilder
     var content: some View {
         switch viewModel.state {
-        case .idle, .error:
+        case .idle:
             Color.clear
 
         case .loading:
@@ -96,6 +89,9 @@ private extension TimelineDetailView {
 
         case .content:
             buildAssetList(viewModel.carouselItems)
+
+        case .error:
+            errorView
         }
     }
 
@@ -164,8 +160,38 @@ private extension TimelineDetailView {
     var loadingView: some View {
         TimelineDetailAssetCardSkeleton()
     }
+
+    var errorView: some View {
+        TimelineDetailErrorView {
+            viewModel.loadFirstPage()
+        }
+    }
 }
 
+
+// MARK: - Close Button Inset
+private extension TimelineDetailView {
+
+    /// Extra top padding for close button when a top sponsor badge/banner is configured.
+    /// Applied consistently for all asset types to avoid jumping.
+    var closeButtonTopInset: CGFloat {
+        let sponsorship = viewModel.carouselConfig.sponsorship
+        guard sponsorship?.verticalEnabled == true else { return 0 }
+
+        switch sponsorship?.adPlacementType {
+        case "badge" where sponsorship?.badge != nil:
+            return styleConfig.sponsorBadgeHeight
+        case "banner" where sponsorship?.banner != nil:
+            let pos = sponsorship?.banner?.position ?? "top"
+            if pos == "top" || pos == "top-bottom" {
+                return styleConfig.sponsorBadgeHeight
+            }
+            return 0
+        default:
+            return 0
+        }
+    }
+}
 
 // MARK: - Logic & Actions
 private extension TimelineDetailView {

@@ -110,11 +110,17 @@ public actor ImageDiskCache {
 
     private func imageData(from image: PlatformImage) -> Data? {
         #if canImport(UIKit)
+        if image.hasAlphaChannel {
+            return image.pngData()
+        }
         return image.jpegData(compressionQuality: 0.8)
         #elseif canImport(AppKit)
         guard let tiffData = image.tiffRepresentation,
               let bitmapRep = NSBitmapImageRep(data: tiffData) else {
             return nil
+        }
+        if bitmapRep.hasAlpha {
+            return bitmapRep.representation(using: .png, properties: [:])
         }
         return bitmapRep.representation(using: .jpeg, properties: [.compressionFactor: 0.8])
         #endif

@@ -64,6 +64,14 @@
 
 "accessibility.loading" = "Chargement du contenu";
 
+// MARK: - Error View
+
+"error.title" = "Impossible de charger\nce contenu";
+"error.subtitle" = "Veuillez réessayer dans un moment.";
+"error.retry_button" = "Réessayer";
+"accessibility.error.label" = "Erreur de chargement du contenu. Impossible de charger ce contenu. Veuillez réessayer dans un moment.";
+"accessibility.error.retry_hint" = "Appuyez pour recharger le contenu";
+
 // MARK: - Swipe Hint
 
 "accessibility.swipe_hint" = "Balayez vers le haut ou le bas pour naviguer entre les éléments";

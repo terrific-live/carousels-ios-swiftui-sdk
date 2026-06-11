@@ -40,9 +40,6 @@ struct TimelineCoordinatorView: View {
                 styleConfig: styleConfiguration.detail,
                 onDismiss: dismiss
             )
-            .floatingCloseButton(28) {
-                dismiss()
-            }
             .coordinateSpace(name: "TimelineScrollSpace")
         }
     }

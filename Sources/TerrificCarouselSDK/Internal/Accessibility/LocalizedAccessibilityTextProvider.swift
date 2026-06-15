@@ -19,7 +19,29 @@ struct LocalizedAccessibilityTextProvider: AccessibilityTextProvider {
 
     /// Creates a localized accessibility text provider.
     /// - Parameter bundle: The bundle containing localization resources. Defaults to the SDK bundle.
+    ///
+    /// Explicitly resolves the correct `.lproj` sub-bundle for the user's preferred language.
+    /// This is necessary because `NSLocalizedString` with `Bundle.module` relies on the host app's
+    /// `CFBundleLocalizations` to determine the language. If the host app doesn't declare a language
+    /// that the SDK supports, `NSLocalizedString` falls back to the development language (English)
+    /// even when the SDK has the correct `.lproj` resources.
+    ///
+    /// We bypass `Bundle.preferredLocalizations(from:)` because it is also filtered by the host app.
+    /// Instead, we match `Locale.preferredLanguages` (the raw system preference) against the
+    /// bundle's available `.lproj` directories ourselves.
     init(bundle: Bundle = .module) {
+        let bundleLocalizations = bundle.localizations
+
+        for language in Locale.preferredLanguages {
+            let code = Locale(identifier: language).language.languageCode?.identifier ?? language
+            if bundleLocalizations.contains(code),
+               let path = bundle.path(forResource: code, ofType: "lproj"),
+               let localizedBundle = Bundle(path: path) {
+                self.bundle = localizedBundle
+                return
+            }
+        }
+
         self.bundle = bundle
     }
 
@@ -194,6 +216,28 @@ struct LocalizedAccessibilityTextProvider: AccessibilityTextProvider {
 
     var loadingLabel: String {
         localized("accessibility.loading")
+    }
+
+    // MARK: - Error View
+
+    var errorTitle: String {
+        localized("error.title")
+    }
+
+    var errorSubtitle: String {
+        localized("error.subtitle")
+    }
+
+    var errorRetryButton: String {
+        localized("error.retry_button")
+    }
+
+    var errorAccessibilityLabel: String {
+        localized("accessibility.error.label")
+    }
+
+    var errorRetryHint: String {
+        localized("accessibility.error.retry_hint")
     }
 
     // MARK: - Swipe Hint

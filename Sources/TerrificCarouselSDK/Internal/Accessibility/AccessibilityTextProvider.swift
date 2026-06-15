@@ -55,6 +55,13 @@ protocol AccessibilityTextProvider: Sendable {
     // MARK: - Loading States
     var loadingLabel: String { get }
 
+    // MARK: - Error View
+    var errorTitle: String { get }
+    var errorSubtitle: String { get }
+    var errorRetryButton: String { get }
+    var errorAccessibilityLabel: String { get }
+    var errorRetryHint: String { get }
+
     // MARK: - Swipe Hint
     var swipeHintLabel: String { get }
 }

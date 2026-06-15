@@ -126,6 +126,18 @@ struct DefaultAccessibilityFrenchTextProvider: AccessibilityTextProvider {
 
     var loadingLabel: String { "Chargement du contenu" }
 
+    // MARK: - Error View
+
+    var errorTitle: String { "Impossible de charger\nce contenu" }
+
+    var errorSubtitle: String { "Veuillez réessayer dans un moment." }
+
+    var errorRetryButton: String { "Réessayer" }
+
+    var errorAccessibilityLabel: String { "Erreur de chargement du contenu. Impossible de charger ce contenu. Veuillez réessayer dans un moment." }
+
+    var errorRetryHint: String { "Appuyez pour recharger le contenu" }
+
     // MARK: - Swipe Hint
 
     var swipeHintLabel: String { "Balayez vers le haut ou le bas pour naviguer entre les éléments" }

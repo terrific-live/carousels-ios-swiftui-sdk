@@ -292,7 +292,7 @@ enum SponsorshipClickPosition: String, Encodable {
 
 // MARK: - CarouselSponsorshipClicked AuxData
 struct CarouselSponsorshipClickedAuxData: Encodable {
-    let parentUrl: String?
+    let parentUrl: String
     let externalUserId: String?
     let sponsorshipPlacement: CarouselSponsorshipPlacement
     let sponsorshipUrl: String?

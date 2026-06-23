@@ -23,12 +23,14 @@ protocol AnalyticsService {
     /// - Parameters:
     ///   - carouselId: The carousel/timeline identifier (used as sessionId)
     ///   - parentUrl: The parent URL context
-    ///   - openDurationMs: Total time the timeline was open in milliseconds
+    ///   - totalOpenDurationMs: Total wall-clock time the timeline was open in milliseconds
+    ///   - activeViewDurationMs: Time the user was actively viewing (excluding background) in milliseconds
     ///   - externalUserId: Optional external user ID if present
     func trackTimelineClosed(
         carouselId: String,
         parentUrl: String,
-        openDurationMs: Int,
+        totalOpenDurationMs: Int,
+        activeViewDurationMs: Int,
         externalUserId: String?
     ) async throws
 
@@ -50,13 +52,15 @@ protocol AnalyticsService {
     ///   - carouselId: The carousel/timeline identifier
     ///   - asset: The asset that was viewed
     ///   - position: The asset position
-    ///   - viewDurationMs: How long the asset was viewed in milliseconds
+    ///   - viewDurationMs: Total wall-clock time the asset was viewed in milliseconds
+    ///   - netoWatchTimeMs: Time the asset was actually on screen (excluding background) in milliseconds
     ///   - externalUserId: Optional external user ID if present
     func trackAssetViewEnded(
         carouselId: String,
         asset: TimelineAssetDTO,
         position: Int,
         viewDurationMs: Int,
+        netoWatchTimeMs: Int,
         externalUserId: String?
     ) async throws
 

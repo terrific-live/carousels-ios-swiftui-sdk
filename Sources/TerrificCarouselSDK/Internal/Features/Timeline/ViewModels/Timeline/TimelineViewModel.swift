@@ -78,10 +78,16 @@ final class TimelineViewModel: ObservableObject {
     /// Tracks the currently viewed asset index and start time for duration calculation
     private var currentViewStartTime: Date?
     private var currentViewAssetIndex: Int?
+    /// Accumulated background time during the current asset view (reset on each new asset)
+    private var assetViewBackgroundDuration: TimeInterval = 0
 
     // MARK: - Timeline Open Duration Tracking
     /// Tracks when the timeline detail view was opened
     private var timelineDetailsOpenedTime: Date?
+    /// Accumulated background time during the detail session (reset on open)
+    private var detailBackgroundDuration: TimeInterval = 0
+    /// Timestamp when app entered background (used to measure background intervals)
+    private var backgroundEnteredTime: Date?
 
     // MARK: - Cursor-Based Pagination
     /// Anchor for cursor-based pagination (used by detail view)
@@ -125,6 +131,7 @@ final class TimelineViewModel: ObservableObject {
         self.errorRoute = errorRoute
 
         bindAutoAdvance()
+        bindBackgroundTracking()
     }
 }
 
@@ -223,6 +230,7 @@ extension TimelineViewModel {
     func handleDetailOpened() {
         // Track when detail view was opened
         timelineDetailsOpenedTime = Date()
+        detailBackgroundDuration = 0
 
         // Get parentUrl from current asset
         let parentUrl = getAsset(at: currentPageIndex)?.parentUrl ?? ""
@@ -233,16 +241,24 @@ extension TimelineViewModel {
     func handleDetailClosed() {
         guard let openedTime = timelineDetailsOpenedTime else { return }
 
-        // Calculate open duration in milliseconds
-        let openDurationMs = Int(Date().timeIntervalSince(openedTime) * 1000)
+        // Calculate total wall-clock duration
+        let totalOpenDurationMs = Int(Date().timeIntervalSince(openedTime) * 1000)
+        // Subtract background time for active duration
+        let activeViewDurationMs = max(0, totalOpenDurationMs - Int(detailBackgroundDuration * 1000))
 
         // Get parentUrl from current asset
         let parentUrl = getAsset(at: currentPageIndex)?.parentUrl ?? ""
 
         // Reset tracking state
         timelineDetailsOpenedTime = nil
+        detailBackgroundDuration = 0
 
-        analyticDelegate?.viewModel(self, didCloseDetailWithParentUrl: parentUrl, openDurationMs: openDurationMs)
+        analyticDelegate?.viewModel(
+            self,
+            didCloseDetailWithParentUrl: parentUrl,
+            totalOpenDurationMs: totalOpenDurationMs,
+            activeViewDurationMs: activeViewDurationMs
+        )
     }
 
     /// Call when user starts viewing an asset in detail view
@@ -255,6 +271,7 @@ extension TimelineViewModel {
         // Track start time for duration calculation
         currentViewStartTime = Date()
         currentViewAssetIndex = index
+        assetViewBackgroundDuration = 0
 
         analyticDelegate?.viewModel(self, didStartViewingAsset: asset, at: asset.position)
     }
@@ -267,14 +284,23 @@ extension TimelineViewModel {
             return
         }
 
-        // Calculate view duration in milliseconds
+        // Total wall-clock duration
         let viewDurationMs = Int(Date().timeIntervalSince(startTime) * 1000)
+        // Subtract background time for net watch time
+        let netoWatchTimeMs = max(0, viewDurationMs - Int(assetViewBackgroundDuration * 1000))
 
         // Reset tracking state
         currentViewStartTime = nil
         currentViewAssetIndex = nil
+        assetViewBackgroundDuration = 0
 
-        analyticDelegate?.viewModel(self, didEndViewingAsset: asset, at: asset.position, viewDurationMs: viewDurationMs)
+        analyticDelegate?.viewModel(
+            self,
+            didEndViewingAsset: asset,
+            at: asset.position,
+            viewDurationMs: viewDurationMs,
+            netoWatchTimeMs: netoWatchTimeMs
+        )
     }
 
     // MARK: - Auto-Advance Logic
@@ -371,6 +397,40 @@ extension TimelineViewModel {
 
 // MARK: - Internal Logic
 private extension TimelineViewModel {
+
+    func bindBackgroundTracking() {
+        NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)
+            .sink { [weak self] _ in
+                self?.handleAppDidEnterBackground()
+            }
+            .store(in: &cancellables)
+
+        NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
+            .sink { [weak self] _ in
+                self?.handleAppWillEnterForeground()
+            }
+            .store(in: &cancellables)
+    }
+
+    func handleAppDidEnterBackground() {
+        backgroundEnteredTime = Date()
+    }
+
+    func handleAppWillEnterForeground() {
+        guard let enteredTime = backgroundEnteredTime else { return }
+        let backgroundInterval = Date().timeIntervalSince(enteredTime)
+        backgroundEnteredTime = nil
+
+        // Accumulate background time for detail session
+        if timelineDetailsOpenedTime != nil {
+            detailBackgroundDuration += backgroundInterval
+        }
+
+        // Accumulate background time for current asset view
+        if currentViewStartTime != nil {
+            assetViewBackgroundDuration += backgroundInterval
+        }
+    }
 
     func bindAutoAdvance() {
         // Observe page index changes

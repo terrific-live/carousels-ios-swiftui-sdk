@@ -132,7 +132,8 @@ final class TimelineViewModelTests: XCTestCase {
             name: "Test Carousel",
             showTimestamps: true,
             mapBrandNameToProductName: false,
-            swipeUpText: nil
+            swipeUpText: nil,
+            sponsorship: nil
         )
         mockService.stubbedResult = .sample(
             assets: .samplePage(count: 3),
@@ -340,7 +341,7 @@ final class TimelineViewModelTests: XCTestCase {
 
         // Then
         XCTAssertEqual(mockAnalyticDelegate.detailClosedEvents.count, 1)
-        XCTAssertGreaterThan(mockAnalyticDelegate.detailClosedEvents[0].durationMs, 0)
+        XCTAssertGreaterThan(mockAnalyticDelegate.detailClosedEvents[0].totalOpenDurationMs, 0)
     }
 
     // MARK: - Asset View Duration Tests

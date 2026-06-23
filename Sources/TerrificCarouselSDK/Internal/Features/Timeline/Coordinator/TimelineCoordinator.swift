@@ -297,7 +297,8 @@ extension TimelineCoordinator: TimelineViewModelAnalyticDelegate {
         _ viewModel: TimelineViewModel,
         didEndViewingAsset asset: TimelineAssetDTO,
         at position: Int,
-        viewDurationMs: Int
+        viewDurationMs: Int,
+        netoWatchTimeMs: Int
     ) {
         emit(.assetViewEnded(
             asset: CarouselAsset(from: asset),
@@ -311,6 +312,7 @@ extension TimelineCoordinator: TimelineViewModelAnalyticDelegate {
                 asset: asset,
                 position: position,
                 viewDurationMs: viewDurationMs,
+                netoWatchTimeMs: netoWatchTimeMs,
                 externalUserId: nil
             )
         }
@@ -319,15 +321,17 @@ extension TimelineCoordinator: TimelineViewModelAnalyticDelegate {
     func viewModel(
         _ viewModel: TimelineViewModel,
         didCloseDetailWithParentUrl parentUrl: String,
-        openDurationMs: Int
+        totalOpenDurationMs: Int,
+        activeViewDurationMs: Int
     ) {
-        emit(.timelineClosed(parentUrl: parentUrl, durationMs: openDurationMs))
+        emit(.timelineClosed(parentUrl: parentUrl, durationMs: totalOpenDurationMs))
 
         sendAnalyticsIfEnabled("TimelineClosed") { [analyticsService, carouselId] in
             try await analyticsService?.trackTimelineClosed(
                 carouselId: carouselId,
                 parentUrl: parentUrl,
-                openDurationMs: openDurationMs,
+                totalOpenDurationMs: totalOpenDurationMs,
+                activeViewDurationMs: activeViewDurationMs,
                 externalUserId: nil
             )
         }

@@ -320,7 +320,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "206"
             endingLineNumber = "206"
-            landmarkName = "handleCarouselViewed()"
+            landmarkName = "handleAssetAppeared(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

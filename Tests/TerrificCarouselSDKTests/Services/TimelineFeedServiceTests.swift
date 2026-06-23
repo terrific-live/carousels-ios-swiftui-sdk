@@ -164,7 +164,8 @@ final class TimelineFeedServiceTests: XCTestCase {
             name: "Test Carousel",
             showTimestamps: true,
             mapBrandNameToProductName: false,
-            swipeUpText: nil
+            swipeUpText: nil,
+            sponsorship: nil
         )
         let response = TimelineResponseDTO(assets: [], carouselConfig: config, anchor: nil)
         mockTransport.stubSuccess(response)

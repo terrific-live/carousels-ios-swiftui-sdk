@@ -78,10 +78,16 @@ final class TimelineViewModel: ObservableObject {
     /// Tracks the currently viewed asset index and start time for duration calculation
     var currentViewStartTime: Date?
     var currentViewAssetIndex: Int?
+    /// Accumulated background time during the current asset view (reset on each new asset)
+    var assetViewBackgroundDuration: TimeInterval = 0
 
     // MARK: - Timeline Open Duration Tracking
     /// Tracks when the timeline detail view was opened
     var timelineDetailsOpenedTime: Date?
+    /// Accumulated background time during the detail session (reset on open)
+    var detailBackgroundDuration: TimeInterval = 0
+    /// Timestamp when app entered background (used to measure background intervals)
+    var backgroundEnteredTime: Date?
 
     // MARK: - Cursor-Based Pagination
     /// Anchor for cursor-based pagination (used by detail view)
@@ -125,6 +131,7 @@ final class TimelineViewModel: ObservableObject {
         self.errorRoute = errorRoute
 
         bindAutoAdvance()
+        bindBackgroundTracking()
     }
 }
 
@@ -222,6 +229,40 @@ extension TimelineViewModel {
 
 // MARK: - Internal Logic
 private extension TimelineViewModel {
+
+    func bindBackgroundTracking() {
+        NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)
+            .sink { [weak self] _ in
+                self?.handleAppDidEnterBackground()
+            }
+            .store(in: &cancellables)
+
+        NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
+            .sink { [weak self] _ in
+                self?.handleAppWillEnterForeground()
+            }
+            .store(in: &cancellables)
+    }
+
+    func handleAppDidEnterBackground() {
+        backgroundEnteredTime = Date()
+    }
+
+    func handleAppWillEnterForeground() {
+        guard let enteredTime = backgroundEnteredTime else { return }
+        let backgroundInterval = Date().timeIntervalSince(enteredTime)
+        backgroundEnteredTime = nil
+
+        // Accumulate background time for detail session
+        if timelineDetailsOpenedTime != nil {
+            detailBackgroundDuration += backgroundInterval
+        }
+
+        // Accumulate background time for current asset view
+        if currentViewStartTime != nil {
+            assetViewBackgroundDuration += backgroundInterval
+        }
+    }
 
     func bindAutoAdvance() {
         // Observe page index changes

@@ -15,9 +15,9 @@ final class MockTimelineViewModelAnalyticDelegate: TimelineViewModelAnalyticDele
     private(set) var viewedCarouselAssets: [[TimelineAssetDTO]] = []
     private(set) var likedAssets: [TimelineAssetDTO] = []
     private(set) var detailOpenedParentUrls: [String] = []
-    private(set) var detailClosedEvents: [(parentUrl: String, durationMs: Int)] = []
+    private(set) var detailClosedEvents: [(parentUrl: String, totalOpenDurationMs: Int, activeViewDurationMs: Int)] = []
     private(set) var assetViewStartedEvents: [(asset: TimelineAssetDTO, position: Int)] = []
-    private(set) var assetViewEndedEvents: [(asset: TimelineAssetDTO, position: Int, durationMs: Int)] = []
+    private(set) var assetViewEndedEvents: [(asset: TimelineAssetDTO, position: Int, durationMs: Int, netoWatchTimeMs: Int)] = []
     private(set) var ctaClickedEvents: [(asset: TimelineAssetDTO, position: Int, url: String)] = []
     private(set) var shareEvents: [(asset: TimelineAssetDTO, position: Int)] = []
     private(set) var productClickEvents: [(product: ProductDTO, asset: TimelineAssetDTO, url: String)] = []
@@ -74,17 +74,19 @@ final class MockTimelineViewModelAnalyticDelegate: TimelineViewModelAnalyticDele
         _ viewModel: TimelineViewModel,
         didEndViewingAsset asset: TimelineAssetDTO,
         at position: Int,
-        viewDurationMs: Int
+        viewDurationMs: Int,
+        netoWatchTimeMs: Int
     ) {
-        assetViewEndedEvents.append((asset, position, viewDurationMs))
+        assetViewEndedEvents.append((asset, position, viewDurationMs, netoWatchTimeMs))
     }
 
     func viewModel(
         _ viewModel: TimelineViewModel,
         didCloseDetailWithParentUrl parentUrl: String,
-        openDurationMs: Int
+        totalOpenDurationMs: Int,
+        activeViewDurationMs: Int
     ) {
-        detailClosedEvents.append((parentUrl, openDurationMs))
+        detailClosedEvents.append((parentUrl, totalOpenDurationMs, activeViewDurationMs))
     }
 
     func viewModel(

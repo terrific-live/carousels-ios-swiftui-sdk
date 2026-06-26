@@ -9,6 +9,9 @@ import UIKit
 // MARK: - View
 struct TimelineDetailErrorView: View {
 
+    // MARK: - Environment
+    @Environment(\.accessibilityText) private var accessibilityText
+
     // MARK: - Callbacks
     let onRetry: () -> Void
 
@@ -27,9 +30,7 @@ struct TimelineDetailErrorView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.white)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(
-            NSLocalizedString("accessibility.error.label", bundle: .module, comment: "")
-        )
+        .accessibilityLabel(accessibilityText.errorAccessibilityLabel)
     }
 }
 
@@ -50,7 +51,7 @@ private extension TimelineDetailErrorView {
     }
 
     var titleText: some View {
-        Text(NSLocalizedString("error.title", bundle: .module, comment: ""))
+        Text(accessibilityText.errorTitle)
             .font(.system(size: 24, weight: .bold))
             .foregroundColor(.black)
             .multilineTextAlignment(.center)
@@ -58,7 +59,7 @@ private extension TimelineDetailErrorView {
     }
 
     var subtitleText: some View {
-        Text(NSLocalizedString("error.subtitle", bundle: .module, comment: ""))
+        Text(accessibilityText.errorSubtitle)
             .font(.system(size: 17, weight: .regular))
             .foregroundColor(.black.opacity(0.7))
             .multilineTextAlignment(.center)
@@ -70,7 +71,7 @@ private extension TimelineDetailErrorView {
             HStack(spacing: 8) {
                 Image(systemName: "arrow.clockwise")
                     .font(.system(size: 16, weight: .semibold))
-                Text(NSLocalizedString("error.retry_button", bundle: .module, comment: ""))
+                Text(accessibilityText.errorRetryButton)
                     .font(.system(size: 16, weight: .semibold))
             }
             .foregroundColor(.white)
@@ -82,9 +83,7 @@ private extension TimelineDetailErrorView {
             )
         }
         .padding(.top, 8)
-        .accessibilityHint(
-            NSLocalizedString("accessibility.error.retry_hint", bundle: .module, comment: "")
-        )
+        .accessibilityHint(accessibilityText.errorRetryHint)
     }
 }
 

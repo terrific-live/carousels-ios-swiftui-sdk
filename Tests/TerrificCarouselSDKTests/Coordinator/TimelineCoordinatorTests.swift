@@ -340,7 +340,7 @@ final class TimelineCoordinatorTests: XCTestCase {
         let viewModel = sut.feedViewModel
 
         // When
-        sut.viewModel(viewModel, didEndViewingAsset: asset, at: 3, viewDurationMs: 5000)
+        sut.viewModel(viewModel, didEndViewingAsset: asset, at: 3, viewDurationMs: 5000, netoWatchTimeMs: 4500)
 
         // Then
         XCTAssertEqual(capturedEvents.count, 1)
@@ -358,7 +358,7 @@ final class TimelineCoordinatorTests: XCTestCase {
         let viewModel = sut.feedViewModel
 
         // When
-        sut.viewModel(viewModel, didCloseDetailWithParentUrl: "https://example.com", openDurationMs: 10000)
+        sut.viewModel(viewModel, didCloseDetailWithParentUrl: "https://example.com", totalOpenDurationMs: 10000, activeViewDurationMs: 9000)
 
         // Then
         XCTAssertEqual(capturedEvents.count, 1)

@@ -138,6 +138,18 @@ struct DefaultAccessibilityTextProvider: AccessibilityTextProvider {
 
     var loadingLabel: String { "Loading content" }
 
+    // MARK: - Error View
+
+    var errorTitle: String { "We couldn't load\nthis content" }
+
+    var errorSubtitle: String { "Please try again in a moment." }
+
+    var errorRetryButton: String { "Try Again" }
+
+    var errorAccessibilityLabel: String { "Error loading content. We couldn't load this content. Please try again in a moment." }
+
+    var errorRetryHint: String { "Tap to reload content" }
+
     // MARK: - Swipe Hint
 
     var swipeHintLabel: String { "Swipe up or down to navigate between items" }

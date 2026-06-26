@@ -19,7 +19,8 @@ final class MockAnalyticsService: AnalyticsService {
     struct TimelineClosedCall {
         let carouselId: String
         let parentUrl: String
-        let openDurationMs: Int
+        let totalOpenDurationMs: Int
+        let activeViewDurationMs: Int
         let externalUserId: String?
     }
 
@@ -35,6 +36,7 @@ final class MockAnalyticsService: AnalyticsService {
         let asset: TimelineAssetDTO
         let position: Int
         let viewDurationMs: Int
+        let netoWatchTimeMs: Int
         let externalUserId: String?
     }
 
@@ -152,9 +154,9 @@ final class MockAnalyticsService: AnalyticsService {
         timelineOpenedCalls.append(TimelineOpenedCall(carouselId: carouselId, parentUrl: parentUrl, externalUserId: externalUserId))
     }
 
-    func trackTimelineClosed(carouselId: String, parentUrl: String, openDurationMs: Int, externalUserId: String?) async throws {
+    func trackTimelineClosed(carouselId: String, parentUrl: String, totalOpenDurationMs: Int, activeViewDurationMs: Int, externalUserId: String?) async throws {
         if let error = stubbedError { throw error }
-        timelineClosedCalls.append(TimelineClosedCall(carouselId: carouselId, parentUrl: parentUrl, openDurationMs: openDurationMs, externalUserId: externalUserId))
+        timelineClosedCalls.append(TimelineClosedCall(carouselId: carouselId, parentUrl: parentUrl, totalOpenDurationMs: totalOpenDurationMs, activeViewDurationMs: activeViewDurationMs, externalUserId: externalUserId))
     }
 
     func trackAssetViewStarted(carouselId: String, asset: TimelineAssetDTO, position: Int, externalUserId: String?) async throws {
@@ -162,9 +164,9 @@ final class MockAnalyticsService: AnalyticsService {
         assetViewStartedCalls.append(AssetViewStartedCall(carouselId: carouselId, asset: asset, position: position, externalUserId: externalUserId))
     }
 
-    func trackAssetViewEnded(carouselId: String, asset: TimelineAssetDTO, position: Int, viewDurationMs: Int, externalUserId: String?) async throws {
+    func trackAssetViewEnded(carouselId: String, asset: TimelineAssetDTO, position: Int, viewDurationMs: Int, netoWatchTimeMs: Int, externalUserId: String?) async throws {
         if let error = stubbedError { throw error }
-        assetViewEndedCalls.append(AssetViewEndedCall(carouselId: carouselId, asset: asset, position: position, viewDurationMs: viewDurationMs, externalUserId: externalUserId))
+        assetViewEndedCalls.append(AssetViewEndedCall(carouselId: carouselId, asset: asset, position: position, viewDurationMs: viewDurationMs, netoWatchTimeMs: netoWatchTimeMs, externalUserId: externalUserId))
     }
 
     func trackAssetLiked(carouselId: String, asset: TimelineAssetDTO, externalUserId: String?) async throws {

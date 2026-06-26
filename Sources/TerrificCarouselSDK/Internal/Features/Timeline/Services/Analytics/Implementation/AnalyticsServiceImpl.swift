@@ -33,7 +33,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
         let auxData = TimelineOpenedAuxData(
             externalUserId: externalUserId,
             userAgent: configuration.userAgent,
-            parentUrl: parentUrl
+            parentUrl: ""
         )
 
         let body = AnalyticsEventRequestBody(
@@ -54,17 +54,18 @@ struct AnalyticsServiceImpl: AnalyticsService {
     func trackTimelineClosed(
         carouselId: String,
         parentUrl: String,
-        openDurationMs: Int,
+        totalOpenDurationMs: Int,
+        activeViewDurationMs: Int,
         externalUserId: String?
     ) async throws {
         // sessionId is carouselId only (not related to specific asset)
         let sessionId = carouselId
 
         let auxData = TimelineClosedAuxData(
-            activeViewDurationMs: openDurationMs,
+            activeViewDurationMs: activeViewDurationMs,
             externalUserId: externalUserId,
-            parentUrl: parentUrl,
-            totalOpenDurationMs: openDurationMs
+            parentUrl: "",
+            totalOpenDurationMs: totalOpenDurationMs
         )
 
         let body = AnalyticsEventRequestBody(
@@ -102,7 +103,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
             customProducts: customProducts,
             externalUserId: externalUserId,
             fixedPosition: position,
-            parentUrl: asset.parentUrl ?? "",
+            parentUrl: "",
             position: position,
             products: products
         )
@@ -127,6 +128,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
         asset: TimelineAssetDTO,
         position: Int,
         viewDurationMs: Int,
+        netoWatchTimeMs: Int,
         externalUserId: String?
     ) async throws {
         // Build sessionId: carouselId~assetId
@@ -143,8 +145,8 @@ struct AnalyticsServiceImpl: AnalyticsService {
             customProducts: customProducts,
             drawerOpenDurationMs: 0,  // TODO: Not yet understood, defaulting to 0
             externalUserId: externalUserId,
-            netoAssetWatchTimeMs: viewDurationMs,  // TODO: Same as viewDurationMs for now
-            parentUrl: asset.parentUrl ?? "",
+            netoAssetWatchTimeMs: netoWatchTimeMs,
+            parentUrl: "",
             position: position,
             products: products,
             viewDurationMs: viewDurationMs
@@ -178,7 +180,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
             campaignName: asset.campaignName,
             externalUserId: externalUserId,
             userAgent: configuration.userAgent,
-            parentUrl: asset.parentUrl ?? "",
+            parentUrl: "",
             position: asset.position
         )
 
@@ -210,7 +212,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
             assetTimestamps: assets.map { $0.timestampMilliseconds },
             externalUserId: externalUserId,
             userAgent: configuration.userAgent,
-            parentUrl: assets.first?.parentUrl ?? "",
+            parentUrl: "",
             position: nil,
             totalAssets: assets.count
         )
@@ -243,7 +245,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
             assetTimestamps: assets.map { $0.timestampMilliseconds },
             externalUserId: externalUserId,
             userAgent: configuration.userAgent,
-            parentUrl: assets.first?.parentUrl ?? "",
+            parentUrl: "",
             position: nil,
             totalAssets: assets.count
         )
@@ -281,7 +283,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
             campaignName: asset.campaignName,
             externalUserId: externalUserId,
             userAgent: configuration.userAgent,
-            parentUrl: asset.parentUrl ?? "",
+            parentUrl: "",
             isInitialView: isInitialView,
             position: position,
             fixedPosition: position,
@@ -321,7 +323,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
             campaignName: clickedAsset.campaignName,
             customProducts: [],
             externalUserId: externalUserId,
-            parentUrl: clickedAsset.parentUrl ?? "",
+            parentUrl: "",
             position: position,
             totalAssets: allAssets.count
         )
@@ -359,7 +361,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
             campaignName: asset.campaignName,
             customProducts: customProducts,
             externalUserId: externalUserId,
-            parentUrl: asset.parentUrl ?? "",
+            parentUrl: "",
             position: position,
             targetUrl: targetUrl,
             terrificClickId: terrificClickId,
@@ -398,7 +400,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
             campaignName: asset.campaignName,
             customProducts: customProducts,
             externalUserId: externalUserId,
-            parentUrl: asset.parentUrl ?? "",
+            parentUrl: "",
             position: position,
             userAgent: configuration.userAgent
         )
@@ -434,7 +436,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
             brandName: asset.brandName,
             campaignName: asset.campaignName,
             externalUserId: externalUserId,
-            parentUrl: asset.parentUrl ?? "",
+            parentUrl: "",
             position: position,
             questionId: questionId,
             userAgent: configuration.userAgent
@@ -482,7 +484,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
             campaignName: asset.campaignName,
             customProducts: customProducts,
             externalUserId: externalUserId,
-            parentUrl: asset.parentUrl ?? "",
+            parentUrl: "",
             position: position,
             terrificClickId: terrificClickId,
             userAgent: configuration.userAgent
@@ -490,7 +492,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
 
         // Use first variant's id if available, otherwise empty string
         let variantId = product.variants?.first?.id ?? ""
-        let items = [ProductClickedItem(productId: product.id, variantId: variantId)]
+        let items = [ProductClickedItem(productId: product.externalId ?? "", variantId: variantId)]
 
         let body = ProductClickedRequestBody(
             name: .timelineProductClicked,
@@ -555,7 +557,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
         let sessionId = carouselId
 
         let auxData = CarouselSponsorshipClickedAuxData(
-            parentUrl: parentUrl,
+            parentUrl: "",
             externalUserId: externalUserId,
             sponsorshipPlacement: sponsorshipPlacement,
             sponsorshipUrl: sponsorshipUrl
@@ -588,7 +590,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
         let sessionId = "\(carouselId)~\(asset.id)"
 
         let auxData = AssetSponsorshipClickedAuxData(
-            parentUrl: asset.parentUrl ?? "",
+            parentUrl: "",
             externalUserId: externalUserId,
             sponsorshipPlacement: sponsorshipPlacement,
             sponsorshipPosition: sponsorshipPosition,

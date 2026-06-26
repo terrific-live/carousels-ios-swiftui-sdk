@@ -341,7 +341,7 @@ final class TimelineViewModelTests: XCTestCase {
 
         // Then
         XCTAssertEqual(mockAnalyticDelegate.detailClosedEvents.count, 1)
-        XCTAssertGreaterThan(mockAnalyticDelegate.detailClosedEvents[0].durationMs, 0)
+        XCTAssertGreaterThan(mockAnalyticDelegate.detailClosedEvents[0].totalOpenDurationMs, 0)
     }
 
     // MARK: - Asset View Duration Tests

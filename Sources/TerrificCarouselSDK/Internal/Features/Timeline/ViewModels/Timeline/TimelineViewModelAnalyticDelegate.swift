@@ -54,14 +54,16 @@ protocol TimelineViewModelAnalyticDelegate: AnyObject {
         _ viewModel: TimelineViewModel,
         didEndViewingAsset asset: TimelineAssetDTO,
         at position: Int,
-        viewDurationMs: Int
+        viewDurationMs: Int,
+        netoWatchTimeMs: Int
     )
 
     /// Called when timeline detail view is closed
     func viewModel(
         _ viewModel: TimelineViewModel,
         didCloseDetailWithParentUrl parentUrl: String,
-        openDurationMs: Int
+        totalOpenDurationMs: Int,
+        activeViewDurationMs: Int
     )
 
     /// Called when user clicks a CTA button
@@ -113,8 +115,8 @@ extension TimelineViewModelAnalyticDelegate {
     func viewModel(_ viewModel: TimelineViewModel, didLikeAsset asset: TimelineAssetDTO) {}
     func viewModel(_ viewModel: TimelineViewModel, didOpenDetailWithParentUrl parentUrl: String) {}
     func viewModel(_ viewModel: TimelineViewModel, didStartViewingAsset asset: TimelineAssetDTO, at position: Int) {}
-    func viewModel(_ viewModel: TimelineViewModel, didEndViewingAsset asset: TimelineAssetDTO, at position: Int, viewDurationMs: Int) {}
-    func viewModel(_ viewModel: TimelineViewModel, didCloseDetailWithParentUrl parentUrl: String, openDurationMs: Int) {}
+    func viewModel(_ viewModel: TimelineViewModel, didEndViewingAsset asset: TimelineAssetDTO, at position: Int, viewDurationMs: Int, netoWatchTimeMs: Int) {}
+    func viewModel(_ viewModel: TimelineViewModel, didCloseDetailWithParentUrl parentUrl: String, totalOpenDurationMs: Int, activeViewDurationMs: Int) {}
     func viewModel(_ viewModel: TimelineViewModel, didClickCTAButton asset: TimelineAssetDTO, at position: Int, targetUrl: String) {}
     func viewModel(_ viewModel: TimelineViewModel, didShareAsset asset: TimelineAssetDTO, at position: Int) {}
     func viewModel(_ viewModel: TimelineViewModel, didClickProduct product: ProductDTO, inAsset asset: TimelineAssetDTO, targetUrl: String) {}

@@ -31,7 +31,11 @@ extension TimelineViewModel {
 
     /// Call when timeline detail view appears on screen
     func handleDetailOpened() {
+        // Track when detail view was opened
         timelineDetailsOpenedTime = Date()
+        detailBackgroundDuration = 0
+
+        // Get parentUrl from current asset
         let parentUrl = getAsset(at: currentPageIndex)?.parentUrl ?? ""
         analyticDelegate?.viewModel(self, didOpenDetailWithParentUrl: parentUrl)
     }
@@ -40,22 +44,37 @@ extension TimelineViewModel {
     func handleDetailClosed() {
         guard let openedTime = timelineDetailsOpenedTime else { return }
 
-        let openDurationMs = Int(Date().timeIntervalSince(openedTime) * 1000)
+        // Calculate total wall-clock duration
+        let totalOpenDurationMs = Int(Date().timeIntervalSince(openedTime) * 1000)
+        // Subtract background time for active duration
+        let activeViewDurationMs = max(0, totalOpenDurationMs - Int(detailBackgroundDuration * 1000))
+
+        // Get parentUrl from current asset
         let parentUrl = getAsset(at: currentPageIndex)?.parentUrl ?? ""
 
+        // Reset tracking state
         timelineDetailsOpenedTime = nil
+        detailBackgroundDuration = 0
 
-        analyticDelegate?.viewModel(self, didCloseDetailWithParentUrl: parentUrl, openDurationMs: openDurationMs)
+        analyticDelegate?.viewModel(
+            self,
+            didCloseDetailWithParentUrl: parentUrl,
+            totalOpenDurationMs: totalOpenDurationMs,
+            activeViewDurationMs: activeViewDurationMs
+        )
     }
 
     /// Call when user starts viewing an asset in detail view
     func handleAssetViewStarted(at index: Int) {
+        // End previous view if exists
         handleAssetViewEnded()
 
         guard let asset = getAsset(at: index) else { return }
 
+        // Track start time for duration calculation
         currentViewStartTime = Date()
         currentViewAssetIndex = index
+        assetViewBackgroundDuration = 0
 
         analyticDelegate?.viewModel(self, didStartViewingAsset: asset, at: asset.position)
     }
@@ -68,12 +87,23 @@ extension TimelineViewModel {
             return
         }
 
+        // Total wall-clock duration
         let viewDurationMs = Int(Date().timeIntervalSince(startTime) * 1000)
+        // Subtract background time for net watch time
+        let netoWatchTimeMs = max(0, viewDurationMs - Int(assetViewBackgroundDuration * 1000))
 
+        // Reset tracking state
         currentViewStartTime = nil
         currentViewAssetIndex = nil
+        assetViewBackgroundDuration = 0
 
-        analyticDelegate?.viewModel(self, didEndViewingAsset: asset, at: asset.position, viewDurationMs: viewDurationMs)
+        analyticDelegate?.viewModel(
+            self,
+            didEndViewingAsset: asset,
+            at: asset.position,
+            viewDurationMs: viewDurationMs,
+            netoWatchTimeMs: netoWatchTimeMs
+        )
     }
 
     /// Notifies delegate about CTA button tap

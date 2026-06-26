@@ -279,38 +279,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "A20BFCEB-672D-44E0-BF65-C969A317592A"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../../Sources/TerrificCarouselSDK/Internal/Features/Timeline/Coordinator/TimelineCoordinator.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "230"
-            endingLineNumber = "230"
-            landmarkName = "viewModel(_:didViewCarouselWithAssets:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "02078E32-F5E4-448E-B1DF-5625C7632318"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../../Sources/TerrificCarouselSDK/Internal/Features/Timeline/Coordinator/TimelineCoordinator.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "231"
-            endingLineNumber = "231"
-            landmarkName = "viewModel(_:didViewCarouselWithAssets:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "BA0FFF07-1759-447E-AA4C-C871B1C43940"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -320,7 +288,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "206"
             endingLineNumber = "206"
-            landmarkName = "handleAssetAppeared(_:)"
+            landmarkName = "handleCarouselViewed()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

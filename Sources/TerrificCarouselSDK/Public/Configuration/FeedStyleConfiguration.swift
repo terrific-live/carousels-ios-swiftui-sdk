@@ -7,7 +7,7 @@ import SwiftUI
 
 // MARK: - FeedStyleConfiguration
 /// Size configuration for the feed (horizontal carousel) cards
-public struct FeedStyleConfiguration: Equatable, Sendable {
+public struct FeedStyleConfiguration: Equatable, Sendable, TimestampStyleProviding {
 
     // MARK: - Carousel Layout
     /// Width of each carousel item

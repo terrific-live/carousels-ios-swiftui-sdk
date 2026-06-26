@@ -153,12 +153,12 @@ private extension TimelineDetailView {
                 }
             )
         case .loading:
-            TimelineDetailAssetCardSkeleton()
+            TimelineAssetCardSkeleton(mode: .detail)
         }
     }
 
     var loadingView: some View {
-        TimelineDetailAssetCardSkeleton()
+        TimelineAssetCardSkeleton(mode: .detail)
     }
 
     var errorView: some View {

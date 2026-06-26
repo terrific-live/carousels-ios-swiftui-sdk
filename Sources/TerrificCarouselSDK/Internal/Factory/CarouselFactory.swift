@@ -36,7 +36,9 @@ final class CarouselFactory {
     }()
 
     private var analyticsConfiguration: AnalyticsConfiguration {
-        .production(apiConfig: configuration, terrificUserId: terrificUserId)
+        AnalyticsConfiguration.isStagingMode
+            ? .staging(apiConfig: configuration, terrificUserId: terrificUserId)
+            : .production(apiConfig: configuration, terrificUserId: terrificUserId)
     }
 
     private lazy var errorLoggingClient: ErrorLoggingClient = {

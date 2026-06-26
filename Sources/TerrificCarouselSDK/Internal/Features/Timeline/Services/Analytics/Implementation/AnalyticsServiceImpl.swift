@@ -92,39 +92,9 @@ struct AnalyticsServiceImpl: AnalyticsService {
         // Build sessionId: carouselId~assetId
         let sessionId = "\(carouselId)~\(asset.id)"
 
-        // Map asset type to string
-        let assetType: String
-        switch asset.type {
-        case .video:
-            assetType = "video"
-        case .image:
-            assetType = "image"
-        case .poll:
-            assetType = "poll"
-        case .ad:
-            assetType = "ad"
-        }
-
-        // Map products to AnalyticCustomProduct
-        let customProducts = (asset.products ?? []).map { product in
-            AnalyticCustomProduct(
-                name: product.name ?? "",
-                price: product.formattedPrice ?? String(product.price ?? 0),
-                currency: product.currency ?? "",
-                description: product.description ?? "",
-                externalURL: product.externalUrl ?? ""
-            )
-        }
-
-        // Map products to AnalyticProduct
-        let products = (asset.products ?? []).map { product in
-            AnalyticProduct(
-                id: product.id ?? "",
-                sku: product.sku ?? "",
-                categories: product.categories ?? [],
-                tags: []
-            )
-        }
+        let assetType = assetTypeString(from: asset.type)
+        let customProducts = mapCustomProducts(from: asset.products)
+        let products = mapAnalyticProducts(from: asset.products)
 
         let auxData = AssetViewStartedAuxData(
             assetType: assetType,
@@ -164,39 +134,9 @@ struct AnalyticsServiceImpl: AnalyticsService {
         // Build sessionId: carouselId~assetId
         let sessionId = "\(carouselId)~\(asset.id)"
 
-        // Map asset type to string
-        let assetType: String
-        switch asset.type {
-        case .video:
-            assetType = "video"
-        case .image:
-            assetType = "image"
-        case .poll:
-            assetType = "poll"
-        case .ad:
-            assetType = "ad"
-        }
-
-        // Map products to AnalyticCustomProduct
-        let customProducts = (asset.products ?? []).map { product in
-            AnalyticCustomProduct(
-                name: product.name ?? "",
-                price: product.formattedPrice ?? String(product.price ?? 0),
-                currency: product.currency ?? "",
-                description: product.description ?? "",
-                externalURL: product.externalUrl ?? ""
-            )
-        }
-
-        // Map products to AnalyticProduct
-        let products = (asset.products ?? []).map { product in
-            AnalyticProduct(
-                id: product.id ?? "",
-                sku: product.sku ?? "",
-                categories: product.categories ?? [],
-                tags: []
-            )
-        }
+        let assetType = assetTypeString(from: asset.type)
+        let customProducts = mapCustomProducts(from: asset.products)
+        let products = mapAnalyticProducts(from: asset.products)
 
         let auxData = AssetViewEndedAuxData(
             assetType: assetType,
@@ -335,16 +275,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
         // Build sessionId: carouselId~assetId
         let sessionId = "\(carouselId)~\(asset.id)"
 
-        // Map products to AnalyticCustomProduct
-        let customProducts = (asset.products ?? []).map { product in
-            AnalyticCustomProduct(
-                name: product.name ?? "",
-                price: product.formattedPrice ?? String(product.price ?? 0),
-                currency: product.currency ?? "",
-                description: product.description ?? "",
-                externalURL: product.externalUrl ?? ""
-            )
-        }
+        let customProducts = mapCustomProducts(from: asset.products)
 
         let auxData = AssetViewedAuxData(
             assetTimestamp: asset.timestampMilliseconds,
@@ -423,16 +354,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
         // Build sessionId: carouselId~assetId
         let sessionId = "\(carouselId)~\(asset.id)"
 
-        // Map products to AnalyticCustomProduct
-        let customProducts = (asset.products ?? []).map { product in
-            AnalyticCustomProduct(
-                name: product.name ?? "",
-                price: product.formattedPrice ?? String(product.price ?? 0),
-                currency: product.currency ?? "",
-                description: product.description ?? "",
-                externalURL: product.externalUrl ?? ""
-            )
-        }
+        let customProducts = mapCustomProducts(from: asset.products)
 
         let auxData = CTAButtonClickedAuxData(
             brandName: asset.brandName,
@@ -471,16 +393,7 @@ struct AnalyticsServiceImpl: AnalyticsService {
         // Build sessionId: carouselId~assetId
         let sessionId = "\(carouselId)~\(asset.id)"
 
-        // Map products to AnalyticCustomProduct
-        let customProducts = (asset.products ?? []).map { product in
-            AnalyticCustomProduct(
-                name: product.name ?? "",
-                price: product.formattedPrice ?? String(product.price ?? 0),
-                currency: product.currency ?? "",
-                description: product.description ?? "",
-                externalURL: product.externalUrl ?? ""
-            )
-        }
+        let customProducts = mapCustomProducts(from: asset.products)
 
         let auxData = AssetSharedAuxData(
             brandName: asset.brandName,
@@ -557,19 +470,10 @@ struct AnalyticsServiceImpl: AnalyticsService {
         // Build sessionId: carouselId~assetId
         let sessionId = "\(carouselId)~\(asset.id)"
 
-        // Map products to AnalyticCustomProduct (include the clicked product)
-        let customProducts = [
-            AnalyticCustomProduct(
-                name: product.name ?? "",
-                price: product.formattedPrice ?? String(product.price ?? 0),
-                currency: product.currency ?? "",
-                description: product.description ?? "",
-                externalURL: product.externalUrl ?? ""
-            )
-        ]
+        let customProducts = mapCustomProducts(from: [product])
 
         let auxData = ProductClickedAuxData(
-            id: product.id ?? "",
+            id: product.id,
             name: product.name ?? "",
             description: product.description ?? "",
             externalURL: product.externalUrl ?? "",
@@ -606,6 +510,42 @@ struct AnalyticsServiceImpl: AnalyticsService {
 
         let _ = try await client.send(request)
     }
+
+    // MARK: - Mapping Helpers
+
+    private func mapCustomProducts(from products: [ProductDTO]?) -> [AnalyticCustomProduct] {
+        (products ?? []).map { product in
+            AnalyticCustomProduct(
+                name: product.name ?? "",
+                price: product.formattedPrice ?? String(product.price ?? 0),
+                currency: product.currency ?? "",
+                description: product.description ?? "",
+                externalURL: product.externalUrl ?? ""
+            )
+        }
+    }
+
+    private func mapAnalyticProducts(from products: [ProductDTO]?) -> [AnalyticProduct] {
+        (products ?? []).map { product in
+            AnalyticProduct(
+                id: product.id,
+                sku: product.sku ?? "",
+                categories: product.categories ?? [],
+                tags: []
+            )
+        }
+    }
+
+    private func assetTypeString(from type: AssetMediaTypeDTO) -> String {
+        switch type {
+        case .video: return "video"
+        case .image: return "image"
+        case .poll: return "poll"
+        case .ad: return "ad"
+        }
+    }
+
+    // MARK: - Sponsorship Events
 
     func trackCarouselSponsorshipClicked(
         carouselId: String,

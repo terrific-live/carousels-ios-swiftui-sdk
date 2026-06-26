@@ -12,7 +12,12 @@ struct AnalyticsConfiguration {
     /// Controls whether analytics events are sent to the server.
     /// - Returns: `true` in Release mode, `false` in Debug mode.
     /// - Note: SDK user callbacks (onAnalyticsEvent) are still called regardless of this setting.
+    /// When `true`, analytics requests are sent to the staging endpoint.
+    /// Set to `false` for production.
+    static var isStagingMode: Bool = true
+
     static var isAnalyticsEnabled: Bool {
+        return true
 #if DEBUG
         return false
 #else

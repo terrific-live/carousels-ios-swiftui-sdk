@@ -183,15 +183,7 @@ extension TimelineFeedAssetCard {
     }
 
     private var timestampLabel: some View {
-        Text(viewData.formattedTimestamp)
-            .font(sizeConfig.timestampFont.toFont())
-            .foregroundColor(.black)
-            .padding(.horizontal, sizeConfig.timestampPaddingHorizontal)
-            .padding(.vertical, sizeConfig.timestampPaddingVertical)
-            .background(
-                RoundedRectangle(cornerRadius: sizeConfig.timestampCornerRadius)
-                    .fill(Color.white)
-            )
+        TimelineTimestampLabel(text: viewData.formattedTimestamp, style: sizeConfig)
     }
 
     private var bottomInfo: some View {

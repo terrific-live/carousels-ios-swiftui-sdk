@@ -21,6 +21,8 @@ final class MockTimelineViewModelAnalyticDelegate: TimelineViewModelAnalyticDele
     private(set) var ctaClickedEvents: [(asset: TimelineAssetDTO, position: Int, url: String)] = []
     private(set) var shareEvents: [(asset: TimelineAssetDTO, position: Int)] = []
     private(set) var productClickEvents: [(product: ProductDTO, asset: TimelineAssetDTO, url: String)] = []
+    private(set) var carouselSponsorshipClickEvents: [(placement: CarouselSponsorshipPlacement, url: String?)] = []
+    private(set) var assetSponsorshipClickEvents: [(asset: TimelineAssetDTO, placement: AssetSponsorshipPlacement, position: SponsorshipPosition?, clickPosition: SponsorshipClickPosition?, url: String?)] = []
 
     // MARK: - TimelineViewModelAnalyticDelegate
     func viewModel(
@@ -113,6 +115,25 @@ final class MockTimelineViewModelAnalyticDelegate: TimelineViewModelAnalyticDele
         productClickEvents.append((product, asset, targetUrl))
     }
 
+    func viewModel(
+        _ viewModel: TimelineViewModel,
+        didClickCarouselSponsorship sponsorshipPlacement: CarouselSponsorshipPlacement,
+        sponsorshipUrl: String?
+    ) {
+        carouselSponsorshipClickEvents.append((sponsorshipPlacement, sponsorshipUrl))
+    }
+
+    func viewModel(
+        _ viewModel: TimelineViewModel,
+        didClickAssetSponsorship asset: TimelineAssetDTO,
+        sponsorshipPlacement: AssetSponsorshipPlacement,
+        sponsorshipPosition: SponsorshipPosition?,
+        clickPosition: SponsorshipClickPosition?,
+        sponsorshipUrl: String?
+    ) {
+        assetSponsorshipClickEvents.append((asset, sponsorshipPlacement, sponsorshipPosition, clickPosition, sponsorshipUrl))
+    }
+
     // MARK: - Reset
     func reset() {
         viewedAssets.removeAll()
@@ -126,5 +147,7 @@ final class MockTimelineViewModelAnalyticDelegate: TimelineViewModelAnalyticDele
         ctaClickedEvents.removeAll()
         shareEvents.removeAll()
         productClickEvents.removeAll()
+        carouselSponsorshipClickEvents.removeAll()
+        assetSponsorshipClickEvents.removeAll()
     }
 }

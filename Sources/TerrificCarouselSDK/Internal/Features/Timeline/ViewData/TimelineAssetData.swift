@@ -117,7 +117,7 @@ struct TimelineAssetData: Identifiable {
         self.thumbnailURL = thumbnailURL
         self.pollViewModel = pollViewModel
         self.timestamp = timestamp
-        self.formattedTimestamp = formattedTimestamp ?? Self.defaultFormattedTimestamp(timestamp)
+        self.formattedTimestamp = formattedTimestamp ?? TimestampFormatter.format(timestamp, with: nil)
         self.showTimestamp = showTimestamp
         self.title = title
         self.subtitle = subtitle
@@ -128,22 +128,6 @@ struct TimelineAssetData: Identifiable {
         self.backgroundImageURL = backgroundImageURL
         self.hasCustomBackground = hasCustomBackground
         self.products = products
-    }
-
-    /// Default timestamp formatting
-    private static func defaultFormattedTimestamp(_ date: Date) -> String {
-        let timeFormatter = DateFormatter()
-        timeFormatter.timeStyle = .short
-        timeFormatter.dateStyle = .none
-
-        let dateFormatter = DateFormatter()
-        dateFormatter.timeStyle = .none
-        dateFormatter.dateStyle = .short
-
-        let time = timeFormatter.string(from: date)
-        let dateStr = dateFormatter.string(from: date)
-
-        return "\(dateStr) | \(time)"
     }
 
     // MARK: - Computed Properties
@@ -196,7 +180,7 @@ extension TimelineAssetData {
         // Timestamp - parse from ISO8601 string and format using carouselConfig
         let timestampDate = asset.timestampDate ?? Date()
         self.timestamp = timestampDate
-        self.formattedTimestamp = carouselConfig.formatTimestamp(timestampDate)
+        self.formattedTimestamp = TimestampFormatter.format(timestampDate, with: carouselConfig.timestampFormat)
         self.showTimestamp = carouselConfig.showTimestamps ?? true
 
         // Title - use displayTitle which handles fallback to name

@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Product
 struct ProductDTO: Identifiable, Codable, Equatable, Hashable {
-    let id: String?
+    let id: String
     let name: String?
     let description: String?
     let externalUrl: String?
@@ -28,9 +28,66 @@ struct ProductDTO: Identifiable, Codable, Equatable, Hashable {
     let ctaButton: ProductCTAButtonDTO?
     let background: ProductBackgroundDTO?
 
-    /// Computed id for Identifiable conformance (falls back to UUID if nil)
-    var stableId: String {
-        id ?? UUID().uuidString
+    init(
+        id: String,
+        name: String? = nil,
+        description: String? = nil,
+        externalUrl: String? = nil,
+        imageUrl: String? = nil,
+        price: Double? = nil,
+        formattedPrice: String? = nil,
+        compareAtPrice: Double? = nil,
+        formattedCompareAtPrice: String? = nil,
+        currency: String? = nil,
+        externalId: String? = nil,
+        sku: String? = nil,
+        type: String? = nil,
+        categories: [String]? = nil,
+        variants: [ProductVariantDTO]? = nil,
+        badge: ProductBadgeDTO? = nil,
+        ctaButton: ProductCTAButtonDTO? = nil,
+        background: ProductBackgroundDTO? = nil
+    ) {
+        self.id = id
+        self.name = name
+        self.description = description
+        self.externalUrl = externalUrl
+        self.imageUrl = imageUrl
+        self.price = price
+        self.formattedPrice = formattedPrice
+        self.compareAtPrice = compareAtPrice
+        self.formattedCompareAtPrice = formattedCompareAtPrice
+        self.currency = currency
+        self.externalId = externalId
+        self.sku = sku
+        self.type = type
+        self.categories = categories
+        self.variants = variants
+        self.badge = badge
+        self.ctaButton = ctaButton
+        self.background = background
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
+        self.name = try container.decodeIfPresent(String.self, forKey: .name)
+        self.description = try container.decodeIfPresent(String.self, forKey: .description)
+        self.externalUrl = try container.decodeIfPresent(String.self, forKey: .externalUrl)
+        self.imageUrl = try container.decodeIfPresent(String.self, forKey: .imageUrl)
+        self.price = try container.decodeIfPresent(Double.self, forKey: .price)
+        self.formattedPrice = try container.decodeIfPresent(String.self, forKey: .formattedPrice)
+        self.compareAtPrice = try container.decodeIfPresent(Double.self, forKey: .compareAtPrice)
+        self.formattedCompareAtPrice = try container.decodeIfPresent(String.self, forKey: .formattedCompareAtPrice)
+        self.currency = try container.decodeIfPresent(String.self, forKey: .currency)
+        self.externalId = try container.decodeIfPresent(String.self, forKey: .externalId)
+        self.sku = try container.decodeIfPresent(String.self, forKey: .sku)
+        self.type = try container.decodeIfPresent(String.self, forKey: .type)
+        self.categories = try container.decodeIfPresent([String].self, forKey: .categories)
+        self.variants = try container.decodeIfPresent([ProductVariantDTO].self, forKey: .variants)
+        self.badge = try container.decodeIfPresent(ProductBadgeDTO.self, forKey: .badge)
+        self.ctaButton = try container.decodeIfPresent(ProductCTAButtonDTO.self, forKey: .ctaButton)
+        self.background = try container.decodeIfPresent(ProductBackgroundDTO.self, forKey: .background)
     }
 }
 
@@ -61,156 +118,4 @@ struct ProductCTAButtonDTO: Codable, Equatable, Hashable {
 struct ProductBackgroundDTO: Codable, Equatable, Hashable {
     let color: String?
     let textColor: String?
-}
-
-// MARK: - Product Sample Data
-extension ProductDTO {
-    /// Full product with all elements
-    static let sampleFull = ProductDTO(
-        id: "product-1",
-        name: "Premium Headphones",
-        description: "High-quality wireless headphones with noise cancellation",
-        externalUrl: "https://example.com/products/headphones",
-        imageUrl: "https://picsum.photos/200?random=10",
-        price: 299.99,
-        formattedPrice: "299,99 €",
-        compareAtPrice: 399.99,
-        formattedCompareAtPrice: "399,99 €",
-        currency: "EUR",
-        externalId: nil,
-        sku: "SKU-001",
-        type: "custom",
-        categories: ["Electronics", "Audio"],
-        variants: [],
-        badge: ProductBadgeDTO(
-            color: "#000E3D",
-            text: "Sponsored",
-            textColor: "#FFFFFF"
-        ),
-        ctaButton: ProductCTAButtonDTO(
-            color: "#BEF264",
-            text: "Buy Now",
-            textColor: "#000000"
-        ),
-        background: ProductBackgroundDTO(
-            color: "#D946EF",
-            textColor: "#FFFFFF"
-        )
-    )
-
-    /// Product without badge
-    static let sampleNoBadge = ProductDTO(
-        id: "product-2",
-        name: "Wireless Earbuds",
-        description: "Compact earbuds with crystal clear sound",
-        externalUrl: "https://example.com/products/earbuds",
-        imageUrl: "https://picsum.photos/200?random=11",
-        price: 149.50,
-        formattedPrice: "149,50 €",
-        compareAtPrice: nil,
-        formattedCompareAtPrice: nil,
-        currency: "EUR",
-        externalId: nil,
-        sku: nil,
-        type: "custom",
-        categories: nil,
-        variants: [],
-        badge: nil,
-        ctaButton: ProductCTAButtonDTO(
-            color: "#FBBF24",
-            text: "Shop",
-            textColor: "#000000"
-        ),
-        background: ProductBackgroundDTO(
-            color: "#3B82F6",
-            textColor: "#FFFFFF"
-        )
-    )
-
-    /// Product without CTA button
-    static let sampleNoCTA = ProductDTO(
-        id: "product-3",
-        name: "Smart Watch",
-        description: "Track your fitness and stay connected",
-        externalUrl: "https://example.com/products/watch",
-        imageUrl: "https://picsum.photos/200?random=12",
-        price: 399.00,
-        formattedPrice: "399,00 €",
-        compareAtPrice: nil,
-        formattedCompareAtPrice: nil,
-        currency: "EUR",
-        externalId: nil,
-        sku: nil,
-        type: "custom",
-        categories: nil,
-        variants: [],
-        badge: ProductBadgeDTO(
-            color: "#EF4444",
-            text: "New",
-            textColor: "#FFFFFF"
-        ),
-        ctaButton: nil,
-        background: ProductBackgroundDTO(
-            color: "#10B981",
-            textColor: "#FFFFFF"
-        )
-    )
-
-    /// Product with minimal data
-    static let sampleMinimal = ProductDTO(
-        id: "product-4",
-        name: "USB-C Cable",
-        description: "Fast charging cable, 2 meters",
-        externalUrl: "https://example.com/products/cable",
-        imageUrl: "https://picsum.photos/200?random=13",
-        price: 19.99,
-        formattedPrice: "19,99 €",
-        compareAtPrice: nil,
-        formattedCompareAtPrice: nil,
-        currency: "EUR",
-        externalId: nil,
-        sku: nil,
-        type: "custom",
-        categories: nil,
-        variants: [],
-        badge: nil,
-        ctaButton: nil,
-        background: ProductBackgroundDTO(
-            color: "#F3F4F6",
-            textColor: "#000000"
-        )
-    )
-
-    /// Product with light background
-    static let sampleLightBackground = ProductDTO(
-        id: "product-5",
-        name: "Laptop Stand",
-        description: "Ergonomic aluminum stand for laptops",
-        externalUrl: "https://example.com/products/stand",
-        imageUrl: "https://picsum.photos/200?random=14",
-        price: 79.00,
-        formattedPrice: "79,00 €",
-        compareAtPrice: nil,
-        formattedCompareAtPrice: nil,
-        currency: "EUR",
-        externalId: nil,
-        sku: nil,
-        type: "custom",
-        categories: nil,
-        variants: [],
-        badge: ProductBadgeDTO(
-            color: "#1F2937",
-            text: "Best Seller",
-            textColor: "#FFFFFF"
-        ),
-        ctaButton: ProductCTAButtonDTO(
-            color: "#1F2937",
-            text: "View Details",
-            textColor: "#FFFFFF"
-        ),
-        background: ProductBackgroundDTO(
-            color: "#FEF3C7",
-            textColor: "#000000"
-        )
-    )
 }

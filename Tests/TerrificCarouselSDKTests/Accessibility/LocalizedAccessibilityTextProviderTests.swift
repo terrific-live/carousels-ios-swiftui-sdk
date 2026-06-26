@@ -61,16 +61,14 @@ final class LocalizedAccessibilityTextProviderTests: XCTestCase {
     }
 
     func testFeedAssetCardLabel_withSubtitle_formatsCorrectly() {
-        let result = sut.feedAssetCardLabel(title: "Title", subtitle: "Subtitle", timestamp: "2 hours ago")
+        let result = sut.feedAssetCardLabel(title: "Title", subtitle: "Subtitle", mediaType: .image, pollQuestion: nil)
         XCTAssertTrue(result.contains("Title"))
         XCTAssertTrue(result.contains("Subtitle"))
-        XCTAssertTrue(result.contains("2 hours ago"))
     }
 
     func testFeedAssetCardLabel_withoutSubtitle_formatsCorrectly() {
-        let result = sut.feedAssetCardLabel(title: "Title", subtitle: nil, timestamp: "2 hours ago")
+        let result = sut.feedAssetCardLabel(title: "Title", subtitle: nil, mediaType: .video, pollQuestion: nil)
         XCTAssertTrue(result.contains("Title"))
-        XCTAssertTrue(result.contains("2 hours ago"))
     }
 
     func testDetailAssetLabel_withSubtitle_formatsCorrectly() {

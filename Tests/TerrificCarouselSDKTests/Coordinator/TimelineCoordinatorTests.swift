@@ -388,6 +388,164 @@ final class TimelineCoordinatorTests: XCTestCase {
         }
     }
 
+    func testDidClickCTAButton_emitsCTAButtonClickedEvent() {
+        // Given
+        let asset = TimelineAssetDTO.sample(id: "asset-1")
+        let viewModel = sut.feedViewModel
+
+        // When
+        sut.viewModel(viewModel, didClickCTAButton: asset, at: 1, targetUrl: "https://example.com")
+
+        // Then
+        XCTAssertEqual(capturedEvents.count, 1)
+        if case .ctaButtonClicked(let eventAsset, let position, let targetUrl) = capturedEvents.first {
+            XCTAssertEqual(eventAsset.id, "asset-1")
+            XCTAssertEqual(position, 1)
+            XCTAssertEqual(targetUrl, "https://example.com")
+        } else {
+            XCTFail("Expected ctaButtonClicked event")
+        }
+    }
+
+    func testDidClickProduct_emitsProductClickedEvent() {
+        // Given
+        let asset = TimelineAssetDTO.sample(id: "asset-1", position: 3)
+        let product = ProductDTO.sampleFull
+        let viewModel = sut.feedViewModel
+
+        // When
+        sut.viewModel(viewModel, didClickProduct: product, inAsset: asset, targetUrl: "https://example.com/product")
+
+        // Then
+        XCTAssertEqual(capturedEvents.count, 1)
+        if case .productClicked(let eventAsset, let eventProduct, let position, let targetUrl) = capturedEvents.first {
+            XCTAssertEqual(eventAsset.id, "asset-1")
+            XCTAssertEqual(eventProduct.id, product.id)
+            XCTAssertEqual(position, 3)
+            XCTAssertEqual(targetUrl, "https://example.com/product")
+        } else {
+            XCTFail("Expected productClicked event")
+        }
+    }
+
+    func testDidClickCarouselSponsorship_emitsCarouselSponsorshipClickedEvent() {
+        // Given
+        let viewModel = sut.feedViewModel
+
+        // When
+        sut.viewModel(viewModel, didClickCarouselSponsorship: .topLogo, sponsorshipUrl: "https://sponsor.com")
+
+        // Then
+        XCTAssertEqual(capturedEvents.count, 1)
+        if case .carouselSponsorshipClicked(let placement, let url) = capturedEvents.first {
+            XCTAssertEqual(placement, "TopLogo")
+            XCTAssertEqual(url, "https://sponsor.com")
+        } else {
+            XCTFail("Expected carouselSponsorshipClicked event")
+        }
+    }
+
+    func testDidClickCarouselSponsorship_withNilUrl_emitsEvent() {
+        // Given
+        let viewModel = sut.feedViewModel
+
+        // When
+        sut.viewModel(viewModel, didClickCarouselSponsorship: .sideLogo, sponsorshipUrl: nil)
+
+        // Then
+        XCTAssertEqual(capturedEvents.count, 1)
+        if case .carouselSponsorshipClicked(let placement, let url) = capturedEvents.first {
+            XCTAssertEqual(placement, "SideLogo")
+            XCTAssertNil(url)
+        } else {
+            XCTFail("Expected carouselSponsorshipClicked event")
+        }
+    }
+
+    func testDidClickAssetSponsorship_emitsAssetSponsorshipClickedEvent() {
+        // Given
+        let asset = TimelineAssetDTO.sample(id: "asset-1")
+        let viewModel = sut.feedViewModel
+
+        // When
+        sut.viewModel(
+            viewModel,
+            didClickAssetSponsorship: asset,
+            sponsorshipPlacement: .badgeLogo,
+            sponsorshipPosition: .top,
+            clickPosition: .top,
+            sponsorshipUrl: "https://sponsor.com/badge"
+        )
+
+        // Then
+        XCTAssertEqual(capturedEvents.count, 1)
+        if case .assetSponsorshipClicked(let eventAsset, let placement, let position, let clickPos, let url) = capturedEvents.first {
+            XCTAssertEqual(eventAsset.id, "asset-1")
+            XCTAssertEqual(placement, "badgeLogo")
+            XCTAssertEqual(position, "top")
+            XCTAssertEqual(clickPos, "Top")
+            XCTAssertEqual(url, "https://sponsor.com/badge")
+        } else {
+            XCTFail("Expected assetSponsorshipClicked event")
+        }
+    }
+
+    func testDidClickAssetSponsorship_withNilPositions_emitsEvent() {
+        // Given
+        let asset = TimelineAssetDTO.sample(id: "asset-1")
+        let viewModel = sut.feedViewModel
+
+        // When
+        sut.viewModel(
+            viewModel,
+            didClickAssetSponsorship: asset,
+            sponsorshipPlacement: .bannerLogo,
+            sponsorshipPosition: nil,
+            clickPosition: nil,
+            sponsorshipUrl: nil
+        )
+
+        // Then
+        XCTAssertEqual(capturedEvents.count, 1)
+        if case .assetSponsorshipClicked(_, let placement, let position, let clickPos, let url) = capturedEvents.first {
+            XCTAssertEqual(placement, "bannerLogo")
+            XCTAssertNil(position)
+            XCTAssertNil(clickPos)
+            XCTAssertNil(url)
+        } else {
+            XCTFail("Expected assetSponsorshipClicked event")
+        }
+    }
+
+    func testPresentDetail_emitsCarouselClickedEvent() async throws {
+        // Given - load assets into feed
+        mockFeedService.stubbedResult = TimelineServiceResult(
+            assets: [
+                TimelineAssetDTO.sample(id: "asset-0", position: 0),
+                TimelineAssetDTO.sample(id: "asset-1", position: 1)
+            ],
+            carouselConfig: nil,
+            anchor: nil
+        )
+        sut.feedViewModel.loadFirstPage()
+        try await Task.sleep(nanoseconds: 200_000_000)
+
+        // Clear events from load
+        capturedEvents = []
+
+        // When
+        sut.presentDetail(at: 0)
+
+        // Then
+        XCTAssertEqual(capturedEvents.count, 1)
+        if case .carouselClicked(let eventAsset, let position) = capturedEvents.first {
+            XCTAssertEqual(eventAsset.id, "asset-0")
+            XCTAssertEqual(position, 0)
+        } else {
+            XCTFail("Expected carouselClicked event")
+        }
+    }
+
     // MARK: - PollViewModelStore Tests
 
     func testPollViewModelStore_isCreated() {
@@ -466,5 +624,44 @@ final class TimelineCoordinatorPollDelegateTests: XCTestCase {
 
         // Then - no event emitted because asset wasn't found
         XCTAssertTrue(capturedEvents.isEmpty)
+    }
+
+    func testPollVoted_emitsEvent_whenAssetFound() async throws {
+        // Given - load assets so findAsset can find them
+        mockFeedService.stubbedResult = TimelineServiceResult(
+            assets: [TimelineAssetDTO.sample(id: "poll-asset", position: 2)],
+            carouselConfig: nil,
+            anchor: nil
+        )
+        sut.feedViewModel.loadFirstPage()
+        try await Task.sleep(nanoseconds: 200_000_000)
+
+        // Clear events from load
+        capturedEvents = []
+
+        let pollViewModel = PollViewModel(
+            assetId: "poll-asset",
+            pollData: PollData.sample
+        )
+
+        // When
+        sut.pollViewModel(
+            pollViewModel,
+            didVoteForAssetId: "poll-asset",
+            pollId: "poll-123",
+            pollAnswer: "Blue",
+            questionId: "q-1"
+        )
+
+        // Then
+        XCTAssertEqual(capturedEvents.count, 1)
+        if case .pollVoted(let eventAsset, let position, let pollId, let answer) = capturedEvents.first {
+            XCTAssertEqual(eventAsset.id, "poll-asset")
+            XCTAssertEqual(position, 2)
+            XCTAssertEqual(pollId, "poll-123")
+            XCTAssertEqual(answer, "Blue")
+        } else {
+            XCTFail("Expected pollVoted event")
+        }
     }
 }

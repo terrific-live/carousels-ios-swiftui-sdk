@@ -226,7 +226,7 @@ private extension TimelineFeedView {
                 handleAssetAppeared(asset)
             }
         case .loading:
-            TimelineFeedAssetCardSkeleton(sizeConfig: sizeConfig)
+            TimelineAssetCardSkeleton(mode: .feed(sizeConfig))
         }
     }
 

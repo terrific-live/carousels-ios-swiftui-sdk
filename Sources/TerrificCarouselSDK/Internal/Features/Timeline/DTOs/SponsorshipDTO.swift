@@ -8,7 +8,7 @@ import Foundation
 // MARK: - SponsorshipDTO
 /// Sponsorship configuration from the API.
 /// Contains settings for both horizontal (feed) and vertical (detail) carousel sponsorship.
-struct SponsorshipDTO: Codable, Equatable {
+struct SponsorshipDTO: Codable, Equatable, Hashable {
     /// Whether HCarousel sponsorship is enabled
     let enabled: Bool?
     /// Text label displayed above the carousel name (e.g., "Brought to you by")
@@ -37,7 +37,7 @@ struct SponsorshipDTO: Codable, Equatable {
 
 // MARK: - SponsorshipPollDTO
 /// Poll-specific sponsorship configuration.
-struct SponsorshipPollDTO: Codable, Equatable {
+struct SponsorshipPollDTO: Codable, Equatable, Hashable {
     /// Logo URL for the poll sponsor
     let logoUrl: String?
     /// Position of the ad: "top" or "bottom"
@@ -48,7 +48,7 @@ struct SponsorshipPollDTO: Codable, Equatable {
 
 // MARK: - SponsorshipBadgeDTO
 /// Badge sponsorship configuration for VCarousel.
-struct SponsorshipBadgeDTO: Codable, Equatable {
+struct SponsorshipBadgeDTO: Codable, Equatable, Hashable {
     /// Redirect URL when badge is tapped
     let clickRedirect: String?
     /// Logo URL for the badge
@@ -63,7 +63,7 @@ struct SponsorshipBadgeDTO: Codable, Equatable {
 
 // MARK: - SponsorshipBannerDTO
 /// Banner sponsorship configuration for VCarousel.
-struct SponsorshipBannerDTO: Codable, Equatable {
+struct SponsorshipBannerDTO: Codable, Equatable, Hashable {
     /// Redirect URL when banner is tapped
     let clickRedirect: String?
     /// Whether banner is at the bottom

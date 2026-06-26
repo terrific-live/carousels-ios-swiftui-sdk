@@ -107,6 +107,24 @@ final class MockAnalyticsService: AnalyticsService {
         let externalUserId: String?
     }
 
+    struct CarouselSponsorshipClickedCall {
+        let carouselId: String
+        let parentUrl: String?
+        let externalUserId: String?
+        let sponsorshipPlacement: CarouselSponsorshipPlacement
+        let sponsorshipUrl: String?
+    }
+
+    struct AssetSponsorshipClickedCall {
+        let carouselId: String
+        let asset: TimelineAssetDTO
+        let externalUserId: String?
+        let sponsorshipPlacement: AssetSponsorshipPlacement
+        let sponsorshipPosition: SponsorshipPosition?
+        let clickPosition: SponsorshipClickPosition?
+        let sponsorshipUrl: String?
+    }
+
     // MARK: - Recorded Calls
     private(set) var timelineOpenedCalls: [TimelineOpenedCall] = []
     private(set) var timelineClosedCalls: [TimelineClosedCall] = []
@@ -121,6 +139,8 @@ final class MockAnalyticsService: AnalyticsService {
     private(set) var assetSharedCalls: [AssetSharedCall] = []
     private(set) var pollVotedCalls: [PollVotedCall] = []
     private(set) var productClickedCalls: [ProductClickedCall] = []
+    private(set) var carouselSponsorshipClickedCalls: [CarouselSponsorshipClickedCall] = []
+    private(set) var assetSponsorshipClickedCalls: [AssetSponsorshipClickedCall] = []
 
     // MARK: - Error Stubbing
     var stubbedError: Error?
@@ -192,6 +212,16 @@ final class MockAnalyticsService: AnalyticsService {
         productClickedCalls.append(ProductClickedCall(carouselId: carouselId, asset: asset, product: product, position: position, terrificClickId: terrificClickId, externalUserId: externalUserId))
     }
 
+    func trackCarouselSponsorshipClicked(carouselId: String, parentUrl: String?, externalUserId: String?, sponsorshipPlacement: CarouselSponsorshipPlacement, sponsorshipUrl: String?) async throws {
+        if let error = stubbedError { throw error }
+        carouselSponsorshipClickedCalls.append(CarouselSponsorshipClickedCall(carouselId: carouselId, parentUrl: parentUrl, externalUserId: externalUserId, sponsorshipPlacement: sponsorshipPlacement, sponsorshipUrl: sponsorshipUrl))
+    }
+
+    func trackAssetSponsorshipClicked(carouselId: String, asset: TimelineAssetDTO, externalUserId: String?, sponsorshipPlacement: AssetSponsorshipPlacement, sponsorshipPosition: SponsorshipPosition?, clickPosition: SponsorshipClickPosition?, sponsorshipUrl: String?) async throws {
+        if let error = stubbedError { throw error }
+        assetSponsorshipClickedCalls.append(AssetSponsorshipClickedCall(carouselId: carouselId, asset: asset, externalUserId: externalUserId, sponsorshipPlacement: sponsorshipPlacement, sponsorshipPosition: sponsorshipPosition, clickPosition: clickPosition, sponsorshipUrl: sponsorshipUrl))
+    }
+
     // MARK: - Reset
     func reset() {
         timelineOpenedCalls = []
@@ -207,6 +237,8 @@ final class MockAnalyticsService: AnalyticsService {
         assetSharedCalls = []
         pollVotedCalls = []
         productClickedCalls = []
+        carouselSponsorshipClickedCalls = []
+        assetSponsorshipClickedCalls = []
         stubbedError = nil
     }
 }

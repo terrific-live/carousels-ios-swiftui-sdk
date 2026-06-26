@@ -39,7 +39,7 @@ struct ProductCarouselView: View {
     // MARK: - State
     @State private var currentIndex: Int = 0
     @State private var isAnimating: Bool = false
-    @State private var timer: Timer?
+    @State private var autoScrollTask: Task<Void, Never>?
 
     // MARK: - Display Item for unique IDs
     private struct DisplayProduct: Identifiable {
@@ -108,17 +108,17 @@ struct ProductCarouselView: View {
         .clipShape(Rectangle()) // Clip at container level to hide next item
         .onAppear {
             if isSelected {
-                startTimer()
+                startAutoScroll()
             }
         }
         .onDisappear {
-            stopTimer()
+            stopAutoScroll()
         }
         .onChange(of: isSelected) { _, newValue in
             if newValue {
-                startTimer()
+                startAutoScroll()
             } else {
-                stopTimer()
+                stopAutoScroll()
             }
         }
     }
@@ -183,21 +183,24 @@ private extension ProductCarouselView {
         }
     }
 
-    // MARK: - Timer Management
-    func startTimer() {
-        guard products.count > 1 else { return }
-        stopTimer()
+    // MARK: - Auto-Scroll
 
-        timer = Timer.scheduledTimer(withTimeInterval: autoScrollInterval, repeats: true) { _ in
-            DispatchQueue.main.async {
-                self.advanceToNext()
+    func startAutoScroll() {
+        guard products.count > 1 else { return }
+        stopAutoScroll()
+
+        autoScrollTask = Task { @MainActor in
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: UInt64(autoScrollInterval * 1_000_000_000))
+                guard !Task.isCancelled else { break }
+                advanceToNext()
             }
         }
     }
 
-    func stopTimer() {
-        timer?.invalidate()
-        timer = nil
+    func stopAutoScroll() {
+        autoScrollTask?.cancel()
+        autoScrollTask = nil
     }
 
     func advanceToNext() {
@@ -207,7 +210,8 @@ private extension ProductCarouselView {
         currentIndex = nextIndex
 
         // Reset animation flag after animation completes
-        DispatchQueue.main.asyncAfter(deadline: .now() + animationDuration + 0.05) {
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: UInt64((animationDuration + 0.05) * 1_000_000_000))
             isAnimating = false
         }
     }

@@ -7,7 +7,7 @@ import SwiftUI
 
 // MARK: - DetailStyleConfiguration
 /// Size configuration for the detail (fullscreen) cards
-public struct DetailStyleConfiguration: Equatable, Sendable {
+public struct DetailStyleConfiguration: Equatable, Sendable, TimestampStyleProviding {
 
     // MARK: - Card
     /// Corner radius of the card

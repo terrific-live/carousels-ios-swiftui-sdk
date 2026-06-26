@@ -10,9 +10,6 @@ import ImageLoader
 import MediaPlayback
 
 struct TimelineDetailAssetCard: View {
-    // MARK: - Constants
-    private let collapsedLineLimit = 6
-    private let expandedLineLimit = 12
 
     // MARK: - Environment
     @Environment(\.accessibilityText) private var accessibilityText
@@ -36,16 +33,9 @@ struct TimelineDetailAssetCard: View {
     @Binding var isMuted: Bool
 
     // MARK: - State
-    @State
-    private var isSubtitleExpanded = false
-    @State
-    private var isSubtitleTruncated = false
-    @State
-    private var progress: Double = 0
-    @State
-    private var timerTask: Task<Void, Never>?
-    @State
-    private var hasValidVideo: Bool = false
+    @State private var progress: Double = 0
+    @State private var timerTask: Task<Void, Never>?
+    @State private var hasValidVideo: Bool = false
 
     // MARK: - Init
     init(
@@ -76,6 +66,16 @@ struct TimelineDetailAssetCard: View {
         self.onShareTap = onShareTap
         self.onVideoFinished = onVideoFinished
         self.onSponsorshipTap = onSponsorshipTap
+    }
+
+    // MARK: - Sponsor Layout
+    private var sponsorLayout: DetailSponsorLayout {
+        DetailSponsorLayout(
+            sponsorship: sponsorship,
+            mediaType: viewData.mediaType,
+            sizeConfig: sizeConfig,
+            hasCustomBackground: viewData.hasCustomBackground
+        )
     }
 
     // MARK: - Body
@@ -149,13 +149,13 @@ struct TimelineDetailAssetCard: View {
 
             // Progress bar at the bottom
             progressBar
-                .padding(.bottom, bannerBottomInset)
+                .padding(.bottom, sponsorLayout.bannerBottomInset)
         }
-        .overlay(alignment: badgeAlignment) {
-            sponsorBadgeOnlyOverlay
+        .overlay(alignment: sponsorLayout.badgeAlignment) {
+            DetailSponsorBadgeOverlay(layout: sponsorLayout, onTap: handleSponsorTap)
         }
         .overlay {
-            sponsorBannerContainerOverlay
+            DetailSponsorBannerOverlay(layout: sponsorLayout, onTap: handleSponsorTap)
         }
         .clipShape(RoundedRectangle(cornerRadius: viewData.hasCustomBackground ? sizeConfig.cardCornerRadius : 0))
         .clipped()
@@ -204,11 +204,11 @@ struct TimelineDetailAssetCard: View {
         if let pollViewModel = viewData.pollViewModel {
             GeometryReader { geometry in
                 VStack(spacing: 0) {
-                    if shouldShowPollSponsor && pollSponsorPosition == "top" {
-                        pollSponsorView
+                    if sponsorLayout.shouldShowPollSponsor && sponsorLayout.pollSponsorPosition == "top" {
+                        DetailPollSponsorView(layout: sponsorLayout)
                             .padding(.top, sizeConfig.timestampTopMargin * 3)
                             .onTapGesture {
-                                handleSponsorTap(placement: .pollLogo, position: .top, clickPosition: .top, url: pollSponsorRedirectUrl)
+                                handleSponsorTap(placement: .pollLogo, position: .top, clickPosition: .top, url: sponsorLayout.pollSponsorRedirectUrl)
                             }
                     }
                     Spacer()
@@ -218,11 +218,11 @@ struct TimelineDetailAssetCard: View {
                         displayMode: .interactive  // Shows actual state, allows interaction
                     )
                     Spacer()
-                    if shouldShowPollSponsor && pollSponsorPosition == "bottom" {
-                        pollSponsorView
+                    if sponsorLayout.shouldShowPollSponsor && sponsorLayout.pollSponsorPosition == "bottom" {
+                        DetailPollSponsorView(layout: sponsorLayout)
                             .padding(.bottom, sizeConfig.bottomInfoPaddingBottom + sizeConfig.progressBarHeight)
                             .onTapGesture {
-                                handleSponsorTap(placement: .pollLogo, position: .bottom, clickPosition: .bottom, url: pollSponsorRedirectUrl)
+                                handleSponsorTap(placement: .pollLogo, position: .bottom, clickPosition: .bottom, url: sponsorLayout.pollSponsorRedirectUrl)
                             }
                     }
                 }
@@ -357,7 +357,7 @@ private extension TimelineDetailAssetCard {
             if viewData.showTimestamp {
                 timestampLabel
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top, sizeConfig.timestampTopMargin + topSponsorInset)
+                    .padding(.top, sizeConfig.timestampTopMargin + sponsorLayout.topSponsorInset)
                     .padding(.horizontal, sizeConfig.timestampHorizontalMargin)
             }
 
@@ -365,64 +365,38 @@ private extension TimelineDetailAssetCard {
 
             // Bottom: Info section with action buttons
             HStack(alignment: .bottom, spacing: 4) {
-                bottomInfoSection
+                DetailBottomInfoSection(
+                    viewData: viewData,
+                    sizeConfig: sizeConfig,
+                    onCtaButtonTap: onCtaButtonTap
+                )
 
                 actionButtons
                     .padding(.trailing, sizeConfig.contentHorizontalPadding)
                     .padding(.bottom, sizeConfig.bottomInfoPaddingBottom)
             }
-            .padding(.bottom, bannerBottomInset)
+            .padding(.bottom, sponsorLayout.bannerBottomInset)
         }
     }
 
     var actionButtons: some View {
-        VStack(spacing: sizeConfig.actionButtonSpacing) {
-            Button(action: {
-                onLikeTap?()
-            }) {
-                Image(systemName: isLiked ? "hand.thumbsup.fill" : "hand.thumbsup")
-                    .font(.system(size: sizeConfig.actionButtonIconSize))
-                    .foregroundColor(.white)
-            }
-            .frame(width: 24, height: 24)
-            .accessibilityLabel(isLiked ? accessibilityText.unlikeButtonLabel : accessibilityText.likeButtonLabel)
-
-            shareButton
-                .frame(width: 24, height: 24)
-                .accessibilityLabel(accessibilityText.shareButtonLabel)
-
-            // Sound on/off button (only for videos)
-            if viewData.mediaType == .video {
-                Button(action: {
-                    isMuted.toggle()
-                }) {
-                    Image(systemName: isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                        .font(.system(size: sizeConfig.actionButtonIconSize))
-                        .foregroundColor(.white)
-                }
-                .frame(width: 24, height: 24)
-                .accessibilityLabel(isMuted ? accessibilityText.unmuteButtonLabel : accessibilityText.muteButtonLabel)
-            }
-        }
+        DetailActionButtonsView(
+            isLiked: isLiked,
+            mediaType: viewData.mediaType,
+            shareContent: shareContent,
+            sizeConfig: sizeConfig,
+            isMuted: $isMuted,
+            onLikeTap: onLikeTap,
+            onShareTap: onShareTap
+        )
     }
 
-    @ViewBuilder
-    var shareButton: some View {
-        if #available(iOS 16.0, *) {
-            ShareButton(content: shareContent, onShare: onShareTap)
-        } else {
-            Button(action: {
-                onShareTap?()
-            }) {
-                Image(systemName: "arrowshape.turn.up.right")
-                    .font(.system(size: sizeConfig.actionButtonIconSize))
-                    .foregroundColor(.white)
-            }
-        }
+    var timestampLabel: some View {
+        TimelineTimestampLabel(text: viewData.formattedTimestamp, style: sizeConfig)
     }
 
     /// Content to share - URL if available, otherwise text
-    private var shareContent: ShareableContent {
+    var shareContent: ShareableContent {
         if let url = viewData.ctaButton?.url ?? viewData.products.first?.ctaButton?.url {
             return .url(url)
         }
@@ -432,395 +406,14 @@ private extension TimelineDetailAssetCard {
         }
         return .text(text)
     }
-
-    var timestampLabel: some View {
-        Text(viewData.formattedTimestamp)
-            .font(sizeConfig.timestampFont.toFont())
-            .foregroundColor(.black)
-            .padding(.horizontal, sizeConfig.timestampPaddingHorizontal)
-            .padding(.vertical, sizeConfig.timestampPaddingVertical)
-            .background(
-                RoundedRectangle(cornerRadius: sizeConfig.timestampCornerRadius)
-                    .fill(Color.white)
-            )
-    }
-
-    var bottomInfoSection: some View {
-        VStack(alignment: .leading, spacing: sizeConfig.contentSpacing) {
-            // Brand logo
-            if let brandLogoURL = viewData.brandLogoURL {
-                CachedAsyncImage(urlString: brandLogoURL) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: sizeConfig.brandLogoSize, height: sizeConfig.brandLogoSize)
-                        .clipShape(RoundedRectangle(cornerRadius: sizeConfig.brandLogoCornerRadius))
-                } placeholder: {
-                    RoundedRectangle(cornerRadius: sizeConfig.brandLogoCornerRadius)
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(width: sizeConfig.brandLogoSize, height: sizeConfig.brandLogoSize)
-                }
-            }
-
-            // Title
-            Text(viewData.title)
-                .font(sizeConfig.titleFont.toFont())
-                .foregroundColor(.white)
-                .lineLimit(1)
-
-            // Subtitle with truncation detection
-            if let subtitle = viewData.subtitle {
-                TruncatableText(
-                    text: subtitle,
-                    font: sizeConfig.subtitleFont.toFont(),
-                    lineLimit: isSubtitleExpanded ? expandedLineLimit : collapsedLineLimit,
-                    isTruncated: $isSubtitleTruncated
-                )
-                .foregroundColor(.white.opacity(0.85))
-                .animation(.easeInOut(duration: 0.3), value: isSubtitleExpanded)
-            }
-
-            // Read more / Read less button (only visible when text is truncated)
-            if isSubtitleTruncated || isSubtitleExpanded {
-                Button(action: {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        isSubtitleExpanded.toggle()
-                    }
-                }) {
-                    Text(isSubtitleExpanded ? readLess : readMore)
-                        .font(sizeConfig.subtitleFont.toFont())
-                        .foregroundColor(.white)
-                }
-                .accessibilityLabel(isSubtitleExpanded ? accessibilityText.readLessButtonLabel : accessibilityText.readMoreButtonLabel)
-            }
-
-            // CTA Button
-            if let ctaButton = viewData.ctaButton {
-                Button(action: {
-                    onCtaButtonTap?()
-                }) {
-                    Text(ctaButton.text)
-                        .font(sizeConfig.ctaButtonFont.toFont())
-                        .foregroundColor(ctaButton.textColor)
-                        .padding(.horizontal, sizeConfig.ctaButtonPaddingHorizontal)
-                        .padding(.vertical, sizeConfig.ctaButtonPaddingVertical)
-                        .background(
-                            Capsule()
-                                .fill(ctaButton.backgroundColor)
-                        )
-                }
-                .padding(.top, 4)
-                .accessibilityLabel(accessibilityText.ctaButtonLabel(title: ctaButton.text))
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.leading, sizeConfig.contentHorizontalPadding)
-        .padding(.bottom, sizeConfig.bottomInfoPaddingBottom)
-        .padding(.top, sizeConfig.bottomInfoPaddingBottom)
-    }
 }
 
-// MARK: - Sponsor Badge / Banner
+// MARK: - Sponsor Actions
 private extension TimelineDetailAssetCard {
-
-    var shouldShowSponsorOverlay: Bool {
-        guard sponsorship?.verticalEnabled == true,
-              viewData.mediaType != .poll else { return false }
-        switch sponsorship?.adPlacementType {
-        case "badge": return sponsorship?.badge != nil
-        case "banner": return sponsorship?.banner != nil
-        default: return false
-        }
-    }
-
-    /// Whether a top sponsor overlay (badge or top banner) is present,
-    /// requiring timestamp and close button to shift down.
-    var hasTopSponsorOverlay: Bool {
-        guard shouldShowSponsorOverlay else { return false }
-        if sponsorship?.adPlacementType == "badge" {
-            // All badge positions are at top (top-left, top-center, top-right)
-            return true
-        }
-        if sponsorship?.adPlacementType == "banner" {
-            return showsTopBanner
-        }
-        return false
-    }
-
-    /// Extra top inset to avoid overlapping with top badge/banner
-    var topSponsorInset: CGFloat {
-        hasTopSponsorOverlay ? sizeConfig.sponsorBadgeHeight : 0
-    }
-
-    /// Logo URL from either badge or banner data
-    private var sponsorLogoUrl: String? {
-        if sponsorship?.adPlacementType == "badge" {
-            return sponsorship?.badge?.logoUrl
-        }
-        return sponsorship?.banner?.logoUrl
-    }
-
-    /// Background color hex from either badge or banner data (nil = transparent)
-    private var sponsorBackgroundColor: String? {
-        if sponsorship?.adPlacementType == "badge" {
-            return sponsorship?.badge?.backgroundColor
-        }
-        return sponsorship?.banner?.backgroundColor
-    }
-
-    /// Position string from either badge or banner data
-    private var sponsorPosition: String {
-        if sponsorship?.adPlacementType == "badge" {
-            return sponsorship?.badge?.position ?? "top-left"
-        }
-        return sponsorship?.banner?.position ?? "top"
-    }
-
-    /// Analytics position enum mapped from the API position string
-    private var sponsorAnalyticsPosition: SponsorshipPosition? {
-        switch sponsorPosition {
-        case "top", "top-left", "top-center", "top-right": return .top
-        case "bottom": return .bottom
-        case "top-bottom": return .both
-        default: return nil
-        }
-    }
-
-    /// Redirect URL for the current sponsor overlay type
-    private var sponsorRedirectUrl: URL? {
-        let urlString: String?
-        if sponsorship?.adPlacementType == "badge" {
-            urlString = sponsorship?.badge?.clickRedirect ?? sponsorship?.verticalClickRedirect
-        } else {
-            urlString = sponsorship?.banner?.clickRedirect ?? sponsorship?.verticalClickRedirect
-        }
-        guard let urlString else { return nil }
-        return URL(string: urlString)
-    }
-
-    // MARK: Banner helpers
-
-    private var showsTopBanner: Bool {
-        let pos = sponsorship?.banner?.position ?? "top"
-        return pos == "top" || pos == "top-bottom"
-    }
-
-    private var showsBottomBanner: Bool {
-        let pos = sponsorship?.banner?.position ?? "top"
-        return pos == "bottom" || pos == "top-bottom"
-            || sponsorship?.banner?.isBottom == true
-    }
-
-    /// Extra bottom inset for overlay content when a bottom banner is present
-    var bannerBottomInset: CGFloat {
-        guard shouldShowSponsorOverlay,
-              sponsorship?.adPlacementType == "banner",
-              showsBottomBanner else { return 0 }
-        return sizeConfig.sponsorBadgeHeight
-    }
-
-    var badgeAlignment: Alignment {
-        guard shouldShowSponsorOverlay else { return .topLeading }
-        switch sponsorPosition {
-        case "top-center": return .top
-        case "top-right": return .topTrailing
-        default: return .topLeading
-        }
-    }
-
-    // MARK: Badge-only overlay (corner position)
-
-    @ViewBuilder
-    var sponsorBadgeOnlyOverlay: some View {
-        if shouldShowSponsorOverlay && sponsorship?.adPlacementType == "badge" {
-            badgeOverlayView
-                .onTapGesture {
-                    handleSponsorTap(placement: .badgeLogo, position: sponsorAnalyticsPosition, clickPosition: sponsorPosition.hasPrefix("top") ? .top : .bottom, url: sponsorRedirectUrl)
-                }
-        }
-    }
-
-    // MARK: Banner container overlay (full-width, supports top/bottom/top-bottom)
-
-    @ViewBuilder
-    var sponsorBannerContainerOverlay: some View {
-        if shouldShowSponsorOverlay && sponsorship?.adPlacementType == "banner" {
-            VStack {
-                if showsTopBanner {
-                    bannerOverlayView
-                        .onTapGesture {
-                            handleSponsorTap(placement: .bannerLogo, position: sponsorAnalyticsPosition, clickPosition: .top, url: sponsorRedirectUrl)
-                        }
-                }
-                Spacer()
-                if showsBottomBanner {
-                    bannerOverlayView
-                        .onTapGesture {
-                            handleSponsorTap(placement: .bannerLogo, position: sponsorAnalyticsPosition, clickPosition: .bottom, url: sponsorRedirectUrl)
-                        }
-                }
-            }
-        }
-    }
-
-    private var bannerOverlayView: some View {
-        HStack {
-            if let logoUrl = sponsorLogoUrl {
-                CachedAsyncImage(urlString: logoUrl) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                }
-                .frame(height: sizeConfig.sponsorBadgeHeight - sizeConfig.sponsorBadgeVerticalPadding * 2)
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, sizeConfig.sponsorBadgeVerticalPadding)
-        .background(sponsorBackgroundColor.map { Color(hex: $0) } ?? .clear)
-    }
-
-    // MARK: Badge (corner overlay)
-
-    private var badgeOverlayView: some View {
-        HStack(spacing: 6) {
-            if let logoUrl = sponsorLogoUrl {
-                CachedAsyncImage(urlString: logoUrl) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                }
-                .frame(height: sizeConfig.sponsorBadgeHeight - sizeConfig.sponsorBadgeVerticalPadding * 2)
-            }
-        }
-        .padding(.vertical, sizeConfig.sponsorBadgeVerticalPadding)
-        .padding(.horizontal, 10)
-        .background(sponsorBackgroundColor.map { Color(hex: $0) } ?? .clear)
-        .clipShape(badgeShape)
-    }
-
-    private var badgeShape: UnevenRoundedRectangle {
-        let outerRadius = viewData.hasCustomBackground ? sizeConfig.cardCornerRadius : 0
-        let innerRadius: CGFloat = 8
-        switch sponsorPosition {
-        case "top-center":
-            return UnevenRoundedRectangle(
-                bottomLeadingRadius: innerRadius,
-                bottomTrailingRadius: innerRadius
-            )
-        case "top-right":
-            return UnevenRoundedRectangle(
-                bottomLeadingRadius: innerRadius,
-                topTrailingRadius: outerRadius
-            )
-        default: // "top-left"
-            return UnevenRoundedRectangle(
-                topLeadingRadius: outerRadius,
-                bottomTrailingRadius: innerRadius
-            )
-        }
-    }
-
-    // MARK: Poll sponsor
-
-    var shouldShowPollSponsor: Bool {
-        sponsorship?.verticalEnabled == true
-        && sponsorship?.poll != nil
-        && sponsorship?.poll?.logoUrl != nil
-    }
-
-    var pollSponsorPosition: String {
-        sponsorship?.poll?.adPosition ?? "top"
-    }
-
-    var pollSponsorRedirectUrl: URL? {
-        guard let urlString = sponsorship?.poll?.clickRedirect else { return nil }
-        return URL(string: urlString)
-    }
 
     func handleSponsorTap(placement: AssetSponsorshipPlacement, position: SponsorshipPosition?, clickPosition: SponsorshipClickPosition, url: URL?) {
         onSponsorshipTap?(placement, position, clickPosition, url?.absoluteString)
-        openSponsorRedirect(url)
-    }
-
-    func openSponsorRedirect(_ url: URL?) {
-        guard let url else { return }
-        openURL(url)
-    }
-
-    @ViewBuilder
-    var pollSponsorView: some View {
-        if let logoUrl = sponsorship?.poll?.logoUrl {
-            HStack {
-                CachedAsyncImage(urlString: logoUrl) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                }
-                .frame(height: sizeConfig.sponsorBadgeHeight - sizeConfig.sponsorBadgeVerticalPadding * 2)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, sizeConfig.sponsorBadgeVerticalPadding)
-        }
-    }
-}
-
-// MARK: - Strings
-private extension TimelineDetailAssetCard {
-    var readMore: String {
-        "Read more"
-    }
-
-    var readLess: String {
-        "Read less"
-    }
-}
-
-// MARK: - Truncatable Text
-/// A text view that detects whether its content is being truncated
-private struct TruncatableText: View {
-    let text: String
-    let font: Font
-    let lineLimit: Int
-    @Binding var isTruncated: Bool
-
-    var body: some View {
-        Text(text)
-            .font(font)
-            .lineLimit(lineLimit)
-            .background(
-                // Hidden text to measure full height
-                Text(text)
-                    .font(font)
-                    .lineLimit(nil)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .hidden()
-                    .background(
-                        GeometryReader { fullTextGeometry in
-                            // Visible text to measure truncated height
-                            Text(text)
-                                .font(font)
-                                .lineLimit(lineLimit)
-                                .background(
-                                    GeometryReader { truncatedGeometry in
-                                        Color.clear.onAppear {
-                                            // Compare heights to detect truncation
-                                            let isTruncatedNow = fullTextGeometry.size.height > truncatedGeometry.size.height
-                                            if isTruncated != isTruncatedNow {
-                                                isTruncated = isTruncatedNow
-                                            }
-                                        }
-                                        .onChange(of: lineLimit) { _, _ in
-                                            let isTruncatedNow = fullTextGeometry.size.height > truncatedGeometry.size.height
-                                            if isTruncated != isTruncatedNow {
-                                                isTruncated = isTruncatedNow
-                                            }
-                                        }
-                                    }
-                                )
-                                .hidden()
-                        }
-                    )
-            )
+        if let url { openURL(url) }
     }
 }
 

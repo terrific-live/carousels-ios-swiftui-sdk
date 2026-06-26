@@ -90,7 +90,7 @@ public struct CarouselProduct: Identifiable, Sendable {
 extension CarouselProduct {
     /// Creates a CarouselProduct from internal ProductDTO
     init(from dto: ProductDTO) {
-        self.id = dto.id ?? ""
+        self.id = dto.id
         self.name = dto.name
         self.description = dto.description
         self.externalUrl = dto.externalUrl

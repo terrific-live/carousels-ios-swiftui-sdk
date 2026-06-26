@@ -56,7 +56,7 @@ extension ProductData {
     ///   - product: The product DTO
     ///   - titleOverride: Optional title to use instead of product name (e.g., asset brandName)
     init(from product: ProductDTO, titleOverride: String?) {
-        self.id = product.stableId
+        self.id = product.id
         self.title = titleOverride ?? product.name ?? ""
         self.subtitle = product.description ?? ""
         self.price = product.formattedPrice

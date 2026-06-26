@@ -132,7 +132,8 @@ final class TimelineViewModelTests: XCTestCase {
             name: "Test Carousel",
             showTimestamps: true,
             mapBrandNameToProductName: false,
-            swipeUpText: nil
+            swipeUpText: nil,
+            sponsorship: nil
         )
         mockService.stubbedResult = .sample(
             assets: .samplePage(count: 3),
@@ -447,6 +448,139 @@ final class TimelineViewModelTests: XCTestCase {
         // Then
         XCTAssertEqual(mockAnalyticDelegate.shareEvents.count, 1)
         XCTAssertEqual(mockAnalyticDelegate.shareEvents[0].position, 5)
+    }
+
+    // MARK: - Product CTA Edge Cases
+
+    func testHandleProductCtaTap_withNilUrl_doesNotNotify() {
+        // Given
+        let asset = TimelineAssetDTO.sample()
+        let product = ProductDTO.sampleFull
+
+        // When
+        sut.handleProductCtaTap(product: product, asset: asset, url: nil)
+
+        // Then
+        XCTAssertTrue(mockAnalyticDelegate.productClickEvents.isEmpty)
+    }
+
+    // MARK: - Carousel Sponsorship Tests
+
+    func testHandleCarouselSponsorshipClicked_notifiesDelegate() {
+        // When
+        sut.handleCarouselSponsorshipClicked(
+            placement: .topLogo,
+            sponsorshipUrl: "https://sponsor.com"
+        )
+
+        // Then
+        XCTAssertEqual(mockAnalyticDelegate.carouselSponsorshipClickEvents.count, 1)
+        XCTAssertEqual(mockAnalyticDelegate.carouselSponsorshipClickEvents[0].url, "https://sponsor.com")
+    }
+
+    func testHandleCarouselSponsorshipClicked_withNilUrl_notifiesDelegate() {
+        // When
+        sut.handleCarouselSponsorshipClicked(placement: .topLogo, sponsorshipUrl: nil)
+
+        // Then
+        XCTAssertEqual(mockAnalyticDelegate.carouselSponsorshipClickEvents.count, 1)
+        XCTAssertNil(mockAnalyticDelegate.carouselSponsorshipClickEvents[0].url)
+    }
+
+    // MARK: - Asset Sponsorship Tests
+
+    func testHandleAssetSponsorshipClicked_notifiesDelegate() {
+        // Given
+        let asset = TimelineAssetDTO.sample()
+
+        // When
+        sut.handleAssetSponsorshipClicked(
+            asset: asset,
+            placement: .badgeLogo,
+            position: .top,
+            clickPosition: .top,
+            sponsorshipUrl: "https://sponsor.com/asset"
+        )
+
+        // Then
+        XCTAssertEqual(mockAnalyticDelegate.assetSponsorshipClickEvents.count, 1)
+        XCTAssertEqual(mockAnalyticDelegate.assetSponsorshipClickEvents[0].url, "https://sponsor.com/asset")
+    }
+
+    func testHandleAssetSponsorshipClicked_withNilPositions_notifiesDelegate() {
+        // Given
+        let asset = TimelineAssetDTO.sample()
+
+        // When
+        sut.handleAssetSponsorshipClicked(
+            asset: asset,
+            placement: .bannerLogo,
+            position: nil,
+            clickPosition: nil,
+            sponsorshipUrl: nil
+        )
+
+        // Then
+        XCTAssertEqual(mockAnalyticDelegate.assetSponsorshipClickEvents.count, 1)
+        XCTAssertNil(mockAnalyticDelegate.assetSponsorshipClickEvents[0].position)
+        XCTAssertNil(mockAnalyticDelegate.assetSponsorshipClickEvents[0].clickPosition)
+        XCTAssertNil(mockAnalyticDelegate.assetSponsorshipClickEvents[0].url)
+    }
+
+    // MARK: - Detail View Disappear Analytics Tests
+
+    func testHandleDetailViewDisappear_endsCurrentAssetView() async throws {
+        // Given
+        let asset = TimelineAssetDTO.sample()
+        mockService.stubbedResult = .sample(assets: [asset])
+        sut.loadFirstPage()
+        try await Task.sleep(nanoseconds: 100_000_000)
+
+        sut.enableAutoAdvance()
+        // enableAutoAdvance calls handleCurrentAssetChanged which calls handleAssetViewStarted
+        let startedCount = mockAnalyticDelegate.assetViewStartedEvents.count
+        XCTAssertEqual(startedCount, 1)
+
+        // When
+        sut.handleDetailViewDisappear()
+
+        // Then - should have ended the current view
+        XCTAssertEqual(mockAnalyticDelegate.assetViewEndedEvents.count, 1)
+    }
+
+    func testHandleDetailViewDisappear_tracksDetailClosed() async throws {
+        // Given
+        let asset = TimelineAssetDTO.sample()
+        mockService.stubbedResult = .sample(assets: [asset])
+        sut.loadFirstPage()
+        try await Task.sleep(nanoseconds: 100_000_000)
+
+        sut.enableAutoAdvance() // This triggers handleDetailOpened via loadNextPage
+        sut.handleDetailOpened()
+
+        // When
+        sut.handleDetailViewDisappear()
+
+        // Then
+        XCTAssertFalse(mockAnalyticDelegate.detailClosedEvents.isEmpty)
+    }
+
+    // MARK: - Asset View Edge Cases
+
+    func testHandleAssetViewEnded_withoutStarted_isNoOp() {
+        // When - end without starting
+        sut.handleAssetViewEnded()
+
+        // Then
+        XCTAssertTrue(mockAnalyticDelegate.assetViewEndedEvents.isEmpty)
+    }
+
+    func testHandleDetailClosed_withoutOpened_isNoOp() {
+        // When - close without opening
+        sut.handleDetailClosed()
+
+        // Then
+        XCTAssertTrue(mockAnalyticDelegate.detailClosedEvents.isEmpty)
     }
 
     // MARK: - Auto-Advance Tests

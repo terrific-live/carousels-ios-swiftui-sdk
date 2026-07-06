@@ -3,8 +3,6 @@
 //  TerrificCarouselSDK
 //
 
-#if DEBUG
-
 // MARK: - Product Sample Data
 extension ProductDTO {
     /// Full product with all elements
@@ -131,5 +129,3 @@ extension ProductDTO {
         )
     )
 }
-
-#endif

@@ -13,6 +13,7 @@ extension APIConfiguration {
         storeId: "uO5g9yzOTkR39JFG3ORP",
         carouselId: "doS2DpZV4YIoYjR2YYQc",
         baseURL: "https://terrific-staging-polls.web.app",
+        analyticsBaseURL: "https://us-central1-terrific-deploy.cloudfunctions.net"
     )
 
     nonisolated(unsafe) static let francTVConfiguration = APIConfiguration(
@@ -33,6 +34,7 @@ extension APIConfiguration {
 //        storeId: "uO5g9yzOTkR39JFG3ORP",
 //        carouselId: "doS2DpZV4YIoYjR2YYQc",
 //        baseURL: "https://terrific-staging-polls.web.app",
+//        analyticsBaseURL: "https://us-central1-terrific-deploy.cloudfunctions.net"
 //    )
 //
 //    nonisolated(unsafe) static let testProductionConfiguration = APIConfiguration(
@@ -58,6 +60,7 @@ extension APIConfiguration {
 //        storeId: "1ihKYs7lmGp0J2cj6Tom",
 //        carouselId: "bcl1sZJUxVXzWa64hXLt",
 //        baseURL: "https://terrific-staging-polls.web.app",
+//        analyticsBaseURL: "https://us-central1-terrific-deploy.cloudfunctions.net",
 //        shopPageUrl: nil
 //    )
 //}

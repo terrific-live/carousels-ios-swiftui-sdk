@@ -11,6 +11,7 @@ import Foundation
 /// Configuration for the Carousel SDK API connection.
 public struct APIConfiguration {
     public let baseURL: URL
+    public let analyticsBaseURL: URL
     public let storeId: String
     public let carouselId: String
     public let shopPageUrl: String?
@@ -20,9 +21,11 @@ public struct APIConfiguration {
         storeId: String,
         carouselId: String,
         baseURL: String? = nil,
+        analyticsBaseURL: String? = nil,
         shopPageUrl: String? = nil
     ) {
         self.baseURL = baseURL.flatMap { URL(string: $0) } ?? URL(string: "https://terrific-live-polls.web.app")!
+        self.analyticsBaseURL = analyticsBaseURL.flatMap { URL(string: $0) } ?? URL(string: "https://us-central1-terrific-live.cloudfunctions.net")!
         self.storeId = storeId
         self.carouselId = carouselId
         self.shopPageUrl = shopPageUrl

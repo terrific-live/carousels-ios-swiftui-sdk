@@ -9,15 +9,7 @@ import Foundation
 struct AnalyticsConfiguration {
     // MARK: - Static Properties
 
-    /// Controls whether analytics events are sent to the server.
-    /// - Returns: `true` in Release mode, `false` in Debug mode.
-    /// - Note: SDK user callbacks (onAnalyticsEvent) are still called regardless of this setting.
-    /// When `true`, analytics requests are sent to the staging endpoint.
-    /// Set to `false` for production.
-    static var isStagingMode: Bool = true
-
     static var isAnalyticsEnabled: Bool {
-        return true
 #if DEBUG
         return false
 #else
@@ -31,11 +23,11 @@ struct AnalyticsConfiguration {
 
     // MARK: - Init
     init(
-        baseURL: String,
+        baseURL: URL,
         storeId: String,
         userId: String
     ) {
-        self.baseURL = URL(string: baseURL)!
+        self.baseURL = baseURL
         self.storeId = storeId
         self.userId = userId
     }
@@ -121,27 +113,15 @@ struct AnalyticsConfiguration {
     ]
 }
 
-// MARK: - Predefined Configurations
+// MARK: - Factory
 extension AnalyticsConfiguration {
-    /// Staging analytics endpoint, for tests
-    static func staging(
+    /// Creates analytics configuration using the analytics base URL from API config.
+    static func make(
         apiConfig: APIConfiguration,
         terrificUserId: String
     ) -> AnalyticsConfiguration {
         AnalyticsConfiguration(
-            baseURL: "https://us-central1-terrific-deploy.cloudfunctions.net",
-            storeId: apiConfig.storeId,
-            userId: terrificUserId
-        )
-    }
-
-    /// Production analytics endpoint
-    static func production(
-        apiConfig: APIConfiguration,
-        terrificUserId: String
-    ) -> AnalyticsConfiguration {
-        AnalyticsConfiguration(
-            baseURL: "https://us-central1-terrific-live.cloudfunctions.net",
+            baseURL: apiConfig.analyticsBaseURL,
             storeId: apiConfig.storeId,
             userId: terrificUserId
         )

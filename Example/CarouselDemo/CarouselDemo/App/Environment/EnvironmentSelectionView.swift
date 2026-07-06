@@ -9,54 +9,10 @@ import SwiftUI
 import TerrificCarouselSDK
 
 // MARK: - APIEnvironmentOption
-enum APIEnvironmentOption: String, CaseIterable, Identifiable {
-    case francTV = "France TV (Production)"
-    case francTV2 = "France TV 2 (Production)"
-    case test = "Test Store (Staging)"
-
-    var id: String { rawValue }
-
-    var configuration: APIConfiguration {
-        switch self {
-        case .francTV:
-            return .francTVConfiguration
-        case .francTV2:
-            return .francTVConfiguration2
-        case .test:
-            return .testStoreConfiguration
-        }
-    }
-
-    var description: String {
-        switch self {
-        case .francTV:
-            return "Live production environment"
-        case .francTV2:
-            return "Live production environment"
-        case .test:
-            return "Staging environment for testing"
-        }
-    }
-
-    var icon: String {
-        switch self {
-        case .francTV:
-            return "tv"
-        case .francTV2:
-            return "tv"
-        case .test:
-            return "testtube.2"
-        }
-    }
-}
-
-
 //enum APIEnvironmentOption: String, CaseIterable, Identifiable {
 //    case francTV = "France TV (Production)"
-//    case testProduction = "Test Store (Production)"
-//    case testProductionVolodimir = "Test Volodimir Store (Production)"
+//    case francTV2 = "France TV 2 (Production)"
 //    case test = "Test Store (Staging)"
-//    case test2 = "Test Volodimir Store (Staging)"
 //
 //    var id: String { rawValue }
 //
@@ -64,14 +20,10 @@ enum APIEnvironmentOption: String, CaseIterable, Identifiable {
 //        switch self {
 //        case .francTV:
 //            return .francTVConfiguration
-//        case .testProduction:
-//            return .testProductionConfiguration
-//        case .testProductionVolodimir:
-//            return .testVolodimirCarouselProductionConfiguration
+//        case .francTV2:
+//            return .francTVConfiguration2
 //        case .test:
 //            return .testStoreConfiguration
-//        case .test2:
-//            return .testStagingConfiguration
 //        }
 //    }
 //
@@ -79,13 +31,9 @@ enum APIEnvironmentOption: String, CaseIterable, Identifiable {
 //        switch self {
 //        case .francTV:
 //            return "Live production environment"
-//        case .testProduction:
-//            return "Production environment for testing"
-//        case .testProductionVolodimir:
-//            return "Production Volodimir environment for testing"
+//        case .francTV2:
+//            return "Live production environment"
 //        case .test:
-//            return "Staging environment for testing"
-//        case .test2:
 //            return "Staging environment for testing"
 //        }
 //    }
@@ -94,17 +42,69 @@ enum APIEnvironmentOption: String, CaseIterable, Identifiable {
 //        switch self {
 //        case .francTV:
 //            return "tv"
-//        case .testProduction:
-//            return "checkmark.seal"
-//        case .testProductionVolodimir:
-//            return "checkmark.seal"
+//        case .francTV2:
+//            return "tv"
 //        case .test:
-//            return "testtube.2"
-//        case .test2:
 //            return "testtube.2"
 //        }
 //    }
 //}
+
+
+enum APIEnvironmentOption: String, CaseIterable, Identifiable {
+    case francTV = "France TV (Production)"
+    case testProduction = "Test Store (Production)"
+    case testProductionVolodimir = "Test Volodimir Store (Production)"
+    case test = "Test Store (Staging)"
+    case test2 = "Test Volodimir Store (Staging)"
+
+    var id: String { rawValue }
+
+    var configuration: APIConfiguration {
+        switch self {
+        case .francTV:
+            return .francTVConfiguration
+        case .testProduction:
+            return .testProductionConfiguration
+        case .testProductionVolodimir:
+            return .testVolodimirCarouselProductionConfiguration
+        case .test:
+            return .testStoreConfiguration
+        case .test2:
+            return .testStagingConfiguration
+        }
+    }
+
+    var description: String {
+        switch self {
+        case .francTV:
+            return "Live production environment"
+        case .testProduction:
+            return "Production environment for testing"
+        case .testProductionVolodimir:
+            return "Production Volodimir environment for testing"
+        case .test:
+            return "Staging environment for testing"
+        case .test2:
+            return "Staging environment for testing"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .francTV:
+            return "tv"
+        case .testProduction:
+            return "checkmark.seal"
+        case .testProductionVolodimir:
+            return "checkmark.seal"
+        case .test:
+            return "testtube.2"
+        case .test2:
+            return "testtube.2"
+        }
+    }
+}
 
 // MARK: - EnvironmentSelectionView
 struct EnvironmentSelectionView: View {

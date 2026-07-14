@@ -38,7 +38,7 @@ struct AssetMediaDTO: Codable, Equatable, Hashable {
     }
 }
 
-// MARK: - AssetMediaType
+// MARK: - AssetMediaTypeDTO
 enum AssetMediaTypeDTO: String, Codable, Hashable {
     case image
     case video

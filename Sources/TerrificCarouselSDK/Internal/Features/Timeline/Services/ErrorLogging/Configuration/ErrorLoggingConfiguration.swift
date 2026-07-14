@@ -7,12 +7,12 @@ import Foundation
 
 // MARK: - ErrorLoggingConfiguration
 struct ErrorLoggingConfiguration {
-    let baseURL: URL
+    let baseURL: URL?
     let project: String
 
     // MARK: - Init
     init(baseURL: String, project: String = "terrific-carousel-ios-sdk") {
-        self.baseURL = URL(string: baseURL)!
+        self.baseURL = URL(string: baseURL)
         self.project = project
     }
 

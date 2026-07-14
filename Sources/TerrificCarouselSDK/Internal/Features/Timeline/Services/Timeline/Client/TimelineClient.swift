@@ -20,7 +20,7 @@ final class TimelineClient {
 
     // MARK: - Factory
     static func live(configuration: APIConfiguration) -> TimelineClient {
-        let baseURL = configuration.baseURL.absoluteString
+        let baseURL = configuration.baseURL?.absoluteString ?? ""
 
         // Create client
         let client = Client(base: baseURL, version: nil)

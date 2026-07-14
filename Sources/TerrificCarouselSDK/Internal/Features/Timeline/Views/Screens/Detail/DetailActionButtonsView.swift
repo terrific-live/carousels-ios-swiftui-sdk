@@ -12,7 +12,7 @@ struct DetailActionButtonsView: View {
 
     // MARK: - Inputs
     let isLiked: Bool
-    let mediaType: AssetMediaType
+    let mediaType: AssetMediaTypeData
     let shareContent: ShareableContent
     let sizeConfig: DetailStyleConfiguration
     @Binding var isMuted: Bool

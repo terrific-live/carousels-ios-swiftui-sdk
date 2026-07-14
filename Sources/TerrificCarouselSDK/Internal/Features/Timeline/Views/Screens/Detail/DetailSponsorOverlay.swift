@@ -12,7 +12,7 @@ struct DetailSponsorLayout {
 
     // MARK: - Inputs
     let sponsorship: SponsorshipDTO?
-    let mediaType: AssetMediaType
+    let mediaType: AssetMediaTypeData
     let sizeConfig: DetailStyleConfiguration
     let hasCustomBackground: Bool
 

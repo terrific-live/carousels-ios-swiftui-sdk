@@ -17,7 +17,7 @@ final class AnalyticsClient {
 
     // MARK: - Factory
     static func live(configuration: AnalyticsConfiguration) -> AnalyticsClient {
-        let baseURL = configuration.baseURL.absoluteString
+        let baseURL = configuration.baseURL?.absoluteString ?? ""
 
         // Create client
         let client = Client(base: baseURL, version: nil)

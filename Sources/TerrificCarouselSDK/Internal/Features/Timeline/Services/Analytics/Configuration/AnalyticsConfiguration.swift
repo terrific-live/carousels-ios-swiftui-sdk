@@ -17,7 +17,6 @@ struct AnalyticsConfiguration {
     static var isStagingMode: Bool = true
 
     static var isAnalyticsEnabled: Bool {
-        return true
 #if DEBUG
         return false
 #else
@@ -25,7 +24,7 @@ struct AnalyticsConfiguration {
 #endif
     }
 
-    let baseURL: URL
+    let baseURL: URL?
     let storeId: String
     let userId: String
 
@@ -35,7 +34,7 @@ struct AnalyticsConfiguration {
         storeId: String,
         userId: String
     ) {
-        self.baseURL = URL(string: baseURL)!
+        self.baseURL = URL(string: baseURL)
         self.storeId = storeId
         self.userId = userId
     }

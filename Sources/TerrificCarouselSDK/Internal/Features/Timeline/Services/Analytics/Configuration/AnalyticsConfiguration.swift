@@ -17,7 +17,7 @@ struct AnalyticsConfiguration {
 #endif
     }
 
-    let baseURL: URL
+    let baseURL: URL?
     let storeId: String
     let userId: String
 

@@ -36,7 +36,7 @@ struct DefaultAccessibilityTextProvider: AccessibilityTextProvider {
 
     // MARK: - Feed View
 
-    func feedAssetCardLabel(title: String, subtitle: String?, mediaType: AssetMediaType, pollQuestion: String?) -> String {
+    func feedAssetCardLabel(title: String, subtitle: String?, mediaType: AssetMediaTypeData, pollQuestion: String?) -> String {
         let typeLabel: String
         switch mediaType {
         case .image: typeLabel = "Image"

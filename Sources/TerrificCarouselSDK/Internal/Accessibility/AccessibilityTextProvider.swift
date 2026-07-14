@@ -16,7 +16,7 @@ protocol AccessibilityTextProvider: Sendable {
     func itemPositionLabel(current: Int, total: Int) -> String
 
     // MARK: - Feed View
-    func feedAssetCardLabel(title: String, subtitle: String?, mediaType: AssetMediaType, pollQuestion: String?) -> String
+    func feedAssetCardLabel(title: String, subtitle: String?, mediaType: AssetMediaTypeData, pollQuestion: String?) -> String
     var feedAssetCardHint: String { get }
 
     // MARK: - Detail View

@@ -348,7 +348,7 @@ private extension TimelineFeedView {
                     }
                 }
             } catch {
-                print("⏱️ [AutoAdvance] Timer error: \(error)")
+                // Task cancelled — expected when auto-advance is disabled
             }
         }
     }

@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import ImageLoader
 import MediaPlayback
 
 struct TimelineFeedAssetCard: View {
@@ -46,21 +45,16 @@ struct TimelineFeedAssetCard: View {
     // MARK: - Body
 
     var body: some View {
-        VStack(spacing: sizeConfig.cardSpacing) {
-            // Asset Card
+        CardWithProductsContainer(
+            products: viewData.products,
+            displayMode: .compact,
+            isSelected: isSelected,
+            productSizeConfig: sizeConfig.product,
+            spacing: sizeConfig.cardSpacing,
+            onProductCtaTap: onProductCtaTap
+        ) {
             assetCard
                 .padding(.horizontal, assetCardHorizontalPadding)
-
-            // Products Carousel (feed mode - no price, no CTA)
-            if !viewData.products.isEmpty {
-                ProductCarouselView(
-                    products: viewData.products,
-                    displayMode: .compact,
-                    isSelected: isSelected,
-                    sizeConfig: sizeConfig.product,
-                    onCtaTap: onProductCtaTap
-                )
-            }
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityText.feedAssetCardLabel(
@@ -102,9 +96,6 @@ struct TimelineFeedAssetCard: View {
         .clipShape(RoundedRectangle(cornerRadius: sizeConfig.cardCornerRadius))
         .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
         .clipped()
-        .onChange(of: isSelected) { oldValue, newValue in
-            print("📱 [TimelineAssetCard] Asset '\(viewData.title)' (mediaType=\(viewData.mediaType)) isSelected: \(oldValue) -> \(newValue)")
-        }
     }
 
     // MARK: - Poll Content
@@ -149,16 +140,7 @@ struct TimelineFeedAssetCard: View {
             isSelected: isSelected,
             onVideoFinished: onVideoFinished,
             imageContent: { size in
-                CachedAsyncImage(url: viewData.imageURL) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: size.width, height: size.height)
-                        .clipped()
-                } placeholder: {
-                    ImageSkeleton()
-                        .frame(width: size.width, height: size.height)
-                }
+                AssetImageContent(url: viewData.imageURL, size: size)
             }
         )
     }

@@ -80,20 +80,15 @@ struct TimelineDetailAssetCard: View {
 
     // MARK: - Body
     var body: some View {
-        VStack(spacing: viewData.hasCustomBackground ? sizeConfig.cardSpacing : 0) {
-            // Asset Card
+        CardWithProductsContainer(
+            products: viewData.products,
+            displayMode: .full,
+            isSelected: isSelected,
+            productSizeConfig: sizeConfig.product,
+            spacing: viewData.hasCustomBackground ? sizeConfig.cardSpacing : 0,
+            onProductCtaTap: onProductCtaTap
+        ) {
             assetCard
-
-            // Products Carousel (detail mode - with price and CTA)
-            if !viewData.products.isEmpty {
-                ProductCarouselView(
-                    products: viewData.products,
-                    displayMode: .full,
-                    isSelected: isSelected,
-                    sizeConfig: sizeConfig.product,
-                    onCtaTap: onProductCtaTap
-                )
-            }
         }
         .padding(viewData.hasCustomBackground ? sizeConfig.edgePadding : 0)
         .background(backgroundView)
@@ -273,16 +268,7 @@ struct TimelineDetailAssetCard: View {
                 hasValidVideo = isValid
             },
             imageContent: { size in
-                CachedAsyncImage(url: viewData.imageURL) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: size.width, height: size.height)
-                        .clipped()
-                } placeholder: {
-                    ImageSkeleton()
-                        .frame(width: size.width, height: size.height)
-                }
+                AssetImageContent(url: viewData.imageURL, size: size)
             }
         )
         .overlay(

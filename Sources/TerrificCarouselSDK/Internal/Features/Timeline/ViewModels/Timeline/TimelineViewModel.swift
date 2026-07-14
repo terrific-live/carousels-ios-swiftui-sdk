@@ -74,20 +74,11 @@ final class TimelineViewModel: ObservableObject {
     private var autoAdvanceEnabled: Bool = false
     private var cancellables = Set<AnyCancellable>()
 
-    // MARK: - Asset View Duration Tracking
-    /// Tracks the currently viewed asset index and start time for duration calculation
-    var currentViewStartTime: Date?
-    var currentViewAssetIndex: Int?
-    /// Accumulated background time during the current asset view (reset on each new asset)
-    var assetViewBackgroundDuration: TimeInterval = 0
-
-    // MARK: - Timeline Open Duration Tracking
-    /// Tracks when the timeline detail view was opened
-    var timelineDetailsOpenedTime: Date?
-    /// Accumulated background time during the detail session (reset on open)
-    var detailBackgroundDuration: TimeInterval = 0
+    // MARK: - Duration Tracking
+    var assetViewTracker = AssetViewTracker()
+    var detailSessionTracker = DetailSessionTracker()
     /// Timestamp when app entered background (used to measure background intervals)
-    var backgroundEnteredTime: Date?
+    private var backgroundEnteredTime: Date?
 
     // MARK: - Cursor-Based Pagination
     /// Anchor for cursor-based pagination (used by detail view)
@@ -253,15 +244,8 @@ private extension TimelineViewModel {
         let backgroundInterval = Date().timeIntervalSince(enteredTime)
         backgroundEnteredTime = nil
 
-        // Accumulate background time for detail session
-        if timelineDetailsOpenedTime != nil {
-            detailBackgroundDuration += backgroundInterval
-        }
-
-        // Accumulate background time for current asset view
-        if currentViewStartTime != nil {
-            assetViewBackgroundDuration += backgroundInterval
-        }
+        detailSessionTracker.addBackgroundTime(backgroundInterval)
+        assetViewTracker.addBackgroundTime(backgroundInterval)
     }
 
     func bindAutoAdvance() {

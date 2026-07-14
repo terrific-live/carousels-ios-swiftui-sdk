@@ -14,7 +14,9 @@ struct ErrorLoggingClient {
 // MARK: - Live Implementation
 extension ErrorLoggingClient {
     static func live(configuration: ErrorLoggingConfiguration) -> ErrorLoggingClient {
-        let client = Client(base: configuration.baseURL.absoluteString, version: nil)
+        let baseURL = configuration.baseURL?.absoluteString ?? ""
+
+        let client = Client(base: baseURL, version: nil)
 
         // Configure interceptors for debugging
         let cURLInterceptor = CURLInterceptor()

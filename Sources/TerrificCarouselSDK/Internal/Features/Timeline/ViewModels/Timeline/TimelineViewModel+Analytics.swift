@@ -31,36 +31,23 @@ extension TimelineViewModel {
 
     /// Call when timeline detail view appears on screen
     func handleDetailOpened() {
-        // Track when detail view was opened
-        timelineDetailsOpenedTime = Date()
-        detailBackgroundDuration = 0
+        detailSessionTracker.open()
 
-        // Get parentUrl from current asset
         let parentUrl = getAsset(at: currentPageIndex)?.parentUrl ?? ""
         analyticDelegate?.viewModel(self, didOpenDetailWithParentUrl: parentUrl)
     }
 
     /// Call when timeline detail view is closed
     func handleDetailClosed() {
-        guard let openedTime = timelineDetailsOpenedTime else { return }
+        guard let result = detailSessionTracker.close() else { return }
 
-        // Calculate total wall-clock duration
-        let totalOpenDurationMs = Int(Date().timeIntervalSince(openedTime) * 1000)
-        // Subtract background time for active duration
-        let activeViewDurationMs = max(0, totalOpenDurationMs - Int(detailBackgroundDuration * 1000))
-
-        // Get parentUrl from current asset
         let parentUrl = getAsset(at: currentPageIndex)?.parentUrl ?? ""
-
-        // Reset tracking state
-        timelineDetailsOpenedTime = nil
-        detailBackgroundDuration = 0
 
         analyticDelegate?.viewModel(
             self,
             didCloseDetailWithParentUrl: parentUrl,
-            totalOpenDurationMs: totalOpenDurationMs,
-            activeViewDurationMs: activeViewDurationMs
+            totalOpenDurationMs: result.totalOpenDurationMs,
+            activeViewDurationMs: result.activeViewDurationMs
         )
     }
 
@@ -71,38 +58,23 @@ extension TimelineViewModel {
 
         guard let asset = getAsset(at: index) else { return }
 
-        // Track start time for duration calculation
-        currentViewStartTime = Date()
-        currentViewAssetIndex = index
-        assetViewBackgroundDuration = 0
-
+        assetViewTracker.start(at: index)
         analyticDelegate?.viewModel(self, didStartViewingAsset: asset, at: asset.position)
     }
 
     /// Call when user stops viewing an asset in detail view
     func handleAssetViewEnded() {
-        guard let startTime = currentViewStartTime,
-              let assetIndex = currentViewAssetIndex,
-              let asset = getAsset(at: assetIndex) else {
+        guard let result = assetViewTracker.end(),
+              let asset = getAsset(at: result.index) else {
             return
         }
-
-        // Total wall-clock duration
-        let viewDurationMs = Int(Date().timeIntervalSince(startTime) * 1000)
-        // Subtract background time for net watch time
-        let netoWatchTimeMs = max(0, viewDurationMs - Int(assetViewBackgroundDuration * 1000))
-
-        // Reset tracking state
-        currentViewStartTime = nil
-        currentViewAssetIndex = nil
-        assetViewBackgroundDuration = 0
 
         analyticDelegate?.viewModel(
             self,
             didEndViewingAsset: asset,
             at: asset.position,
-            viewDurationMs: viewDurationMs,
-            netoWatchTimeMs: netoWatchTimeMs
+            viewDurationMs: result.viewDurationMs,
+            netoWatchTimeMs: result.netoWatchTimeMs
         )
     }
 

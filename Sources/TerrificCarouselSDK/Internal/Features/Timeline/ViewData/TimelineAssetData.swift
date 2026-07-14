@@ -7,7 +7,7 @@ import Foundation
 import SwiftUI
 
 /// Media type for the asset (includes poll and ad)
-enum AssetMediaType: Equatable {
+enum AssetMediaTypeData: Equatable {
     case image
     case video
     case poll
@@ -24,7 +24,7 @@ struct TimelineAssetData: Identifiable {
     let id: String
 
     /// Media type (image, video, or poll)
-    let mediaType: AssetMediaType
+    let mediaType: AssetMediaTypeData
 
     /// Image URL for the asset (poster/thumbnail for video, main image for image type)
     let imageURL: URL?
@@ -90,7 +90,7 @@ struct TimelineAssetData: Identifiable {
 
     init(
         id: String,
-        mediaType: AssetMediaType,
+        mediaType: AssetMediaTypeData,
         imageURL: URL?,
         videoURL: URL?,
         videoPreviewURL: URL? = nil,
@@ -154,7 +154,7 @@ extension TimelineAssetData {
     ///   - carouselConfig: Configuration for timestamp formatting and visibility
     init(from asset: TimelineAssetDTO, pollViewModel: PollViewModel?, carouselConfig: CarouselConfigDTO = .default) {
         self.id = asset.id
-        self.mediaType = AssetMediaType(from: asset.type)
+        self.mediaType = AssetMediaTypeData(from: asset.type)
 
         // Image URL - use cover for video, mobile URL for image
         if asset.isVideo {
@@ -242,8 +242,8 @@ extension TimelineAssetData {
     }
 }
 
-// MARK: - AssetMediaViewType Conversion
-extension AssetMediaType {
+// MARK: - AssetMediaTypeData Conversion
+extension AssetMediaTypeData {
     init(from mediaType: AssetMediaTypeDTO) {
         switch mediaType {
         case .image:

@@ -127,30 +127,12 @@ struct MultiItemHorizontalCarousel<Item: Identifiable, ItemContent: View, Loadin
 
     // MARK: - Selection Logic
     private func handleVisibilityUpdate(_ visibilities: [Int: CGFloat]) {
-        // Store current visibilities
         itemVisibilities = visibilities
 
-        // Find the maximum visible width
-        guard let maxVisibility = visibilities.values.max(),
-              maxVisibility > 0 else {
-            return
-        }
-
-        // If the current selection is fully (or nearly fully) visible, keep it
-        // This prevents arbitrary jumps when multiple items are equally visible (e.g. iPad)
-        let currentVisibility = visibilities[currentPageIndex] ?? 0
-        if currentVisibility >= maxVisibility * 0.95 {
-            return
-        }
-
-        // Otherwise pick the lowest index among equally most-visible items
-        let mostVisibleIndex = visibilities
-            .filter { $0.value >= maxVisibility * 0.95 }
-            .min(by: { $0.key < $1.key })!
-            .key
-
-        // Only update if selection changed
-        guard currentPageIndex != mostVisibleIndex else { return }
+        guard let mostVisibleIndex = CarouselVisibilityCalculator.resolveSelectedIndex(
+            visibilities: visibilities,
+            currentIndex: currentPageIndex
+        ) else { return }
 
         // When VoiceOver is active, skip updating the currentPageIndex binding.
         // The binding propagates to a @Published property on the parent view model,
@@ -163,52 +145,9 @@ struct MultiItemHorizontalCarousel<Item: Identifiable, ItemContent: View, Loadin
             return
         }
 
-        // Mark as programmatic scroll to prevent onChange from scrolling again
         isProgrammaticScroll = true
         currentPageIndex = mostVisibleIndex
         onPageChange?(mostVisibleIndex)
-    }
-}
-
-// MARK: - Visibility Reporter
-/// Reports the visible width of an item within the container
-private struct VisibilityReporter: View {
-    let index: Int
-    let coordinateSpace: String
-    let containerWidth: CGFloat
-
-    var body: some View {
-        GeometryReader { geometry in
-            let frame = geometry.frame(in: .named(coordinateSpace))
-            let visibleWidth = calculateVisibleWidth(itemFrame: frame)
-
-            Color.clear
-                .preference(
-                    key: ItemVisibilityPreferenceKey.self,
-                    value: [index: visibleWidth]
-                )
-        }
-    }
-
-    private func calculateVisibleWidth(itemFrame: CGRect) -> CGFloat {
-        let itemLeft = itemFrame.minX
-        let itemRight = itemFrame.maxX
-
-        // Calculate visible portion within container bounds (0 to containerWidth)
-        let visibleLeft = max(itemLeft, 0)
-        let visibleRight = min(itemRight, containerWidth)
-        let visibleWidth = max(0, visibleRight - visibleLeft)
-
-        return visibleWidth
-    }
-}
-
-// MARK: - Preference Key for Item Visibility
-private struct ItemVisibilityPreferenceKey: PreferenceKey {
-    static var defaultValue: [Int: CGFloat] = [:]
-
-    static func reduce(value: inout [Int: CGFloat], nextValue: () -> [Int: CGFloat]) {
-        value.merge(nextValue()) { _, new in new }
     }
 }
 

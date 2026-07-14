@@ -49,7 +49,7 @@ final class AnalyticsConfigurationTests: XCTestCase {
 
         let sut = AnalyticsConfiguration.make(apiConfig: apiConfig, terrificUserId: "user-1")
 
-        XCTAssertEqual(sut.baseURL.absoluteString, "https://us-central1-terrific-live.cloudfunctions.net")
+        XCTAssertEqual(sut.baseURL?.absoluteString, "https://us-central1-terrific-live.cloudfunctions.net")
     }
 
     func test_make_stagingConfig_usesStagingAnalyticsURL() {
@@ -62,7 +62,7 @@ final class AnalyticsConfigurationTests: XCTestCase {
 
         let sut = AnalyticsConfiguration.make(apiConfig: apiConfig, terrificUserId: "user-1")
 
-        XCTAssertEqual(sut.baseURL.absoluteString, "https://us-central1-terrific-deploy.cloudfunctions.net")
+        XCTAssertEqual(sut.baseURL?.absoluteString, "https://us-central1-terrific-deploy.cloudfunctions.net")
     }
 
     func test_make_passesStoreId() {
@@ -95,7 +95,7 @@ final class AnalyticsConfigurationTests: XCTestCase {
 
         let sut = AnalyticsConfiguration.make(apiConfig: apiConfig, terrificUserId: "user-1")
 
-        XCTAssertEqual(sut.baseURL.absoluteString, "https://us-central1-terrific-live.cloudfunctions.net")
+        XCTAssertEqual(sut.baseURL?.absoluteString, "https://us-central1-terrific-live.cloudfunctions.net")
     }
 
     // MARK: - isAnalyticsEnabled

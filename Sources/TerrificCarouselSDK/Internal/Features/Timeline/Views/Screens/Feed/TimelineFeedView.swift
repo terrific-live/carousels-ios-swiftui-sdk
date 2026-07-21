@@ -40,6 +40,21 @@ struct TimelineFeedView: View {
 
     // MARK: - Body
     var body: some View {
+        if #available(iOS 17, macOS 14, tvOS 17, *) {
+            bodyContent
+                .onChange(of: viewModel.currentPageIndex) { _, newIndex in
+                    handleCurrentItemChanged(to: newIndex)
+                }
+        } else {
+            // iOS16-COMPAT: Remove when minimum target is iOS 17
+            bodyContent
+                .onChange(of: viewModel.currentPageIndex) { newIndex in
+                    handleCurrentItemChanged(to: newIndex)
+                }
+        }
+    }
+
+    private var bodyContent: some View {
         content
             .onAppear {
                 handleOnAppear()
@@ -49,9 +64,6 @@ struct TimelineFeedView: View {
             .onDisappear {
                 autoAdvanceTask?.cancel()
                 autoAdvanceTask = nil
-            }
-            .onChange(of: viewModel.currentPageIndex) { _, newIndex in
-                handleCurrentItemChanged(to: newIndex)
             }
     }
 }
@@ -198,7 +210,7 @@ private extension TimelineFeedView {
         .frame(maxWidth: .infinity, alignment: .center)
         .padding(sizeConfig.sponsorLogoPadding)
         .background(backgroundColor.map { Color(hex: $0) } ?? .clear)
-        .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: sizeConfig.cardCornerRadius, bottomTrailingRadius: sizeConfig.cardCornerRadius))
+        .clipShape(CompatUnevenRoundedRectangle(bottomLeadingRadius: sizeConfig.cardCornerRadius, bottomTrailingRadius: sizeConfig.cardCornerRadius))
     }
 
     @ViewBuilder

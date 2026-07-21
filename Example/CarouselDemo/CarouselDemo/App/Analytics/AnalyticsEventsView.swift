@@ -75,28 +75,44 @@ struct AnalyticsEventsView: View {
                 emptyStateView
             } else {
                 ScrollViewReader { proxy in
-                    ScrollView {
-                        LazyVStack(spacing: 0) {
-                            ForEach(store.events.reversed()) { event in
-                                eventRowView(event)
-                                    .id(event.id)
-                                Divider()
-                                    .background(Color.gray.opacity(0.2))
+                    if #available(iOS 17, *) {
+                        eventsScrollContent
+                            .onChange(of: store.events.count) { _, _ in
+                                scrollToLatestEvent(proxy: proxy)
                             }
-                        }
-                    }
-                    .frame(height: expandedHeight - collapsedHeight - 40)
-                    .onChange(of: store.events.count) { _, _ in
-                        if let lastEvent = store.events.first {
-                            withAnimation(.easeOut(duration: 0.2)) {
-                                proxy.scrollTo(lastEvent.id, anchor: .bottom)
+                    } else {
+                        // iOS16-COMPAT: Remove when minimum target is iOS 17
+                        eventsScrollContent
+                            .onChange(of: store.events.count) { _ in
+                                scrollToLatestEvent(proxy: proxy)
                             }
-                        }
                     }
                 }
 
                 // Clear button
                 clearButtonView
+            }
+        }
+    }
+
+    private var eventsScrollContent: some View {
+        ScrollView {
+            LazyVStack(spacing: 0) {
+                ForEach(store.events.reversed()) { event in
+                    eventRowView(event)
+                        .id(event.id)
+                    Divider()
+                        .background(Color.gray.opacity(0.2))
+                }
+            }
+        }
+        .frame(height: expandedHeight - collapsedHeight - 40)
+    }
+
+    private func scrollToLatestEvent(proxy: ScrollViewProxy) {
+        if let lastEvent = store.events.first {
+            withAnimation(.easeOut(duration: 0.2)) {
+                proxy.scrollTo(lastEvent.id, anchor: .bottom)
             }
         }
     }

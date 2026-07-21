@@ -31,17 +31,20 @@ struct TruncatableText: View {
                                 .lineLimit(lineLimit)
                                 .background(
                                     GeometryReader { truncatedGeometry in
-                                        Color.clear.onAppear {
-                                            // Compare heights to detect truncation
-                                            let isTruncatedNow = fullTextGeometry.size.height > truncatedGeometry.size.height
-                                            if isTruncated != isTruncatedNow {
-                                                isTruncated = isTruncatedNow
+                                        if #available(iOS 17, macOS 14, tvOS 17, *) {
+                                            Color.clear.onAppear {
+                                                checkTruncation(fullHeight: fullTextGeometry.size.height, truncatedHeight: truncatedGeometry.size.height)
                                             }
-                                        }
-                                        .onChange(of: lineLimit) { _, _ in
-                                            let isTruncatedNow = fullTextGeometry.size.height > truncatedGeometry.size.height
-                                            if isTruncated != isTruncatedNow {
-                                                isTruncated = isTruncatedNow
+                                            .onChange(of: lineLimit) { _, _ in
+                                                checkTruncation(fullHeight: fullTextGeometry.size.height, truncatedHeight: truncatedGeometry.size.height)
+                                            }
+                                        } else {
+                                            // iOS16-COMPAT: Remove when minimum target is iOS 17
+                                            Color.clear.onAppear {
+                                                checkTruncation(fullHeight: fullTextGeometry.size.height, truncatedHeight: truncatedGeometry.size.height)
+                                            }
+                                            .onChange(of: lineLimit) { _ in
+                                                checkTruncation(fullHeight: fullTextGeometry.size.height, truncatedHeight: truncatedGeometry.size.height)
                                             }
                                         }
                                     }
@@ -50,5 +53,12 @@ struct TruncatableText: View {
                         }
                     )
             )
+    }
+
+    private func checkTruncation(fullHeight: CGFloat, truncatedHeight: CGFloat) {
+        let isTruncatedNow = fullHeight > truncatedHeight
+        if isTruncated != isTruncatedNow {
+            isTruncated = isTruncatedNow
+        }
     }
 }

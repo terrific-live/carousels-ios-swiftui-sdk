@@ -48,6 +48,39 @@ public struct MediaContentView<ImageContent: View>: View {
 
     // MARK: - Body
     public var body: some View {
+        if #available(iOS 17, macOS 14, tvOS 17, *) {
+            bodyContent
+                .onChange(of: isSelected) { _, selected in
+                    handleSelectionChange(selected)
+                }
+                .onChange(of: viewModel.progress) { _, newProgress in
+                    onVideoProgress?(newProgress)
+                }
+                .onChange(of: viewModel.hasValidPlayback) { _, hasValid in
+                    onVideoValidityChanged?(hasValid)
+                }
+                .onChange(of: isMuted) { _, newValue in
+                    viewModel.isMuted = newValue
+                }
+        } else {
+            // iOS16-COMPAT: Remove when minimum target is iOS 17
+            bodyContent
+                .onChange(of: isSelected) { selected in
+                    handleSelectionChange(selected)
+                }
+                .onChange(of: viewModel.progress) { newProgress in
+                    onVideoProgress?(newProgress)
+                }
+                .onChange(of: viewModel.hasValidPlayback) { hasValid in
+                    onVideoValidityChanged?(hasValid)
+                }
+                .onChange(of: isMuted) { newValue in
+                    viewModel.isMuted = newValue
+                }
+        }
+    }
+
+    private var bodyContent: some View {
         GeometryReader { geo in
             ZStack {
                 buildImageLayer(size: geo.size)
@@ -59,13 +92,6 @@ public struct MediaContentView<ImageContent: View>: View {
             }
             .animation(.easeInOut(duration: fadeInOutAnimationDuration), value: viewModel.isPlaying)
         }
-        // Inject data into viewModel when either videoURL or configuration changes.
-        .task(id: LoadIdentifier(url: videoURL, configuration: configuration)) {
-            viewModel.handleLoad(url: videoURL, configuration: configuration)
-        }
-        .onChange(of: isSelected) { _, selected in
-            handleSelectionChange(selected)
-        }
         .onAppear {
             handleOnAppear()
         }
@@ -75,14 +101,11 @@ public struct MediaContentView<ImageContent: View>: View {
         .onReceive(viewModel.videoFinishedPublisher) {
             onVideoFinished?()
         }
-        .onChange(of: viewModel.progress) { _, newProgress in
-            onVideoProgress?(newProgress)
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
+            handleAppWillResignActive()
         }
-        .onChange(of: viewModel.hasValidPlayback) { _, hasValid in
-            onVideoValidityChanged?(hasValid)
-        }
-        .onChange(of: isMuted) { _, newValue in
-            viewModel.isMuted = newValue
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            handleAppBecameActive()
         }
     }
 }
@@ -103,21 +126,11 @@ private extension MediaContentView {
 
     @ViewBuilder
     func buildLoadingOverlay() -> some View {
-        if viewModel.isLoading && isSelected {
-            ZStack {
-                Color.black.opacity(0.3)
-
-                VStack(spacing: 12) {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        .scaleEffect(1.5)
-
-                    Text("Loading video...")
-                        .font(.system(size: 14))
-                        .foregroundColor(.white)
-                }
-            }
-            .transition(.opacity)
+        if viewModel.isLoading && isSelected && configuration.playbackMode == .fullScreen {
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                .scaleEffect(1.5)
+                .transition(.opacity)
         }
     }
 }
@@ -128,31 +141,48 @@ private extension MediaContentView {
     func handleOnAppear() {
         viewModel.isMuted = isMuted
         guard videoURL != nil, isSelected else { return }
-        log("handleOnAppear")
+        log("handleOnAppear -> handleLoad + handleStartPlayback")
+        // Load video only when selected and appearing
+        viewModel.handleLoad(url: videoURL, configuration: configuration)
         viewModel.handleStartPlayback()
     }
 
     func handleSelectionChange(_ selected: Bool) {
-        guard videoURL != nil else { return }
         log("========================================")
         log("isSelected changed: -> \(selected)")
         log("========================================")
 
         if selected {
-            log("✅ selected -> handleStartPlayback")
+            guard videoURL != nil else { return }
+            log("✅ selected -> handleLoad + handleStartPlayback")
+            // Load video only when selected to avoid memory bloat
+            viewModel.handleLoad(url: videoURL, configuration: configuration)
             viewModel.handleStartPlayback()
         } else {
-            log("❌ deselected -> handleStopPlayback")
-            viewModel.handleStopPlayback()
+            log("❌ deselected -> handleCleanup (release video buffer)")
+            // Cleanup to release AVPlayer buffer and free memory
+            viewModel.handleCleanup()
         }
     }
 
     func handleOnDisappear() {
-        log("onDisappear")
-        if isSelected {
-            log("onDisappear -> handleStopPlayback")
-            viewModel.handleStopPlayback()
-        }
+        log("onDisappear -> handleCleanup (release video buffer)")
+        // Always cleanup on disappear to free memory
+        viewModel.handleCleanup()
+    }
+
+    func handleAppWillResignActive() {
+        // Pause video when app goes to background
+        guard isSelected && videoURL != nil else { return }
+        log("app will resign active, pausing playback")
+        viewModel.handlePausePlayback()
+    }
+
+    func handleAppBecameActive() {
+        // Resume video playback when app becomes active
+        guard isSelected && videoURL != nil else { return }
+        log("app became active, resuming playback")
+        viewModel.handleResumePlayback()
     }
 
     func log(_ message: String) {
@@ -160,10 +190,4 @@ private extension MediaContentView {
     }
 }
 
-// MARK: - Task Identifier
-/// Combines URL and configuration for single .task(id:) instead of duplicate tasks
-private struct LoadIdentifier: Equatable {
-    let url: URL?
-    let configuration: VideoPreviewConfiguration
-}
 #endif

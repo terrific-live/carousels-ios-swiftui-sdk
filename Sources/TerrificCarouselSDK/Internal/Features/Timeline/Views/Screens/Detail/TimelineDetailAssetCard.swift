@@ -123,7 +123,23 @@ struct TimelineDetailAssetCard: View {
     }
 
     // MARK: - Asset Card
+    @ViewBuilder
     private var assetCard: some View {
+        if #available(iOS 17, macOS 14, tvOS 17, *) {
+            assetCardContent
+                .onChange(of: isSelected) { _, selected in
+                    handleSelectionChange(selected)
+                }
+        } else {
+            // iOS16-COMPAT: Remove when minimum target is iOS 17
+            assetCardContent
+                .onChange(of: isSelected) { selected in
+                    handleSelectionChange(selected)
+                }
+        }
+    }
+
+    private var assetCardContent: some View {
         ZStack(alignment: .bottom) {
             ZStack {
                 // Content based on media type
@@ -158,9 +174,6 @@ struct TimelineDetailAssetCard: View {
             if isSelected {
                 startTimerIfNeeded()
             }
-        }
-        .onChange(of: isSelected) { _, selected in
-            handleSelectionChange(selected)
         }
         .onDisappear {
             stopTimer()

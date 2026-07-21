@@ -48,6 +48,39 @@ public struct MediaContentView<ImageContent: View>: View {
 
     // MARK: - Body
     public var body: some View {
+        if #available(iOS 17, macOS 14, tvOS 17, *) {
+            bodyContent
+                .onChange(of: isSelected) { _, selected in
+                    handleSelectionChange(selected)
+                }
+                .onChange(of: viewModel.progress) { _, newProgress in
+                    onVideoProgress?(newProgress)
+                }
+                .onChange(of: viewModel.hasValidPlayback) { _, hasValid in
+                    onVideoValidityChanged?(hasValid)
+                }
+                .onChange(of: isMuted) { _, newValue in
+                    viewModel.isMuted = newValue
+                }
+        } else {
+            // iOS16-COMPAT: Remove when minimum target is iOS 17
+            bodyContent
+                .onChange(of: isSelected) { selected in
+                    handleSelectionChange(selected)
+                }
+                .onChange(of: viewModel.progress) { newProgress in
+                    onVideoProgress?(newProgress)
+                }
+                .onChange(of: viewModel.hasValidPlayback) { hasValid in
+                    onVideoValidityChanged?(hasValid)
+                }
+                .onChange(of: isMuted) { newValue in
+                    viewModel.isMuted = newValue
+                }
+        }
+    }
+
+    private var bodyContent: some View {
         GeometryReader { geo in
             ZStack {
                 buildImageLayer(size: geo.size)
@@ -59,10 +92,6 @@ public struct MediaContentView<ImageContent: View>: View {
             }
             .animation(.easeInOut(duration: fadeInOutAnimationDuration), value: viewModel.isPlaying)
         }
-        // Only load video when selected to avoid memory bloat from multiple video buffers
-        .onChange(of: isSelected) { _, selected in
-            handleSelectionChange(selected)
-        }
         .onAppear {
             handleOnAppear()
         }
@@ -71,15 +100,6 @@ public struct MediaContentView<ImageContent: View>: View {
         }
         .onReceive(viewModel.videoFinishedPublisher) {
             onVideoFinished?()
-        }
-        .onChange(of: viewModel.progress) { _, newProgress in
-            onVideoProgress?(newProgress)
-        }
-        .onChange(of: viewModel.hasValidPlayback) { _, hasValid in
-            onVideoValidityChanged?(hasValid)
-        }
-        .onChange(of: isMuted) { _, newValue in
-            viewModel.isMuted = newValue
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
             handleAppWillResignActive()

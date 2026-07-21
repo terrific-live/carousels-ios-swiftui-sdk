@@ -119,22 +119,22 @@ struct DetailSponsorLayout {
 
     // MARK: - Badge Shape
 
-    var badgeShape: UnevenRoundedRectangle {
+    var badgeShape: CompatUnevenRoundedRectangle {
         let outerRadius = hasCustomBackground ? sizeConfig.cardCornerRadius : 0
         let innerRadius: CGFloat = 8
         switch sponsorPosition {
         case "top-center":
-            return UnevenRoundedRectangle(
+            return CompatUnevenRoundedRectangle(
                 bottomLeadingRadius: innerRadius,
                 bottomTrailingRadius: innerRadius
             )
         case "top-right":
-            return UnevenRoundedRectangle(
+            return CompatUnevenRoundedRectangle(
                 bottomLeadingRadius: innerRadius,
                 topTrailingRadius: outerRadius
             )
         default: // "top-left"
-            return UnevenRoundedRectangle(
+            return CompatUnevenRoundedRectangle(
                 topLeadingRadius: outerRadius,
                 bottomTrailingRadius: innerRadius
             )

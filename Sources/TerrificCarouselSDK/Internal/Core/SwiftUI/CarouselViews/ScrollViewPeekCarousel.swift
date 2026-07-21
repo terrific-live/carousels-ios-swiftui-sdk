@@ -42,31 +42,38 @@ struct ScrollViewPeekCarousel<Item: Identifiable, ItemContent: View, LoadingView
     }
 
     // MARK: - State
-    @State
-    private var scrollPosition: Int?
+    @State private var scrollPosition: Int?
+    // iOS16-COMPAT: Remove when minimum target is iOS 17
+    @State private var dragOffset: CGFloat = 0
 
+    // MARK: - Body
     var body: some View {
+        if #available(iOS 17, macOS 14, tvOS 17, *) {
+            iOS17Body
+        } else {
+            // iOS16-COMPAT: Remove when minimum target is iOS 17
+            iOS16Body
+        }
+    }
+}
+
+// MARK: - iOS 17 Implementation
+@available(iOS 17, macOS 14, tvOS 17, *)
+private extension ScrollViewPeekCarousel {
+
+    var iOS17Body: some View {
         GeometryReader { geometry in
-            // 1. Calculate the exact width the card needs to be
-            // So that we have exactly 'peek' amount of space on left/right
             let cardWidth = geometry.size.width - (peek * 2) - (spacing * 2)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing: spacing) {
-                    buildContent(cardWidth: cardWidth, cardHeight: geometry.size.height)
+                    iOS17Content(cardWidth: cardWidth, cardHeight: geometry.size.height)
                 }
-                // 4. Important: Tell ScrollView these stack items are the snap targets
                 .scrollTargetLayout()
             }
-            // 5. "Magnet" physics: Snap to the center of the view
             .scrollTargetBehavior(.viewAligned)
-            // 6. Bind scroll to your state
             .scrollPosition(id: $scrollPosition)
-            // 7. Add padding to the scroll container so the first item can be centered
-            // We use 'safeArea' padding to ensure the first item isn't stuck to the left edge
             .contentMargins(.horizontal, peek + spacing, for: .scrollContent)
-
-            // Sync Logic
             .onAppear {
                 scrollPosition = currentPageIndex
             }
@@ -77,7 +84,6 @@ struct ScrollViewPeekCarousel<Item: Identifiable, ItemContent: View, LoadingView
             }
             .onChange(of: scrollPosition) { _, newValue in
                 guard let newValue else { return }
-
                 if currentPageIndex != newValue {
                     currentPageIndex = newValue
                     onPageChange?(newValue)
@@ -87,7 +93,7 @@ struct ScrollViewPeekCarousel<Item: Identifiable, ItemContent: View, LoadingView
     }
 
     @ViewBuilder
-    private func buildContent(cardWidth: CGFloat, cardHeight: CGFloat) -> some View {
+    func iOS17Content(cardWidth: CGFloat, cardHeight: CGFloat) -> some View {
         ForEach(Array(items.enumerated()), id: \.offset) { index, item in
             let isSelected = index == currentPageIndex
             itemContent(item, isSelected)
@@ -97,7 +103,7 @@ struct ScrollViewPeekCarousel<Item: Identifiable, ItemContent: View, LoadingView
                         .scaleEffect(phase.isIdentity ? 1.0 : 0.85)
                         .opacity(phase.isIdentity ? 1.0 : 0.6)
                 }
-                .id(index) // Use integer ID for scroll position binding
+                .id(index)
         }
 
         if showLoadingView {
@@ -108,8 +114,84 @@ struct ScrollViewPeekCarousel<Item: Identifiable, ItemContent: View, LoadingView
                         .scaleEffect(phase.isIdentity ? 1.0 : 0.85)
                         .opacity(phase.isIdentity ? 1.0 : 0.6)
                 }
-                .id(items.count) // Loading gets next index after items
+                .id(items.count)
         }
+    }
+}
+
+// MARK: - iOS 16 Implementation
+// iOS16-COMPAT: Remove this extension when minimum target is iOS 17
+private extension ScrollViewPeekCarousel {
+
+    var iOS16Body: some View {
+        GeometryReader { geometry in
+            let cardWidth = geometry.size.width - (peek * 2) - (spacing * 2)
+            let stride = cardWidth + spacing
+            let totalItems = items.count + (showLoadingView ? 1 : 0)
+            let offset = (peek + spacing) - CGFloat(currentPageIndex) * stride + dragOffset
+
+            HStack(spacing: spacing) {
+                iOS16Content(cardWidth: cardWidth, cardHeight: geometry.size.height, stride: stride)
+            }
+            .offset(x: offset)
+            .gesture(iOS16DragGesture(stride: stride, totalItems: totalItems))
+            .animation(.interactiveSpring(), value: currentPageIndex)
+            .onChange(of: currentPageIndex) { _ in
+                dragOffset = 0
+            }
+        }
+        .clipped()
+    }
+
+    @ViewBuilder
+    func iOS16Content(cardWidth: CGFloat, cardHeight: CGFloat, stride: CGFloat) -> some View {
+        ForEach(Array(items.enumerated()), id: \.offset) { index, item in
+            let isSelected = index == currentPageIndex
+            let transform = iOS16Transform(for: index, stride: stride)
+            itemContent(item, isSelected)
+                .frame(width: cardWidth, height: cardHeight)
+                .scaleEffect(transform.scale)
+                .opacity(transform.opacity)
+                .id(index)
+        }
+
+        if showLoadingView {
+            let transform = iOS16Transform(for: items.count, stride: stride)
+            loadingView()
+                .frame(width: cardWidth, height: cardHeight)
+                .scaleEffect(transform.scale)
+                .opacity(transform.opacity)
+                .id(items.count)
+        }
+    }
+
+    func iOS16Transform(for index: Int, stride: CGFloat) -> (scale: CGFloat, opacity: CGFloat) {
+        let itemDistance = CGFloat(index - currentPageIndex) * stride + dragOffset
+        let normalizedDistance = min(abs(itemDistance) / stride, 1.0)
+        return (
+            scale: 1.0 - (0.15 * normalizedDistance),
+            opacity: 1.0 - (0.4 * normalizedDistance)
+        )
+    }
+
+    func iOS16DragGesture(stride: CGFloat, totalItems: Int) -> some Gesture {
+        DragGesture()
+            .onChanged { value in
+                dragOffset = value.translation.width
+            }
+            .onEnded { value in
+                let predicted = value.predictedEndTranslation.width
+                let pageShift = -Int(round(predicted / stride))
+                let newIndex = max(0, min(totalItems - 1, currentPageIndex + pageShift))
+                let pageChanged = currentPageIndex != newIndex
+                withAnimation(.interactiveSpring()) {
+                    currentPageIndex = newIndex
+                    dragOffset = 0
+                }
+                if pageChanged {
+                    onPageChange?(newIndex)
+                }
+            }
     }
 }
 

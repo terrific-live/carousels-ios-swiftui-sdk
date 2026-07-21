@@ -66,62 +66,78 @@ struct MultiItemHorizontalCarousel<Item: Identifiable, ItemContent: View, Loadin
     var body: some View {
         GeometryReader { geometry in
             ScrollViewReader { proxy in
-                ScrollView(.horizontal, showsIndicators: false) {
-                    LazyHStack(alignment: .top, spacing: spacing) {
-                        ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
-                            let isSelected = index == currentPageIndex
-
-                            itemContent(item, isSelected, index, items.count)
-                                .frame(width: itemWidth, height: itemHeight)
-                                .id(index)
-                                .accessibilityFocused($accessibilityFocusedIndex, equals: index)
-                                .background(
-                                    VisibilityReporter(
-                                        index: index,
-                                        coordinateSpace: "MultiItemCarouselSpace",
-                                        containerWidth: geometry.size.width
-                                    )
-                                )
+                if #available(iOS 17, macOS 14, tvOS 17, *) {
+                    scrollContent(containerWidth: geometry.size.width)
+                        .onChange(of: currentPageIndex) { _, newValue in
+                            handlePageIndexScroll(to: newValue, proxy: proxy)
                         }
-
-                        if showLoadingView {
-                            loadingView()
-                                .frame(width: itemWidth, height: itemHeight)
-                                .id(items.count)
-                                .background(
-                                    VisibilityReporter(
-                                        index: items.count,
-                                        coordinateSpace: "MultiItemCarouselSpace",
-                                        containerWidth: geometry.size.width
-                                    )
-                                )
+                } else {
+                    // iOS16-COMPAT: Remove when minimum target is iOS 17
+                    scrollContent(containerWidth: geometry.size.width)
+                        .onChange(of: currentPageIndex) { newValue in
+                            handlePageIndexScroll(to: newValue, proxy: proxy)
                         }
-                    }
-                    .padding(.horizontal, horizontalPadding)
-                }
-                .coordinateSpace(name: "MultiItemCarouselSpace")
-                .onPreferenceChange(ItemVisibilityPreferenceKey.self) { visibilities in
-                    handleVisibilityUpdate(visibilities)
-                }
-                .onChange(of: currentPageIndex) { oldValue, newValue in
-                    // Only scroll programmatically if this is an external change
-                    // (not from user scrolling which already updates visibility)
-                    guard !isProgrammaticScroll else {
-                        isProgrammaticScroll = false
-                        return
-                    }
-
-                    // Check if the item is already mostly visible
-                    let targetVisibility = itemVisibilities[newValue] ?? 0
-                    let isAlreadyVisible = targetVisibility > itemWidth * 0.8
-
-                    guard !isAlreadyVisible else { return }
-
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        proxy.scrollTo(newValue, anchor: .center)
-                    }
                 }
             }
+        }
+    }
+
+    private func scrollContent(containerWidth: CGFloat) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            LazyHStack(alignment: .top, spacing: spacing) {
+                ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                    let isSelected = index == currentPageIndex
+
+                    itemContent(item, isSelected, index, items.count)
+                        .frame(width: itemWidth, height: itemHeight)
+                        .id(index)
+                        .accessibilityFocused($accessibilityFocusedIndex, equals: index)
+                        .background(
+                            VisibilityReporter(
+                                index: index,
+                                coordinateSpace: "MultiItemCarouselSpace",
+                                containerWidth: containerWidth
+                            )
+                        )
+                }
+
+                if showLoadingView {
+                    loadingView()
+                        .frame(width: itemWidth, height: itemHeight)
+                        .id(items.count)
+                        .background(
+                            VisibilityReporter(
+                                index: items.count,
+                                coordinateSpace: "MultiItemCarouselSpace",
+                                containerWidth: containerWidth
+                            )
+                        )
+                }
+            }
+            .padding(.horizontal, horizontalPadding)
+        }
+        .coordinateSpace(name: "MultiItemCarouselSpace")
+        .onPreferenceChange(ItemVisibilityPreferenceKey.self) { visibilities in
+            handleVisibilityUpdate(visibilities)
+        }
+    }
+
+    private func handlePageIndexScroll(to newValue: Int, proxy: ScrollViewProxy) {
+        // Only scroll programmatically if this is an external change
+        // (not from user scrolling which already updates visibility)
+        guard !isProgrammaticScroll else {
+            isProgrammaticScroll = false
+            return
+        }
+
+        // Check if the item is already mostly visible
+        let targetVisibility = itemVisibilities[newValue] ?? 0
+        let isAlreadyVisible = targetVisibility > itemWidth * 0.8
+
+        guard !isAlreadyVisible else { return }
+
+        withAnimation(.easeInOut(duration: 0.3)) {
+            proxy.scrollTo(newValue, anchor: .center)
         }
     }
 

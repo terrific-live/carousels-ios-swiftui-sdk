@@ -40,6 +40,21 @@ struct TimelineDetailView: View {
 
     // MARK: - Body
     var body: some View {
+        if #available(iOS 17, macOS 14, tvOS 17, *) {
+            bodyContent
+                .onChange(of: viewModel.state) { _, newState in
+                    handleStateChanged(newState)
+                }
+        } else {
+            // iOS16-COMPAT: Remove when minimum target is iOS 17
+            bodyContent
+                .onChange(of: viewModel.state) { newState in
+                    handleStateChanged(newState)
+                }
+        }
+    }
+
+    private var bodyContent: some View {
         content
             .background(Color.black)
             .floatingCloseButton(28 + closeButtonTopInset) {
@@ -58,20 +73,21 @@ struct TimelineDetailView: View {
             .onDisappear {
                 viewModel.handleDetailViewDisappear()
             }
-            .onChange(of: viewModel.state) { _, newState in
-                switch newState {
-                case .content:
-                    // Show swipe hint only once when content first loads
-                    if !hasShownSwipeHint {
-                        hasShownSwipeHint = true
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            showSwipeHint = true
-                        }
-                    }
-                default:
-                    break
+    }
+
+    private func handleStateChanged(_ newState: TimelineViewModel.ViewState) {
+        switch newState {
+        case .content:
+            // Show swipe hint only once when content first loads
+            if !hasShownSwipeHint {
+                hasShownSwipeHint = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    showSwipeHint = true
                 }
             }
+        default:
+            break
+        }
     }
 }
 

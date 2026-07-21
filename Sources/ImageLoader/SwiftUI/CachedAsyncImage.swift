@@ -45,6 +45,21 @@ public struct CachedAsyncImage<Content: View, Placeholder: View>: View {
 
     // MARK: - Body
     public var body: some View {
+        if #available(iOS 17, macOS 14, tvOS 17, *) {
+            bodyContent
+                .onChange(of: url) { _, _ in
+                    loadImageIfNeeded()
+                }
+        } else {
+            // iOS16-COMPAT: Remove when minimum target is iOS 17
+            bodyContent
+                .onChange(of: url) { _ in
+                    loadImageIfNeeded()
+                }
+        }
+    }
+
+    private var bodyContent: some View {
         Group {
             switch viewModel.state {
             case .idle, .loading:
@@ -62,9 +77,6 @@ public struct CachedAsyncImage<Content: View, Placeholder: View>: View {
             }
         }
         .onAppear {
-            loadImageIfNeeded()
-        }
-        .onChange(of: url) { _, _ in
             loadImageIfNeeded()
         }
     }

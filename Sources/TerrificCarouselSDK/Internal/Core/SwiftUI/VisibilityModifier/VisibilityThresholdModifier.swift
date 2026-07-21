@@ -22,13 +22,24 @@ struct VisibilityThresholdModifier: ViewModifier {
         content
             .background(
                 GeometryReader { geometry in
-                    Color.clear
-                        .onAppear {
-                            checkVisibility(geometry: geometry)
-                        }
-                        .onChange(of: geometry.frame(in: .global)) { _, _ in
-                            checkVisibility(geometry: geometry)
-                        }
+                    if #available(iOS 17, macOS 14, tvOS 17, *) {
+                        Color.clear
+                            .onAppear {
+                                checkVisibility(geometry: geometry)
+                            }
+                            .onChange(of: geometry.frame(in: .global)) { _, _ in
+                                checkVisibility(geometry: geometry)
+                            }
+                    } else {
+                        // iOS16-COMPAT: Remove when minimum target is iOS 17
+                        Color.clear
+                            .onAppear {
+                                checkVisibility(geometry: geometry)
+                            }
+                            .onChange(of: geometry.frame(in: .global)) { _ in
+                                checkVisibility(geometry: geometry)
+                            }
+                    }
                 }
             )
     }

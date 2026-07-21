@@ -6,9 +6,9 @@ let package = Package(
     name: "TerrificCarouselSDK",
     defaultLocalization: "en",
     platforms: [
-        .iOS(.v17),
-        .macOS(.v14),
-        .tvOS(.v17)
+        .iOS(.v16),
+        .macOS(.v13),
+        .tvOS(.v16)
     ],
     products: [
         .library(

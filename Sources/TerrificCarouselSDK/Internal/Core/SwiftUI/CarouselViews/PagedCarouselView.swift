@@ -49,10 +49,25 @@ struct PagedCarouselView<Item: Identifiable, ItemContent: View, LoadingView: Vie
     
     // MARK: - Body
     var body: some View {
+        if #available(iOS 17, macOS 14, tvOS 17, *) {
+            bodyContent
+                .onChange(of: selection) { _, newValue in
+                    onPageChange?(newValue)
+                }
+        } else {
+            // iOS16-COMPAT: Remove when minimum target is iOS 17
+            bodyContent
+                .onChange(of: selection) { newValue in
+                    onPageChange?(newValue)
+                }
+        }
+    }
+
+    private var bodyContent: some View {
         GeometryReader { proxy in
             let availableSize = proxy.size
             let containerSize = calculateContainerSize(availableSize: availableSize)
-            
+
             TabView(selection: $selection) {
                 ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                     itemContent(item, index == selection)
@@ -60,7 +75,7 @@ struct PagedCarouselView<Item: Identifiable, ItemContent: View, LoadingView: Vie
                         .rotationEffect(itemCounterRotation)
                         .tag(index)
                 }
-                
+
                 if showLoadingView {
                     loadingView()
                         .frame(width: availableSize.width, height: availableSize.height)
@@ -73,9 +88,6 @@ struct PagedCarouselView<Item: Identifiable, ItemContent: View, LoadingView: Vie
             .rotationEffect(layoutRotation)
             // Position helps to correctly center view with rotationEffect
             .position(x: availableSize.width / 2, y: availableSize.height / 2)
-            .onChange(of: selection) { _, newValue in
-                onPageChange?(newValue)
-            }
         }
     }
 }

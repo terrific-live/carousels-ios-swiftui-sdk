@@ -88,6 +88,21 @@ struct ProductCarouselView: View {
 
     // MARK: - Body
     var body: some View {
+        if #available(iOS 17, macOS 14, tvOS 17, *) {
+            bodyContent
+                .onChange(of: isSelected) { _, newValue in
+                    handleIsSelectedChanged(newValue)
+                }
+        } else {
+            // iOS16-COMPAT: Remove when minimum target is iOS 17
+            bodyContent
+                .onChange(of: isSelected) { newValue in
+                    handleIsSelectedChanged(newValue)
+                }
+        }
+    }
+
+    private var bodyContent: some View {
         GeometryReader { geometry in
             if products.isEmpty {
                 EmptyView()
@@ -114,12 +129,13 @@ struct ProductCarouselView: View {
         .onDisappear {
             stopAutoScroll()
         }
-        .onChange(of: isSelected) { _, newValue in
-            if newValue {
-                startAutoScroll()
-            } else {
-                stopAutoScroll()
-            }
+    }
+
+    private func handleIsSelectedChanged(_ newValue: Bool) {
+        if newValue {
+            startAutoScroll()
+        } else {
+            stopAutoScroll()
         }
     }
 }
@@ -128,42 +144,56 @@ struct ProductCarouselView: View {
 private extension ProductCarouselView {
     func carouselContent(width: CGFloat) -> some View {
         ScrollViewReader { proxy in
-            ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: 0) {
-                    ForEach(expandedProducts) { item in
-                        ProductView(
-                            viewData: item.product,
-                            displayMode: displayMode,
-                            sizeConfiguration: sizeConfiguration,
-                            onCtaTap: onCtaTap
-                        )
-                        .frame(width: width)
-                        .id(item.index)
-                        .background(
-                            GeometryReader { geo in
-                                Color.clear
-                                    .preference(
-                                        key: ProductScrollOffsetKey.self,
-                                        value: [item.index: geo.frame(in: .named("ProductCarousel")).minX]
-                                    )
-                            }
-                        )
+            if #available(iOS 17, macOS 14, tvOS 17, *) {
+                productScrollView(width: width)
+                    .scrollTargetBehavior(.paging)
+                    .onChange(of: currentIndex) { _, _ in
+                        handleAutoScroll(proxy: proxy)
                     }
+            } else {
+                // iOS16-COMPAT: Remove when minimum target is iOS 17
+                productScrollView(width: width)
+                    .onChange(of: currentIndex) { _ in
+                        handleAutoScroll(proxy: proxy)
+                    }
+            }
+        }
+    }
+
+    func productScrollView(width: CGFloat) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            LazyHStack(spacing: 0) {
+                ForEach(expandedProducts) { item in
+                    ProductView(
+                        viewData: item.product,
+                        displayMode: displayMode,
+                        sizeConfiguration: sizeConfiguration,
+                        onCtaTap: onCtaTap
+                    )
+                    .frame(width: width)
+                    .id(item.index)
+                    .background(
+                        GeometryReader { geo in
+                            Color.clear
+                                .preference(
+                                    key: ProductScrollOffsetKey.self,
+                                    value: [item.index: geo.frame(in: .named("ProductCarousel")).minX]
+                                )
+                        }
+                    )
                 }
             }
-            .coordinateSpace(name: "ProductCarousel")
-            .scrollTargetBehavior(.paging)
-            .onPreferenceChange(ProductScrollOffsetKey.self) { offsets in
-                updateCurrentIndexFromScroll(offsets, width: width)
-            }
-            .onChange(of: currentIndex) { oldIndex, newIndex in
-                // Only scroll programmatically if this is an auto-scroll (timer-driven)
-                // Check if the change is from auto-scroll (sequential increment)
-                guard isAnimating else { return }
-                withAnimation(.easeInOut(duration: animationDuration)) {
-                    proxy.scrollTo(newIndex, anchor: .leading)
-                }
-            }
+        }
+        .coordinateSpace(name: "ProductCarousel")
+        .onPreferenceChange(ProductScrollOffsetKey.self) { offsets in
+            updateCurrentIndexFromScroll(offsets, width: width)
+        }
+    }
+
+    func handleAutoScroll(proxy: ScrollViewProxy) {
+        guard isAnimating else { return }
+        withAnimation(.easeInOut(duration: animationDuration)) {
+            proxy.scrollTo(currentIndex, anchor: .leading)
         }
     }
 

@@ -21,9 +21,9 @@ This guide provides detailed instructions for integrating TerrificCarouselSDK in
 |-------------|-----------------|
 | Xcode | 15.0+ |
 | Swift | 5.0+ |
-| iOS | 17.0+ |
-| macOS | 14.0+ |
-| tvOS | 17.0+ |
+| iOS | 16.0+ |
+| macOS | 13.0+ |
+| tvOS | 16.0+ |
 
 ### Before You Begin
 

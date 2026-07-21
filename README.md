@@ -6,9 +6,9 @@
 * **Swift:** 5.0+
 * **Minimum OS versions:**
 
-  * iOS 17
-  * macOS 14
-  * tvOS 17
+  * iOS 16
+  * macOS 13
+  * tvOS 16
 
 ---
 

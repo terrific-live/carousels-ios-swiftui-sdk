@@ -174,7 +174,6 @@ extension TimelineFeedAssetCard {
             Text(viewData.title)
                 .font(sizeConfig.titleFont.toFont())
                 .foregroundColor(.white)
-                .lineLimit(1)
 
             // Subtitle
             if let subtitle = viewData.subtitle {

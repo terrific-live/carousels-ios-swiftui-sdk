@@ -72,6 +72,13 @@
 "accessibility.error.label" = "Erreur de chargement du contenu. Impossible de charger ce contenu. Veuillez réessayer dans un moment.";
 "accessibility.error.retry_hint" = "Appuyez pour recharger le contenu";
 
+// MARK: - Carousel Scroll Buttons
+
+"accessibility.carousel.scroll_previous" = "Élément précédent";
+"accessibility.carousel.scroll_previous_hint" = "Fait défiler le carrousel vers l'élément précédent";
+"accessibility.carousel.scroll_next" = "Élément suivant";
+"accessibility.carousel.scroll_next_hint" = "Fait défiler le carrousel vers l'élément suivant";
+
 // MARK: - Swipe Hint
 
 "accessibility.swipe_hint" = "Balayez vers le haut ou le bas pour naviguer entre les éléments";

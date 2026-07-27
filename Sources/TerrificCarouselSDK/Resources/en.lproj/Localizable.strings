@@ -72,6 +72,13 @@
 "accessibility.error.label" = "Error loading content. We couldn't load this content. Please try again in a moment.";
 "accessibility.error.retry_hint" = "Tap to reload content";
 
+// MARK: - Carousel Scroll Buttons
+
+"accessibility.carousel.scroll_previous" = "Previous item";
+"accessibility.carousel.scroll_previous_hint" = "Scrolls carousel to the previous item";
+"accessibility.carousel.scroll_next" = "Next item";
+"accessibility.carousel.scroll_next_hint" = "Scrolls carousel to the next item";
+
 // MARK: - Swipe Hint
 
 "accessibility.swipe_hint" = "Swipe up or down to navigate between items";

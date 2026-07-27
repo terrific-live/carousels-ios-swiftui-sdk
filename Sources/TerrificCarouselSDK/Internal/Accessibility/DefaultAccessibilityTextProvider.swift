@@ -150,6 +150,16 @@ struct DefaultAccessibilityTextProvider: AccessibilityTextProvider {
 
     var errorRetryHint: String { "Tap to reload content" }
 
+    // MARK: - Carousel Scroll Buttons
+
+    var scrollPreviousButtonLabel: String { "Previous item" }
+
+    var scrollPreviousButtonHint: String { "Scrolls carousel to the previous item" }
+
+    var scrollNextButtonLabel: String { "Next item" }
+
+    var scrollNextButtonHint: String { "Scrolls carousel to the next item" }
+
     // MARK: - Swipe Hint
 
     var swipeHintLabel: String { "Swipe up or down to navigate between items" }

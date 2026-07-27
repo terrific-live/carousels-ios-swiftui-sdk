@@ -85,6 +85,18 @@ public struct FeedStyleConfiguration: Equatable, Sendable, TimestampStyleProvidi
     /// Configuration for poll elements in feed
     public let poll: PollStyleConfiguration
 
+    // MARK: - Scroll Buttons (iPad)
+    /// Diameter of the scroll navigation button circles (iPad only)
+    public let scrollButtonSize: CGFloat
+    /// Icon size for scroll button arrows
+    public let scrollButtonIconSize: CGFloat
+    /// Spacing between scroll buttons
+    public let scrollButtonSpacing: CGFloat
+    /// Horizontal padding inside the scroll buttons capsule
+    public let scrollButtonCapsuleHorizontalPadding: CGFloat
+    /// Vertical padding inside the scroll buttons capsule
+    public let scrollButtonCapsuleVerticalPadding: CGFloat
+
     // MARK: - Product
     /// Configuration for product elements in feed
     public let product: ProductViewSizeConfiguration
@@ -107,7 +119,7 @@ public struct FeedStyleConfiguration: Equatable, Sendable, TimestampStyleProvidi
         titleSubtitleSpacing: CGFloat = 4,
         bottomInfoPaddingHorizontal: CGFloat = 12,
         bottomInfoPaddingBottom: CGFloat = 12,
-        carouselNameFont: CarouselFontDescriptor = .system(size: 22, weight: .bold),
+        carouselNameFont: CarouselFontDescriptor = .system(size: 24, weight: .bold),
         carouselNameColor: Color = .white,
         carouselNameHeight: CGFloat = 54,
         carouselNameBottomPadding: CGFloat = 24,
@@ -119,6 +131,11 @@ public struct FeedStyleConfiguration: Equatable, Sendable, TimestampStyleProvidi
         sponsorLogoPadding: CGFloat = 8,
         sponsorLabelPadding: CGFloat = 8,
         sponsorLogoTopSpacing: CGFloat = 8,
+        scrollButtonSize: CGFloat = 38,
+        scrollButtonIconSize: CGFloat = 17,
+        scrollButtonSpacing: CGFloat = 10,
+        scrollButtonCapsuleHorizontalPadding: CGFloat = 6,
+        scrollButtonCapsuleVerticalPadding: CGFloat = 6,
         poll: PollStyleConfiguration = .compact,
         product: ProductViewSizeConfiguration = .feed
     ) {
@@ -151,6 +168,11 @@ public struct FeedStyleConfiguration: Equatable, Sendable, TimestampStyleProvidi
         self.sponsorLogoPadding = sponsorLogoPadding
         self.sponsorLabelPadding = sponsorLabelPadding
         self.sponsorLogoTopSpacing = sponsorLogoTopSpacing
+        self.scrollButtonSize = scrollButtonSize
+        self.scrollButtonIconSize = scrollButtonIconSize
+        self.scrollButtonSpacing = scrollButtonSpacing
+        self.scrollButtonCapsuleHorizontalPadding = scrollButtonCapsuleHorizontalPadding
+        self.scrollButtonCapsuleVerticalPadding = scrollButtonCapsuleVerticalPadding
         self.poll = poll
         self.product = product
     }

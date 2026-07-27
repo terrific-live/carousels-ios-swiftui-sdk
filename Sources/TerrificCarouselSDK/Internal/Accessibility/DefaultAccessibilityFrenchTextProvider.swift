@@ -138,6 +138,16 @@ struct DefaultAccessibilityFrenchTextProvider: AccessibilityTextProvider {
 
     var errorRetryHint: String { "Appuyez pour recharger le contenu" }
 
+    // MARK: - Carousel Scroll Buttons
+
+    var scrollPreviousButtonLabel: String { "Élément précédent" }
+
+    var scrollPreviousButtonHint: String { "Fait défiler le carrousel vers l'élément précédent" }
+
+    var scrollNextButtonLabel: String { "Élément suivant" }
+
+    var scrollNextButtonHint: String { "Fait défiler le carrousel vers l'élément suivant" }
+
     // MARK: - Swipe Hint
 
     var swipeHintLabel: String { "Balayez vers le haut ou le bas pour naviguer entre les éléments" }

@@ -240,6 +240,24 @@ struct LocalizedAccessibilityTextProvider: AccessibilityTextProvider {
         localized("accessibility.error.retry_hint")
     }
 
+    // MARK: - Carousel Scroll Buttons
+
+    var scrollPreviousButtonLabel: String {
+        localized("accessibility.carousel.scroll_previous")
+    }
+
+    var scrollPreviousButtonHint: String {
+        localized("accessibility.carousel.scroll_previous_hint")
+    }
+
+    var scrollNextButtonLabel: String {
+        localized("accessibility.carousel.scroll_next")
+    }
+
+    var scrollNextButtonHint: String {
+        localized("accessibility.carousel.scroll_next_hint")
+    }
+
     // MARK: - Swipe Hint
 
     var swipeHintLabel: String {

@@ -46,7 +46,6 @@ struct DetailBottomInfoSection: View {
             Text(viewData.title)
                 .font(sizeConfig.titleFont.toFont())
                 .foregroundColor(.white)
-                .lineLimit(1)
 
             // Subtitle with truncation detection
             if let subtitle = viewData.subtitle {

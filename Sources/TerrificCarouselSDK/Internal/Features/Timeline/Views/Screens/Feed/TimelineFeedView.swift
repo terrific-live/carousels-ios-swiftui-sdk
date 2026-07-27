@@ -8,6 +8,10 @@
 import SwiftUI
 import ImageLoader
 
+#if canImport(UIKit)
+import UIKit
+#endif
+
 // MARK: - View
 struct TimelineFeedView: View {
 
@@ -26,6 +30,8 @@ struct TimelineFeedView: View {
 
     // MARK: - State
     @State private var autoAdvanceTask: Task<Void, Never>?
+    @State private var highlightedScrollButton: CarouselScrollButtons.HighlightedButton?
+    @State private var pageScrollDirection: PageScrollDirection?
 
     // MARK: - Init
     init(
@@ -133,16 +139,44 @@ private extension TimelineFeedView {
             // Carousel name label (if showName is true)
             if let carouselName = viewModel.carouselConfig.name,
                viewModel.carouselConfig.showName == true {
-                Text(carouselName)
-                    .font(sizeConfig.carouselNameFont.toFont())
-                    .foregroundColor(sizeConfig.carouselNameColor)
-                    .frame(height: sizeConfig.carouselNameHeight, alignment: .bottom)
-                    .padding(.horizontal, sizeConfig.carouselNameHorizontalPadding)
-                    .padding(.bottom, sizeConfig.carouselNameBottomPadding)
+                HStack(alignment: .bottom, spacing: 0) {
+                    Text(carouselName)
+                        .font(sizeConfig.carouselNameFont.toFont())
+                        .foregroundColor(sizeConfig.carouselNameColor)
+                        .frame(minHeight: sizeConfig.carouselNameHeight, alignment: .bottom)
+
+                    Spacer()
+
+                    // Scroll navigation buttons (iPad only)
+                    #if canImport(UIKit)
+                    if UIDevice.current.userInterfaceIdiom == .pad {
+                        CarouselScrollButtons(
+                            canScrollPrevious: viewModel.currentPageIndex > 0,
+                            canScrollNext: viewModel.currentPageIndex < items.count - 1,
+                            highlightedButton: $highlightedScrollButton,
+                            buttonSize: sizeConfig.scrollButtonSize,
+                            iconSize: sizeConfig.scrollButtonIconSize,
+                            buttonSpacing: sizeConfig.scrollButtonSpacing,
+                            capsuleHorizontalPadding: sizeConfig.scrollButtonCapsuleHorizontalPadding,
+                            capsuleVerticalPadding: sizeConfig.scrollButtonCapsuleVerticalPadding,
+                            onScrollPrevious: {
+                                pageScrollDirection = .backward
+                            },
+                            onScrollNext: {
+                                pageScrollDirection = .forward
+                            }
+                        )
+                    }
+                    #endif
+                }
+                .padding(.leading, sizeConfig.carouselNameHorizontalPadding)
+                .padding(.trailing, sizeConfig.carouselNameHorizontalPadding * 2)
+                .padding(.bottom, sizeConfig.carouselNameBottomPadding)
             }
 
             MultiItemHorizontalCarousel(
                 currentPageIndex: $viewModel.currentPageIndex,
+                pageScrollDirection: $pageScrollDirection,
                 items: items,
                 itemWidth: sizeConfig.carouselItemWidth,
                 itemHeight: sizeConfig.carouselItemHeight,
@@ -262,6 +296,8 @@ private extension TimelineFeedView {
     }
 
     func handleAssetTap(_ asset: TimelineAssetDTO) {
+        highlightedScrollButton = nil
+
         // Find the index of the tapped asset in carouselItems
         let index = viewModel.carouselItems.firstIndex { item in
             if case .content(let itemAsset, _) = item {
@@ -386,4 +422,5 @@ private extension TimelineFeedView {
         }
         return nil
     }
+
 }

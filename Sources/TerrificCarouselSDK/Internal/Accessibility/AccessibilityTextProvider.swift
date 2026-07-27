@@ -62,6 +62,12 @@ protocol AccessibilityTextProvider: Sendable {
     var errorAccessibilityLabel: String { get }
     var errorRetryHint: String { get }
 
+    // MARK: - Carousel Scroll Buttons
+    var scrollPreviousButtonLabel: String { get }
+    var scrollPreviousButtonHint: String { get }
+    var scrollNextButtonLabel: String { get }
+    var scrollNextButtonHint: String { get }
+
     // MARK: - Swipe Hint
     var swipeHintLabel: String { get }
 }

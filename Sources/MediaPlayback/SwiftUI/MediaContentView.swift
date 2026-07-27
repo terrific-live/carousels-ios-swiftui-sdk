@@ -83,9 +83,9 @@ public struct MediaContentView<ImageContent: View>: View {
     private var bodyContent: some View {
         GeometryReader { geo in
             ZStack {
-                buildImageLayer(size: geo.size)
+                buildImageLayer(size: geo.size, isLandscapePad: Self.isLandscapePad(geo.size))
 
-                buildVideoLayer()
+                buildVideoLayer(containerSize: geo.size)
                     .opacity(viewModel.isPlaying ? 1 : 0)
 
                 buildLoadingOverlay()
@@ -113,14 +113,21 @@ public struct MediaContentView<ImageContent: View>: View {
 // MARK: - UI Components (Factories)
 private extension MediaContentView {
 
-    func buildImageLayer(size: CGSize) -> some View {
-        imageContent(size)
+    func buildImageLayer(size: CGSize, isLandscapePad: Bool) -> some View {
+        let shouldBlur = isLandscapePad && videoURL != nil
+        return imageContent(size)
+            .blur(radius: shouldBlur ? 20 : 0)
+            .clipped()
+    }
+
+    static func isLandscapePad(_ size: CGSize) -> Bool {
+        UIDevice.current.userInterfaceIdiom == .pad && size.width > size.height
     }
 
     @ViewBuilder
-    func buildVideoLayer() -> some View {
+    func buildVideoLayer(containerSize: CGSize) -> some View {
         if viewModel.showVideo, let player = viewModel.player {
-            OptimizedVideoPlayer(player: player)
+            OptimizedVideoPlayer(player: player, containerSize: containerSize)
         }
     }
 

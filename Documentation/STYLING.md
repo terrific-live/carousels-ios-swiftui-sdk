@@ -109,7 +109,7 @@ Controls the horizontal carousel (feed) appearance.
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
-| `carouselNameFont` | CarouselFontDescriptor | System 22 bold | Font for carousel name label |
+| `carouselNameFont` | CarouselFontDescriptor | System 24 bold | Font for carousel name label |
 | `carouselNameColor` | Color | .white | Color for carousel name label |
 | `carouselNameHeight` | CGFloat | 54 | Height of carousel name label |
 | `carouselNameBottomPadding` | CGFloat | 24 | Bottom padding below carousel name |

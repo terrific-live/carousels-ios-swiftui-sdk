@@ -8,6 +8,12 @@
 import SwiftUI
 import UIKit
 
+// MARK: - PageScrollDirection
+enum PageScrollDirection: Equatable {
+    case forward
+    case backward
+}
+
 // MARK: - MultiItemHorizontalCarousel
 /// A horizontal carousel that shows multiple items at once.
 /// The item with the most visible area is considered "selected".
@@ -17,6 +23,9 @@ struct MultiItemHorizontalCarousel<Item: Identifiable, ItemContent: View, Loadin
     // MARK: - Configuration properties
     @Binding
     var currentPageIndex: Int
+    /// When set, scrolls one page forward or backward, then resets to nil.
+    @Binding
+    var pageScrollDirection: PageScrollDirection?
     let items: [Item]
     let showLoadingView: Bool
     let itemWidth: CGFloat
@@ -41,6 +50,7 @@ struct MultiItemHorizontalCarousel<Item: Identifiable, ItemContent: View, Loadin
     // MARK: - Init
     init(
         currentPageIndex: Binding<Int>,
+        pageScrollDirection: Binding<PageScrollDirection?> = .constant(nil),
         items: [Item],
         showLoadingView: Bool = false,
         itemWidth: CGFloat = 280,
@@ -52,6 +62,7 @@ struct MultiItemHorizontalCarousel<Item: Identifiable, ItemContent: View, Loadin
         @ViewBuilder loadingView: @escaping () -> LoadingView
     ) {
         self._currentPageIndex = currentPageIndex
+        self._pageScrollDirection = pageScrollDirection
         self.items = items
         self.showLoadingView = showLoadingView
         self.itemWidth = itemWidth
@@ -71,15 +82,69 @@ struct MultiItemHorizontalCarousel<Item: Identifiable, ItemContent: View, Loadin
                         .onChange(of: currentPageIndex) { _, newValue in
                             handlePageIndexScroll(to: newValue, proxy: proxy)
                         }
+                        .onChange(of: pageScrollDirection) { _, newValue in
+                            handlePageScroll(direction: newValue, proxy: proxy, containerWidth: geometry.size.width)
+                        }
                 } else {
                     // iOS16-COMPAT: Remove when minimum target is iOS 17
                     scrollContent(containerWidth: geometry.size.width)
                         .onChange(of: currentPageIndex) { newValue in
                             handlePageIndexScroll(to: newValue, proxy: proxy)
                         }
+                        .onChange(of: pageScrollDirection) { newValue in
+                            handlePageScroll(direction: newValue, proxy: proxy, containerWidth: geometry.size.width)
+                        }
                 }
             }
         }
+    }
+
+    // MARK: - Page Scroll
+
+    private func handlePageScroll(direction: PageScrollDirection?, proxy: ScrollViewProxy, containerWidth: CGFloat) {
+        guard let direction else { return }
+
+        let visibleCount = Self.visibleItemCount(
+            containerWidth: containerWidth,
+            itemWidth: itemWidth,
+            spacing: spacing,
+            horizontalPadding: horizontalPadding
+        )
+
+        // Find the first item that is at least half visible
+        let visibleIndices = itemVisibilities
+            .filter { $0.value > itemWidth * 0.5 }
+            .map(\.key)
+            .sorted()
+
+        let firstVisible = visibleIndices.first ?? currentPageIndex
+
+        let targetIndex: Int
+        switch direction {
+        case .forward:
+            // Scroll so the first currently-invisible item is at the leading edge
+            let lastVisible = visibleIndices.last ?? currentPageIndex
+            targetIndex = min(items.count - 1, lastVisible + 1)
+        case .backward:
+            // Scroll back by one page worth of items
+            targetIndex = max(0, firstVisible - visibleCount)
+        }
+
+        withAnimation(.easeInOut(duration: 0.3)) {
+            proxy.scrollTo(targetIndex, anchor: .leading)
+        }
+        pageScrollDirection = nil
+    }
+
+    static func visibleItemCount(
+        containerWidth: CGFloat,
+        itemWidth: CGFloat,
+        spacing: CGFloat,
+        horizontalPadding: CGFloat
+    ) -> Int {
+        let available = containerWidth - 2 * horizontalPadding
+        let slot = itemWidth + spacing
+        return max(1, Int(floor((available + spacing) / slot)))
     }
 
     private func scrollContent(containerWidth: CGFloat) -> some View {
@@ -171,6 +236,7 @@ struct MultiItemHorizontalCarousel<Item: Identifiable, ItemContent: View, Loadin
 extension MultiItemHorizontalCarousel where LoadingView == EmptyView {
     init(
         currentPageIndex: Binding<Int>,
+        pageScrollDirection: Binding<PageScrollDirection?> = .constant(nil),
         items: [Item],
         itemWidth: CGFloat = 280,
         itemHeight: CGFloat? = nil,
@@ -180,6 +246,7 @@ extension MultiItemHorizontalCarousel where LoadingView == EmptyView {
         @ViewBuilder itemContent: @escaping (Item, Bool, Int, Int) -> ItemContent
     ) {
         self._currentPageIndex = currentPageIndex
+        self._pageScrollDirection = pageScrollDirection
         self.items = items
         self.showLoadingView = false
         self.itemWidth = itemWidth

@@ -65,11 +65,21 @@ private extension CloseButtonOverContentModifier {
         Button(action: {
             closeAction()
         }) {
-            Image(systemName: "xmark.circle")
+            Circle()
+                .fill(Color(white: 0.2))
+                .overlay(
+                    Circle()
+                        .stroke(Color(white: 0.85), lineWidth: 1.5)
+                )
+                .overlay(
+                    Image(systemName: "xmark")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(Color(white: 0.85))
+                )
+                .frame(width: 32, height: 32)
                 .accessibilityHidden(true)
         }
         .font(.system(size: 32, weight: .regular))
-        .foregroundStyle(Color(white: 0.75))
         .frame(width: 44, height: 44)
         .contentShape(.circle)
         .padding(.horizontal, 28)

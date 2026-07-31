@@ -453,17 +453,69 @@ let styleConfiguration = CarouselStyleConfiguration(
 )
 ```
 
+### Custom Font Family (Shorthand)
+
+The simplest way to apply a custom font family — pass one font name per weight variant and all sizes stay at their defaults:
+
+```swift
+let styleConfiguration = CarouselStyleConfiguration(
+    regularFont: "Avenir-Book",
+    mediumFont: "Avenir-Medium",
+    semiboldFont: "Avenir-DemiBold",
+    boldFont: "Avenir-Heavy"
+)
+```
+
+### Custom Fonts Only
+
+To override all fonts while keeping other properties at their defaults:
+
+```swift
+let styleConfiguration = CarouselStyleConfiguration(
+    feed: FeedStyleConfiguration(
+        timestampFont: .custom("Avenir-Medium", size: 14),
+        titleFont: .custom("Avenir-Heavy", size: 18),
+        subtitleFont: .custom("Avenir-Medium", size: 16),
+        carouselNameFont: .custom("Avenir-Black", size: 24),
+        sponsorLabelFont: .custom("Avenir-Medium", size: 14),
+        poll: PollStyleConfiguration(
+            questionFont: .custom("Avenir-Medium", size: 26),
+            optionFont: .custom("Avenir-Medium", size: 18),
+            optionSelectedFont: .custom("Avenir-Heavy", size: 18)
+        )
+    ),
+    detail: DetailStyleConfiguration(
+        timestampFont: .custom("Avenir-Medium", size: 14),
+        titleFont: .custom("Avenir-Heavy", size: 22),
+        subtitleFont: .custom("Avenir-Medium", size: 18),
+        ctaButtonFont: .custom("Avenir-DemiBold", size: 18),
+        poll: PollStyleConfiguration(
+            questionFont: .custom("Avenir-Medium", size: 26),
+            optionFont: .custom("Avenir-Medium", size: 18),
+            optionSelectedFont: .custom("Avenir-Heavy", size: 18)
+        )
+    )
+)
+```
+
 ### Using Custom Fonts
 
 ```swift
 let customFeedStyle = FeedStyleConfiguration(
     carouselItemWidth: 260,
     carouselItemHeight: 450,
+    timestampFont: .custom("Avenir-Medium", size: 14),
     titleFont: .custom("Avenir-Heavy", size: 18),
     subtitleFont: .custom("Avenir-Medium", size: 14),
     carouselNameFont: .custom("Avenir-Black", size: 24),
     carouselNameHeight: 54,
-    carouselNameColor: .primary
+    carouselNameColor: .primary,
+    sponsorLabelFont: .custom("Avenir-Medium", size: 14),
+    poll: PollStyleConfiguration(
+        questionFont: .custom("Avenir-Medium", size: 26),
+        optionFont: .custom("Avenir-Medium", size: 18),
+        optionSelectedFont: .custom("Avenir-Heavy", size: 18)
+    )
 )
 
 let styleConfiguration = CarouselStyleConfiguration(
@@ -477,10 +529,17 @@ let styleConfiguration = CarouselStyleConfiguration(
 let customDetailStyle = DetailStyleConfiguration(
     cardCornerRadius: 20,
     edgePadding: 12,
+    timestampFont: .custom("Avenir-Medium", size: 14),
     brandLogoSize: 50,
-    titleFont: .system(size: 24, weight: .bold),
-    ctaButtonFont: .system(size: 16, weight: .semibold),
-    actionButtonIconSize: 28
+    titleFont: .custom("Avenir-Heavy", size: 22),
+    subtitleFont: .custom("Avenir-Medium", size: 18),
+    ctaButtonFont: .custom("Avenir-DemiBold", size: 18),
+    actionButtonIconSize: 28,
+    poll: PollStyleConfiguration(
+        questionFont: .custom("Avenir-Medium", size: 26),
+        optionFont: .custom("Avenir-Medium", size: 18),
+        optionSelectedFont: .custom("Avenir-Heavy", size: 18)
+    )
 )
 
 let styleConfiguration = CarouselStyleConfiguration(
@@ -530,22 +589,29 @@ let styleConfiguration = CarouselStyleConfiguration(
         carouselItemHeight: 480,
         carouselItemSpacing: 16,
         cardCornerRadius: 12,
+        timestampFont: .custom("Montserrat-Medium", size: 14),
         titleFont: .custom("Montserrat-Bold", size: 18),
+        subtitleFont: .custom("Montserrat-Regular", size: 16),
         carouselNameFont: .custom("Montserrat-Black", size: 26),
         carouselNameHeight: 54,
+        sponsorLabelFont: .custom("Montserrat-Regular", size: 14),
         poll: PollStyleConfiguration(
             questionFont: .custom("Montserrat-Medium", size: 18),
-            optionFont: .custom("Montserrat-Regular", size: 14)
+            optionFont: .custom("Montserrat-Regular", size: 14),
+            optionSelectedFont: .custom("Montserrat-Bold", size: 14)
         ),
         product: .feed  // Use default feed product size
     ),
     detail: DetailStyleConfiguration(
         cardCornerRadius: 12,
+        timestampFont: .custom("Montserrat-Medium", size: 14),
         titleFont: .custom("Montserrat-Bold", size: 22),
+        subtitleFont: .custom("Montserrat-Medium", size: 18),
         ctaButtonFont: .custom("Montserrat-SemiBold", size: 16),
         poll: PollStyleConfiguration(
             questionFont: .custom("Montserrat-Medium", size: 24),
-            optionFont: .custom("Montserrat-Regular", size: 16)
+            optionFont: .custom("Montserrat-Regular", size: 16),
+            optionSelectedFont: .custom("Montserrat-Bold", size: 16)
         ),
         product: .detail  // Use default detail product size
     )

@@ -85,7 +85,7 @@ struct TimelineDetailAssetCard: View {
             displayMode: .full,
             isSelected: isSelected,
             productSizeConfig: sizeConfig.product,
-            spacing: viewData.hasCustomBackground ? sizeConfig.cardSpacing : 0,
+            spacing: sizeConfig.cardSpacing,
             onProductCtaTap: onProductCtaTap
         ) {
             assetCard

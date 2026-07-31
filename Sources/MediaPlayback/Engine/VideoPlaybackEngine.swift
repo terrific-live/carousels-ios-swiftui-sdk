@@ -53,9 +53,36 @@ public final class VideoPlaybackEngine: ObservableObject, VideoPlaybackEnginePro
         looper?.disableLooping()
     }
 
+    // MARK: - Audio Session
+
+    /// Configures AVAudioSession for video playback.
+    /// Called once per app session before the first player is created.
+    /// Overrides Silent switch so audio plays even in silent mode.
+    nonisolated(unsafe) private static var isAudioSessionConfigured = false
+
+    private func configureAudioSessionIfNeeded() {
+        #if os(iOS) || os(tvOS)
+        guard !Self.isAudioSessionConfigured else { return }
+        do {
+            try AVAudioSession.sharedInstance().setCategory(
+                .playback,
+                mode: .moviePlayback,
+                options: .mixWithOthers
+            )
+            try AVAudioSession.sharedInstance().setActive(true)
+            Self.isAudioSessionConfigured = true
+            log("Audio session configured for playback")
+        } catch {
+            log("❌ Failed to configure audio session: \(error.localizedDescription)")
+        }
+        #endif
+    }
+
     // MARK: - Intents (Actions)
     public func handleLoad(url: URL, loop: Bool) {
         log("handleLoad url=\(url.absoluteString) loop=\(loop)")
+
+        configureAudioSessionIfNeeded()
 
         // Store for potential retry
         lastLoadRequest = (url: url, loop: loop)

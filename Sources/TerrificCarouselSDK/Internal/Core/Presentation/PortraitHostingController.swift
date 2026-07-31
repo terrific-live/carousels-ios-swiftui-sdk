@@ -25,6 +25,42 @@ final class PortraitHostingController<Content: View>: UIHostingController<Conten
     }
 }
 
+// MARK: - PortraitStatusBarController
+/// Container controller that wraps a UIHostingController to enforce a static light status bar.
+/// UIHostingController dynamically manages the status bar internally, which causes flickering
+/// during scroll. Wrapping it as a child of a plain UIViewController breaks that behavior.
+private final class PortraitStatusBarController: UIViewController {
+
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        .portrait
+    }
+
+    override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
+        .portrait
+    }
+
+    override var shouldAutorotate: Bool {
+        false
+    }
+
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        .lightContent
+    }
+
+    func embed(_ child: UIViewController) {
+        addChild(child)
+        view.addSubview(child.view)
+        child.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            child.view.topAnchor.constraint(equalTo: view.topAnchor),
+            child.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            child.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            child.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+        ])
+        child.didMove(toParent: self)
+    }
+}
+
 // MARK: - PortraitCoverController
 /// Controller that manages portrait-locked fullscreen presentation
 final class PortraitCoverController: UIViewController {
@@ -44,10 +80,15 @@ final class PortraitCoverController: UIViewController {
         }
 
         let content = contentBuilder(dismissAction)
-        let hostingController = PortraitHostingController(rootView: content)
-        hostingController.modalPresentationStyle = .fullScreen
+        let hostingController = UIHostingController(rootView: content)
 
-        presentedHostingController = hostingController
+        // Wrap in a container that forces a static light status bar.
+        // UIHostingController dynamically manages the status bar, causing flicker during scroll.
+        let container = PortraitStatusBarController()
+        container.embed(hostingController)
+        container.modalPresentationStyle = .fullScreen
+
+        presentedHostingController = container
 
         // Find the top view controller to present from
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
@@ -56,7 +97,7 @@ final class PortraitCoverController: UIViewController {
             while let presented = topVC.presentedViewController {
                 topVC = presented
             }
-            topVC.present(hostingController, animated: true)
+            topVC.present(container, animated: true)
         }
     }
 

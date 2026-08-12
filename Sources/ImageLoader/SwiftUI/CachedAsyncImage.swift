@@ -14,31 +14,26 @@ public struct CachedAsyncImage<Content: View, Placeholder: View>: View {
     private var viewModel = ImageLoaderViewModel()
 
     private let url: URL?
-    private let contentMode: ContentMode
     private let content: (Image) -> Content
     private let placeholder: () -> Placeholder
 
     // MARK: - Init
     public init(
         url: URL?,
-        contentMode: ContentMode = .fill,
         @ViewBuilder content: @escaping (Image) -> Content,
         @ViewBuilder placeholder: @escaping () -> Placeholder
     ) {
         self.url = url
-        self.contentMode = contentMode
         self.content = content
         self.placeholder = placeholder
     }
 
     public init(
         urlString: String?,
-        contentMode: ContentMode = .fill,
         @ViewBuilder content: @escaping (Image) -> Content,
         @ViewBuilder placeholder: @escaping () -> Placeholder
     ) {
         self.url = urlString.flatMap { URL(string: $0) }
-        self.contentMode = contentMode
         self.content = content
         self.placeholder = placeholder
     }
@@ -79,11 +74,17 @@ public struct CachedAsyncImage<Content: View, Placeholder: View>: View {
         .onAppear {
             loadImageIfNeeded()
         }
+        .onDisappear {
+            viewModel.cancel()
+        }
     }
 
     // MARK: - Private Methods
     private func loadImageIfNeeded() {
-        guard let url else { return }
+        guard let url else {
+            viewModel.cancel()
+            return
+        }
         viewModel.load(from: url)
     }
 }
@@ -94,12 +95,10 @@ public extension CachedAsyncImage where Placeholder == ImageSkeleton {
     /// Convenience initializer with default skeleton placeholder
     init(
         url: URL?,
-        contentMode: ContentMode = .fill,
         @ViewBuilder content: @escaping (Image) -> Content
     ) {
         self.init(
             url: url,
-            contentMode: contentMode,
             content: content,
             placeholder: { ImageSkeleton() }
         )
@@ -108,12 +107,10 @@ public extension CachedAsyncImage where Placeholder == ImageSkeleton {
     /// Convenience initializer with URL string and default skeleton placeholder
     init(
         urlString: String?,
-        contentMode: ContentMode = .fill,
         @ViewBuilder content: @escaping (Image) -> Content
     ) {
         self.init(
             url: urlString.flatMap { URL(string: $0) },
-            contentMode: contentMode,
             content: content,
             placeholder: { ImageSkeleton() }
         )

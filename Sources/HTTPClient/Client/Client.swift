@@ -6,7 +6,7 @@ public protocol ApiClient {
 
 public final class Client: ApiClient {
     public private(set) var interceptor = Interceptor()
-    public var transport: NetworkTransport
+    public let transport: NetworkTransport
 
     var requestAdapter: RequestAdapter
     var responseAdapter: ResponseAdapter

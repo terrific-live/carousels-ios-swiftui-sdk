@@ -3,12 +3,10 @@
 ## Requirements
 
 * **Xcode:** 15.0+
-* **Swift:** 5.0+
+* **Swift:** 5.9+
 * **Minimum OS versions:**
 
   * iOS 16
-  * macOS 13
-  * tvOS 16
 
 ---
 

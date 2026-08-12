@@ -6,6 +6,12 @@
 import Foundation
 import HTTPClient
 
+// MARK: - Analytics Constants
+enum AnalyticsConstants {
+    /// parentUrl is not provided by the backend; send empty string as required by the API schema.
+    static let noParentUrl = ""
+}
+
 // MARK: - AnalyticsServiceImpl
 /// Real implementation of AnalyticsService
 struct AnalyticsServiceImpl: AnalyticsService {

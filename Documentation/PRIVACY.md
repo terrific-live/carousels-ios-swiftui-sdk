@@ -227,8 +227,6 @@ Example payload for `timelineAssetViewed` event:
 
 All data is stored in the app's sandboxed `UserDefaults`:
 - **iOS**: App container (not shared)
-- **macOS**: App container (sandboxed)
-- **tvOS**: App container (not shared)
 
 ### Data Persistence
 

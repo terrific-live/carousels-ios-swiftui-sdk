@@ -42,15 +42,16 @@ public final class ImageLoaderViewModel: ObservableObject {
         currentURL = url
         state = .loading
 
-        loadTask = Task {
-            let image = await imageLoader.loadImage(from: url)
+        loadTask = Task { [weak self] in
+            guard let self else { return }
+            let image = await self.imageLoader.loadImage(from: url)
 
             guard !Task.isCancelled else { return }
 
             if let image {
-                state = .loaded(image)
+                self.state = .loaded(image)
             } else {
-                state = .failed(ImageLoaderError.loadFailed)
+                self.state = .failed(ImageLoaderError.loadFailed)
             }
         }
     }

@@ -108,6 +108,13 @@ public actor ImageDiskCache {
 
     // MARK: - Private Helpers
 
+    /// Encodes image to disk-friendly format.
+    /// Uses JPEG 0.8 for opaque images to save disk space (~3-5x smaller than quality 1.0).
+    /// Uses PNG for images with alpha channel (lossless).
+    ///
+    /// Important: Each image should only be encoded once (download → cache).
+    /// Do not load a cached image and re-save it — repeated JPEG re-encoding
+    /// causes cumulative quality loss (generation loss).
     private func imageData(from image: PlatformImage) -> Data? {
         #if canImport(UIKit)
         if image.hasAlphaChannel {

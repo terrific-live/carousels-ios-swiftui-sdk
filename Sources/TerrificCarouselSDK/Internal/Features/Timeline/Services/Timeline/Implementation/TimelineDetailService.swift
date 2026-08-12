@@ -40,7 +40,7 @@ struct TimelineDetailService: TimelineService {
     ) async throws -> TimelineServiceResult {
         let request = TimelineDetailAPIRequest(
             storeId: configuration.storeId,
-            carouselId: configuration.carouselId,
+            carouselId: carouselId,
             numberOfItems: itemsPerPage,
             offset: offset + (page - 1) * itemsPerPage,
             shopPageUrl: configuration.shopPageUrl,

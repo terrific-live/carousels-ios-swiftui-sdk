@@ -14,9 +14,6 @@ final class VideoPreviewConfigurationTests: XCTestCase {
         let config = VideoPreviewConfiguration.timelineCard
 
         XCTAssertEqual(config.playbackMode, .preview)
-        XCTAssertEqual(config.showDelay, 2.5)
-        XCTAssertEqual(config.maxPlaybackDuration, 5.0)
-        XCTAssertFalse(config.shouldLoopPreview)
         XCTAssertEqual(config.playback, .restartOnPreview)
     }
 
@@ -24,10 +21,14 @@ final class VideoPreviewConfigurationTests: XCTestCase {
         let config = VideoPreviewConfiguration.fullScreen
 
         XCTAssertEqual(config.playbackMode, .fullScreen)
-        XCTAssertEqual(config.showDelay, 0)
-        XCTAssertEqual(config.maxPlaybackDuration, .infinity)
-        XCTAssertFalse(config.shouldLoopPreview)
         XCTAssertEqual(config.playback, .loop)
+    }
+
+    func testFullScreenPlayOnceConfiguration() {
+        let config = VideoPreviewConfiguration.fullScreenPlayOnce
+
+        XCTAssertEqual(config.playbackMode, .fullScreen)
+        XCTAssertEqual(config.playback, .playOnce)
     }
 
     // MARK: - Custom Configuration Tests
@@ -35,16 +36,10 @@ final class VideoPreviewConfigurationTests: XCTestCase {
     func testCustomConfiguration() {
         let config = VideoPreviewConfiguration(
             playbackMode: .preview,
-            showDelay: 1.5,
-            maxPlaybackDuration: 10.0,
-            shouldLoopPreview: true,
             playback: .playOnce
         )
 
         XCTAssertEqual(config.playbackMode, .preview)
-        XCTAssertEqual(config.showDelay, 1.5)
-        XCTAssertEqual(config.maxPlaybackDuration, 10.0)
-        XCTAssertTrue(config.shouldLoopPreview)
         XCTAssertEqual(config.playback, .playOnce)
     }
 
@@ -52,9 +47,6 @@ final class VideoPreviewConfigurationTests: XCTestCase {
         let config = VideoPreviewConfiguration()
 
         XCTAssertEqual(config.playbackMode, .preview)
-        XCTAssertEqual(config.showDelay, 0)
-        XCTAssertEqual(config.maxPlaybackDuration, .infinity)
-        XCTAssertFalse(config.shouldLoopPreview)
         XCTAssertEqual(config.playback, .loop)
     }
 
@@ -86,52 +78,5 @@ final class VideoPreviewConfigurationTests: XCTestCase {
         XCTAssertEqual(PlaybackMode.preview, PlaybackMode.preview)
         XCTAssertEqual(PlaybackMode.fullScreen, PlaybackMode.fullScreen)
         XCTAssertNotEqual(PlaybackMode.preview, PlaybackMode.fullScreen)
-    }
-
-    // MARK: - VisibilityBehavior Tests
-
-    func testVisibilityBehaviorManual() {
-        let behavior = VisibilityBehavior.manual
-        XCTAssertEqual(behavior, .manual)
-    }
-
-    func testVisibilityBehaviorAutoPlay() {
-        let behavior = VisibilityBehavior.autoPlay(threshold: 0.5)
-        if case .autoPlay(let threshold) = behavior {
-            XCTAssertEqual(threshold, 0.5)
-        } else {
-            XCTFail("Expected autoPlay behavior")
-        }
-    }
-
-    func testVisibilityBehaviorEquality() {
-        XCTAssertEqual(
-            VisibilityBehavior.autoPlay(threshold: 0.5),
-            VisibilityBehavior.autoPlay(threshold: 0.5)
-        )
-        XCTAssertNotEqual(
-            VisibilityBehavior.autoPlay(threshold: 0.5),
-            VisibilityBehavior.autoPlay(threshold: 0.7)
-        )
-    }
-
-    // MARK: - AudioBehavior Tests
-
-    func testAudioBehavior() {
-        let muted = AudioBehavior(isMuted: true)
-        let unmuted = AudioBehavior(isMuted: false)
-
-        XCTAssertTrue(muted.isMuted)
-        XCTAssertFalse(unmuted.isMuted)
-    }
-
-    // MARK: - AnalyticsBehavior Tests
-
-    func testAnalyticsBehavior() {
-        let tracking = AnalyticsBehavior(shouldTrack: true)
-        let notTracking = AnalyticsBehavior(shouldTrack: false)
-
-        XCTAssertTrue(tracking.shouldTrack)
-        XCTAssertFalse(notTracking.shouldTrack)
     }
 }

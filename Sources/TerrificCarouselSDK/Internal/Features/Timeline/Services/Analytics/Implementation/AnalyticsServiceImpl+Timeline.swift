@@ -18,7 +18,7 @@ extension AnalyticsServiceImpl {
         let auxData = TimelineOpenedAuxData(
             externalUserId: externalUserId,
             userAgent: configuration.userAgent,
-            parentUrl: ""
+            parentUrl: AnalyticsConstants.noParentUrl
         )
 
         let body = AnalyticsEventRequestBody(
@@ -48,7 +48,7 @@ extension AnalyticsServiceImpl {
         let auxData = TimelineClosedAuxData(
             activeViewDurationMs: activeViewDurationMs,
             externalUserId: externalUserId,
-            parentUrl: "",
+            parentUrl: AnalyticsConstants.noParentUrl,
             totalOpenDurationMs: totalOpenDurationMs
         )
 

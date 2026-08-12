@@ -39,6 +39,7 @@ public final class VideoPlaybackEngine: ObservableObject, VideoPlaybackEnginePro
 
     // MARK: - Timeout & Retry State
     private var loadingTimeoutTask: Task<Void, Never>?
+    private var retryTask: Task<Void, Never>?
     private var currentRetryCount = 0
     private var lastLoadRequest: (url: URL, loop: Bool)?
 
@@ -92,7 +93,7 @@ public final class VideoPlaybackEngine: ObservableObject, VideoPlaybackEnginePro
 
         // Configure asset with timeout options for network resources
         let assetOptions: [String: Any] = [
-            AVURLAssetPreferPreciseDurationAndTimingKey: false,
+            AVURLAssetPreferPreciseDurationAndTimingKey: false
         ]
         let asset = AVURLAsset(url: url, options: assetOptions)
 
@@ -141,6 +142,12 @@ public final class VideoPlaybackEngine: ObservableObject, VideoPlaybackEnginePro
     }
 
     public func handlePause() {
+        let allowedStates: [PlaybackState] = [.playing, .ready]
+        guard allowedStates.contains(state) else {
+            log("❌ pause() blocked - state must be .playing/.ready, current=\(state)")
+            return
+        }
+
         player?.pause()
         log("handlePause - state change = paused")
         state = .paused
@@ -186,12 +193,12 @@ public final class VideoPlaybackEngine: ObservableObject, VideoPlaybackEnginePro
     // MARK: - Test Helpers
 
     /// Returns the current retry count (for testing)
-    public var testCurrentRetryCount: Int {
+    var testCurrentRetryCount: Int {
         currentRetryCount
     }
 
     /// Returns whether there's a pending load request (for testing)
-    public var testHasLastLoadRequest: Bool {
+    var testHasLastLoadRequest: Bool {
         lastLoadRequest != nil
     }
 }
@@ -205,6 +212,7 @@ private extension VideoPlaybackEngine {
         currentRetryCount = 0
         lastLoadRequest = nil
         cancelLoadingTimeout()
+        cancelRetry()
         cleanupResourcesOnly()
     }
 
@@ -219,6 +227,9 @@ private extension VideoPlaybackEngine {
         // Reset Player
         player?.removeAllItems()
         player = nil
+
+        // Reset current item to release AVPlayerItem/AVURLAsset
+        currentItem = nil
 
         // Reset Subscriptions (but NOT state)
         cancellables.removeAll()
@@ -273,7 +284,7 @@ private extension VideoPlaybackEngine {
     }
 
     func scheduleRetry(request: (url: URL, loop: Bool)) {
-        Task { [weak self, configuration] in
+        retryTask = Task { [weak self, configuration] in
             do {
                 try await Task.sleep(nanoseconds: UInt64(configuration.retryDelay * 1_000_000_000))
                 self?.handleLoad(url: request.url, loop: request.loop)
@@ -281,6 +292,11 @@ private extension VideoPlaybackEngine {
                 self?.log("Retry cancelled")
             }
         }
+    }
+
+    func cancelRetry() {
+        retryTask?.cancel()
+        retryTask = nil
     }
 
     func retryLoad() {

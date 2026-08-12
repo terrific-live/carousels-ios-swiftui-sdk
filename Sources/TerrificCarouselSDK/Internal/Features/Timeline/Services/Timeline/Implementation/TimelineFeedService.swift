@@ -41,7 +41,7 @@ struct TimelineFeedService: TimelineService {
         // Note: Feed service uses offset-based pagination, not anchor/startAssetId
         let request = TimelineFeedAPIRequest(
             storeId: configuration.storeId,
-            carouselId: configuration.carouselId,
+            carouselId: carouselId,
             numberOfItems: itemsPerPage,
             offset: offset + (page - 1) * itemsPerPage,
             shopPageUrl: configuration.shopPageUrl,
@@ -56,8 +56,4 @@ struct TimelineFeedService: TimelineService {
             anchor: response?.anchor
         )
     }
-}
-
-enum TestError: Swift.Error {
-    case test
 }

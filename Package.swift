@@ -6,15 +6,13 @@ let package = Package(
     name: "TerrificCarouselSDK",
     defaultLocalization: "en",
     platforms: [
-        .iOS(.v16),
-        .macOS(.v13),
-        .tvOS(.v16)
+        .iOS(.v16)
     ],
     products: [
         .library(
             name: "TerrificCarouselSDK",
             targets: ["TerrificCarouselSDK"]
-        ),
+        )
     ],
     targets: [
         // MARK: - Main SDK Target (Public API)

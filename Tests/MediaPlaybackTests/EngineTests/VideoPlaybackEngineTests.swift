@@ -95,8 +95,7 @@ final class VideoPlaybackEngineTests: XCTestCase {
         engine.handlePause()
 
         // State remains .loading — pause was blocked
-        XCTAssertEqual(engine.state, .paused)
-        // XCTAssertEqual(engine.state, .loading)
+        XCTAssertEqual(engine.state, .loading)
     }
 
     // MARK: - HandleCleanup Tests

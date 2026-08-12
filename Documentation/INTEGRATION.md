@@ -1,6 +1,6 @@
 # Integration Guide
 
-This guide provides detailed instructions for integrating TerrificCarouselSDK into your iOS, macOS, or tvOS application.
+This guide provides detailed instructions for integrating TerrificCarouselSDK into your iOS application.
 
 ## Table of Contents
 
@@ -22,8 +22,6 @@ This guide provides detailed instructions for integrating TerrificCarouselSDK in
 | Xcode | 15.0+ |
 | Swift | 5.9+ |
 | iOS | 16.0+ |
-| macOS | 13.0+ |
-| tvOS | 16.0+ |
 
 ### Before You Begin
 

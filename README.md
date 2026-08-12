@@ -7,8 +7,6 @@
 * **Minimum OS versions:**
 
   * iOS 16
-  * macOS 13
-  * tvOS 16
 
 ---
 

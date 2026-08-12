@@ -193,12 +193,12 @@ public final class VideoPlaybackEngine: ObservableObject, VideoPlaybackEnginePro
     // MARK: - Test Helpers
 
     /// Returns the current retry count (for testing)
-    public var testCurrentRetryCount: Int {
+    var testCurrentRetryCount: Int {
         currentRetryCount
     }
 
     /// Returns whether there's a pending load request (for testing)
-    public var testHasLastLoadRequest: Bool {
+    var testHasLastLoadRequest: Bool {
         lastLoadRequest != nil
     }
 }

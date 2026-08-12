@@ -87,13 +87,15 @@ final class VideoPlaybackEngineTests: XCTestCase {
 
     // MARK: - HandlePause Tests
 
-    func testHandlePauseSetsState() {
+    func testHandlePauseBlockedFromLoadingState() {
         let url = URL(string: "https://example.com/video.mp4")!
         engine.handleLoad(url: url, loop: false)
 
+        // handlePause only allows .playing/.ready states
         engine.handlePause()
 
-        XCTAssertEqual(engine.state, .paused)
+        // State remains .loading — pause was blocked
+        XCTAssertEqual(engine.state, .loading)
     }
 
     // MARK: - HandleCleanup Tests

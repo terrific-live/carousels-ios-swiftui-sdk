@@ -76,13 +76,6 @@ public final class MediaPlayerViewModel: ObservableObject {
     // MARK: - Internal State
     private var cancellables = Set<AnyCancellable>()
     private var pendingPlay = false
-
-    deinit {
-        if let token = timeObserverToken, let player = player {
-            player.removeTimeObserver(token)
-        }
-        engine.handleCleanup()
-    }
 }
 
 // MARK: - Intents (Actions)

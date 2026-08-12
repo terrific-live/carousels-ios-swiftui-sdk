@@ -20,7 +20,7 @@ extension AnalyticsServiceImpl {
             assetTimestamps: assets.map { $0.timestampMilliseconds },
             externalUserId: externalUserId,
             userAgent: configuration.userAgent,
-            parentUrl: "",
+            parentUrl: AnalyticsConstants.noParentUrl,
             position: nil,
             totalAssets: assets.count
         )
@@ -52,7 +52,7 @@ extension AnalyticsServiceImpl {
             assetTimestamps: assets.map { $0.timestampMilliseconds },
             externalUserId: externalUserId,
             userAgent: configuration.userAgent,
-            parentUrl: "",
+            parentUrl: AnalyticsConstants.noParentUrl,
             position: nil,
             totalAssets: assets.count
         )
@@ -89,7 +89,7 @@ extension AnalyticsServiceImpl {
             campaignName: clickedAsset.campaignName,
             customProducts: [],
             externalUserId: externalUserId,
-            parentUrl: "",
+            parentUrl: AnalyticsConstants.noParentUrl,
             position: position,
             totalAssets: allAssets.count
         )

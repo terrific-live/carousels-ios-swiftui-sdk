@@ -79,11 +79,17 @@ public struct CachedAsyncImage<Content: View, Placeholder: View>: View {
         .onAppear {
             loadImageIfNeeded()
         }
+        .onDisappear {
+            viewModel.cancel()
+        }
     }
 
     // MARK: - Private Methods
     private func loadImageIfNeeded() {
-        guard let url else { return }
+        guard let url else {
+            viewModel.cancel()
+            return
+        }
         viewModel.load(from: url)
     }
 }

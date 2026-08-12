@@ -14,7 +14,7 @@ let package = Package(
         .library(
             name: "TerrificCarouselSDK",
             targets: ["TerrificCarouselSDK"]
-        ),
+        )
     ],
     targets: [
         // MARK: - Main SDK Target (Public API)

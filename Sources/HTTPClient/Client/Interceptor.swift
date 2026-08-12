@@ -1,6 +1,6 @@
 import Foundation
 
-/// This actor represents stack of `RequestInterceptor` and `ResponseInterceptor` which is called
+/// A thread-safe stack of `RequestInterceptor` and `ResponseInterceptor` which is called
 /// in a reverse order.
 ///
 /// It is technically possible to combine both types of interceptors in a single entity. However due
@@ -16,11 +16,12 @@ import Foundation
 /// stack.push(ResponseOnlyInterceptor())
 /// stack.push(retryInterceptor as ResponseInterceptor) // Will be executed before `ResponseOnlyInterceptor`
 /// ```
-public class Interceptor {
-    private(set) internal var current: Responder?
+public final class Interceptor: @unchecked Sendable {
+    private let lock = NSLock()
+    private var _current: Responder?
 
     public init() {
-        current = nil
+        _current = nil
     }
 
     /// Pushes interceptor into the stack
@@ -28,7 +29,9 @@ public class Interceptor {
     /// - parameter interceptor: `RequestInterceptor` instance
     @discardableResult
     public func push(_ interceptor: RequestInterceptor) -> Self {
-        current = InterceptorWrapper(next: current, wrapperValue: interceptor)
+        lock.withLock {
+            _current = InterceptorWrapper(next: _current, wrapperValue: interceptor)
+        }
         return self
     }
 
@@ -37,7 +40,9 @@ public class Interceptor {
     /// - parameter interceptor: `ResponseInterceptor` instance
     @discardableResult
     public func push(_ interceptor: ResponseInterceptor) -> Self {
-        current = InterceptorWrapper(next: current, wrapperValue: interceptor)
+        lock.withLock {
+            _current = InterceptorWrapper(next: _current, wrapperValue: interceptor)
+        }
         return self
     }
 
@@ -63,11 +68,14 @@ public class Interceptor {
 
     /// Drops the interceptors list.
     public func clean() {
-        current = nil
+        lock.withLock {
+            _current = nil
+        }
     }
 
     private func test<Object>(execute: (Object) async throws -> Void) async rethrows {
-        var last = current
+        // Snapshot head under lock, then iterate without holding it
+        var last = lock.withLock { _current }
         repeat {
             if let interceptor = last as? Object {
                 try await execute(interceptor)

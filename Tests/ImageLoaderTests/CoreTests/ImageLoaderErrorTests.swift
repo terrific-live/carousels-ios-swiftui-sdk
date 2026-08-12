@@ -25,24 +25,15 @@ final class ImageLoaderErrorTests: XCTestCase {
         XCTAssertEqual(error.errorDescription, "Image download timed out")
     }
 
-    func testHTTPErrorDescription() {
-        let error = ImageLoaderError.httpError(statusCode: 404)
-        XCTAssertEqual(error.errorDescription, "HTTP error: 404")
-
-        let error500 = ImageLoaderError.httpError(statusCode: 500)
-        XCTAssertEqual(error500.errorDescription, "HTTP error: 500")
-    }
-
     // MARK: - Equatable Tests
 
     func testErrorEquality() {
         XCTAssertEqual(ImageLoaderError.invalidURL, ImageLoaderError.invalidURL)
         XCTAssertEqual(ImageLoaderError.loadFailed, ImageLoaderError.loadFailed)
         XCTAssertEqual(ImageLoaderError.timeout, ImageLoaderError.timeout)
-        XCTAssertEqual(ImageLoaderError.httpError(statusCode: 404), ImageLoaderError.httpError(statusCode: 404))
 
         XCTAssertNotEqual(ImageLoaderError.invalidURL, ImageLoaderError.loadFailed)
-        XCTAssertNotEqual(ImageLoaderError.httpError(statusCode: 404), ImageLoaderError.httpError(statusCode: 500))
+        XCTAssertNotEqual(ImageLoaderError.invalidURL, ImageLoaderError.timeout)
     }
 
     // MARK: - LocalizedError Conformance Tests

@@ -39,6 +39,7 @@ public final class VideoPlaybackEngine: ObservableObject, VideoPlaybackEnginePro
 
     // MARK: - Timeout & Retry State
     private var loadingTimeoutTask: Task<Void, Never>?
+    private var retryTask: Task<Void, Never>?
     private var currentRetryCount = 0
     private var lastLoadRequest: (url: URL, loop: Bool)?
 
@@ -53,9 +54,36 @@ public final class VideoPlaybackEngine: ObservableObject, VideoPlaybackEnginePro
         looper?.disableLooping()
     }
 
+    // MARK: - Audio Session
+
+    /// Configures AVAudioSession for video playback.
+    /// Called once per app session before the first player is created.
+    /// Overrides Silent switch so audio plays even in silent mode.
+    nonisolated(unsafe) private static var isAudioSessionConfigured = false
+
+    private func configureAudioSessionIfNeeded() {
+        #if os(iOS) || os(tvOS)
+        guard !Self.isAudioSessionConfigured else { return }
+        do {
+            try AVAudioSession.sharedInstance().setCategory(
+                .playback,
+                mode: .moviePlayback,
+                options: .mixWithOthers
+            )
+            try AVAudioSession.sharedInstance().setActive(true)
+            Self.isAudioSessionConfigured = true
+            log("Audio session configured for playback")
+        } catch {
+            log("❌ Failed to configure audio session: \(error.localizedDescription)")
+        }
+        #endif
+    }
+
     // MARK: - Intents (Actions)
     public func handleLoad(url: URL, loop: Bool) {
         log("handleLoad url=\(url.absoluteString) loop=\(loop)")
+
+        configureAudioSessionIfNeeded()
 
         // Store for potential retry
         lastLoadRequest = (url: url, loop: loop)
@@ -114,6 +142,12 @@ public final class VideoPlaybackEngine: ObservableObject, VideoPlaybackEnginePro
     }
 
     public func handlePause() {
+        let allowedStates: [PlaybackState] = [.playing, .ready]
+        guard allowedStates.contains(state) else {
+            log("❌ pause() blocked - state must be .playing/.ready, current=\(state)")
+            return
+        }
+
         player?.pause()
         log("handlePause - state change = paused")
         state = .paused
@@ -178,6 +212,7 @@ private extension VideoPlaybackEngine {
         currentRetryCount = 0
         lastLoadRequest = nil
         cancelLoadingTimeout()
+        cancelRetry()
         cleanupResourcesOnly()
     }
 
@@ -192,6 +227,9 @@ private extension VideoPlaybackEngine {
         // Reset Player
         player?.removeAllItems()
         player = nil
+
+        // Reset current item to release AVPlayerItem/AVURLAsset
+        currentItem = nil
 
         // Reset Subscriptions (but NOT state)
         cancellables.removeAll()
@@ -246,7 +284,7 @@ private extension VideoPlaybackEngine {
     }
 
     func scheduleRetry(request: (url: URL, loop: Bool)) {
-        Task { [weak self, configuration] in
+        retryTask = Task { [weak self, configuration] in
             do {
                 try await Task.sleep(nanoseconds: UInt64(configuration.retryDelay * 1_000_000_000))
                 self?.handleLoad(url: request.url, loop: request.loop)
@@ -254,6 +292,11 @@ private extension VideoPlaybackEngine {
                 self?.log("Retry cancelled")
             }
         }
+    }
+
+    func cancelRetry() {
+        retryTask?.cancel()
+        retryTask = nil
     }
 
     func retryLoad() {

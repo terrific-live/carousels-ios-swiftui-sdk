@@ -27,7 +27,7 @@ extension AnalyticsServiceImpl {
             customProducts: customProducts,
             externalUserId: externalUserId,
             fixedPosition: position,
-            parentUrl: "",
+            parentUrl: AnalyticsConstants.noParentUrl,
             position: position,
             products: products
         )
@@ -69,7 +69,7 @@ extension AnalyticsServiceImpl {
             drawerOpenDurationMs: 0,
             externalUserId: externalUserId,
             netoAssetWatchTimeMs: netoWatchTimeMs,
-            parentUrl: "",
+            parentUrl: AnalyticsConstants.noParentUrl,
             position: position,
             products: products,
             viewDurationMs: viewDurationMs
@@ -107,7 +107,7 @@ extension AnalyticsServiceImpl {
             campaignName: asset.campaignName,
             externalUserId: externalUserId,
             userAgent: configuration.userAgent,
-            parentUrl: "",
+            parentUrl: AnalyticsConstants.noParentUrl,
             isInitialView: isInitialView,
             position: position,
             fixedPosition: position,
@@ -141,7 +141,7 @@ extension AnalyticsServiceImpl {
             campaignName: asset.campaignName,
             externalUserId: externalUserId,
             userAgent: configuration.userAgent,
-            parentUrl: "",
+            parentUrl: AnalyticsConstants.noParentUrl,
             position: asset.position
         )
 
@@ -175,7 +175,7 @@ extension AnalyticsServiceImpl {
             campaignName: asset.campaignName,
             customProducts: customProducts,
             externalUserId: externalUserId,
-            parentUrl: "",
+            parentUrl: AnalyticsConstants.noParentUrl,
             position: position,
             userAgent: configuration.userAgent
         )

@@ -25,7 +25,7 @@ extension AnalyticsServiceImpl {
             campaignName: asset.campaignName,
             customProducts: customProducts,
             externalUserId: externalUserId,
-            parentUrl: "",
+            parentUrl: AnalyticsConstants.noParentUrl,
             position: position,
             targetUrl: targetUrl,
             terrificClickId: terrificClickId,
@@ -63,7 +63,7 @@ extension AnalyticsServiceImpl {
             brandName: asset.brandName,
             campaignName: asset.campaignName,
             externalUserId: externalUserId,
-            parentUrl: "",
+            parentUrl: AnalyticsConstants.noParentUrl,
             position: position,
             questionId: questionId,
             userAgent: configuration.userAgent
@@ -110,7 +110,7 @@ extension AnalyticsServiceImpl {
             campaignName: asset.campaignName,
             customProducts: customProducts,
             externalUserId: externalUserId,
-            parentUrl: "",
+            parentUrl: AnalyticsConstants.noParentUrl,
             position: position,
             terrificClickId: terrificClickId,
             userAgent: configuration.userAgent
@@ -147,7 +147,7 @@ extension AnalyticsServiceImpl {
         let sessionId = carouselId
 
         let auxData = CarouselSponsorshipClickedAuxData(
-            parentUrl: "",
+            parentUrl: AnalyticsConstants.noParentUrl,
             externalUserId: externalUserId,
             sponsorshipPlacement: sponsorshipPlacement,
             sponsorshipUrl: sponsorshipUrl
@@ -180,7 +180,7 @@ extension AnalyticsServiceImpl {
         let sessionId = sessionId(carouselId: carouselId, assetId: asset.id)
 
         let auxData = AssetSponsorshipClickedAuxData(
-            parentUrl: "",
+            parentUrl: AnalyticsConstants.noParentUrl,
             externalUserId: externalUserId,
             sponsorshipPlacement: sponsorshipPlacement,
             sponsorshipPosition: sponsorshipPosition,

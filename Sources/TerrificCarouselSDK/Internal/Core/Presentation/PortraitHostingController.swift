@@ -55,7 +55,7 @@ private final class PortraitStatusBarController: UIViewController {
             child.view.topAnchor.constraint(equalTo: view.topAnchor),
             child.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             child.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            child.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            child.view.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
         child.didMove(toParent: self)
     }
@@ -91,7 +91,8 @@ final class PortraitCoverController: UIViewController {
         presentedHostingController = container
 
         // Find the top view controller to present from
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+        if let windowScene = UIApplication.shared.connectedScenes
+            .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
            let window = windowScene.windows.first,
            var topVC = window.rootViewController {
             while let presented = topVC.presentedViewController {

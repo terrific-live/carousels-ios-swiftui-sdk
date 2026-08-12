@@ -109,7 +109,7 @@ struct AnalyticsConfiguration {
         // Simulator
         "i386": "Simulator",
         "x86_64": "Simulator",
-        "arm64": "Simulator",
+        "arm64": "Simulator"
     ]
 }
 

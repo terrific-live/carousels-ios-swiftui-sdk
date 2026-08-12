@@ -336,18 +336,26 @@ private extension TimelineViewModel {
         } catch {
             if isFirstPage {
                 state = .error(error.localizedDescription)
-
-                // Log error to backend
-                errorLoggingService?.logError(
-                    message: error.localizedDescription,
-                    severity: .error,
-                    route: errorRoute,
-                    metadata: [
-                        "carouselId": carouselId,
-                        "errorType": String(describing: type(of: error))
-                    ]
-                )
+            } else {
+                // Scroll back to last valid content item so the user
+                // isn't stuck on the skeleton. hasMorePages stays true,
+                // so scrolling forward again will re-trigger pagination.
+                let maxValidIndex = pagination.items.count - 1
+                if currentPageIndex > maxValidIndex {
+                    currentPageIndex = max(0, maxValidIndex)
+                }
             }
+
+            // Log error to backend
+            errorLoggingService?.logError(
+                message: error.localizedDescription,
+                severity: .error,
+                route: errorRoute,
+                metadata: [
+                    "carouselId": carouselId,
+                    "errorType": String(describing: type(of: error))
+                ]
+            )
         }
     }
 

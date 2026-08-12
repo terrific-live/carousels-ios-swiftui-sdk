@@ -13,7 +13,8 @@ enum ShareHelper {
 
     /// Presents a share sheet with the given items (imperative approach)
     static func share(items: [Any]) {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+        guard let windowScene = UIApplication.shared.connectedScenes
+                .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene,
               let rootViewController = windowScene.windows.first?.rootViewController else {
             return
         }

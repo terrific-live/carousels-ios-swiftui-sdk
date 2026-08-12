@@ -25,7 +25,7 @@ public enum ResponseAdapterError: Error {
 public actor DefaultRequestAdapter: RequestAdapter {
     let base: URL?
     let version: String?
-    static var encoder = JSONEncoder()
+    private let encoder = JSONEncoder()
 
     public init(base url: URL?, version: String? = nil) {
         self.base = url
@@ -40,7 +40,7 @@ public actor DefaultRequestAdapter: RequestAdapter {
         var urlRequest = URLRequest(url: url)
 
         if let body = request.body {
-            urlRequest.httpBody = try Self.encoder.encode(body)
+            urlRequest.httpBody = try encoder.encode(body)
         }
 
         request.headers?.forEach {

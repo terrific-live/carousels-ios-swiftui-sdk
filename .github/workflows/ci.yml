@@ -45,6 +45,7 @@ jobs:
         run: xcodebuild -resolvePackageDependencies
       - name: Run tests
         run: |
+          set -o pipefail
           xcodebuild test \
             -scheme TerrificCarouselSDK \
             -destination 'platform=iOS Simulator,name=${{ steps.simulator.outputs.device }},OS=latest' \

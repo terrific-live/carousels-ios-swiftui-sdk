@@ -76,13 +76,18 @@ final class InterceptorTests: XCTestCase {
 
     // MARK: - Chainable Push
 
-    func testPush_isChainable() {
+    func testPush_isChainable() async throws {
         let interceptor = Interceptor()
-        let result = interceptor
+        interceptor
             .push(MockRequestInterceptor(headerKey: "A", headerValue: "1"))
             .push(MockRequestInterceptor(headerKey: "B", headerValue: "2"))
 
-        XCTAssertNotNil(result.current)
+        var request = URLRequest(url: URL(string: "https://example.com")!)
+        try await interceptor.applyRequest(&request)
+
+        // Both interceptors applied — chain works
+        XCTAssertNotNil(request.value(forHTTPHeaderField: "A"))
+        XCTAssertNotNil(request.value(forHTTPHeaderField: "B"))
     }
 
     // MARK: - Mixed Interceptors

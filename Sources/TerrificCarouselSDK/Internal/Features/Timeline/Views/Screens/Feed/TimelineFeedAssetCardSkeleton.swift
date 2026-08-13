@@ -33,7 +33,7 @@ struct TimelineFeedSkeletonCarousel: View {
             if showNameLabel {
                 RoundedRectangle(cornerRadius: 4)
                     .fill(Color.gray.opacity(0.2))
-                    .frame(width: 200, height: sizeConfig.carouselNameHeight)
+                    .frame(width: 200, height: sizeConfig.carouselNameFont.size)
                     .shimmer(offset: shimmerOffset)
                     .padding(.horizontal, sizeConfig.carouselNameHorizontalPadding)
                     .padding(.bottom, sizeConfig.carouselNameBottomPadding)

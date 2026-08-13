@@ -90,32 +90,11 @@ private extension TimelineFeedView {
 
         case .content:
             buildAssetList(viewModel.carouselItems)
-                .frame(height: calculatedTotalHeight)
 
         case .error:
             // Hide carousel on error (no height)
             EmptyView()
         }
-    }
-
-    /// Total height accounting for elements actually rendered (name, sponsorship)
-    private var calculatedTotalHeight: CGFloat {
-        let sponsorship = viewModel.carouselConfig.sponsorship
-        let hasSponsorLabel = sponsorship?.enabled == true && hasSponsorLabelContent(sponsorship)
-        let hasSponsorLogo = sponsorship?.enabled == true && sponsorship?.sideLogoUrl != nil
-        let hasCarouselName = viewModel.carouselConfig.name != nil && viewModel.carouselConfig.showName == true
-
-        var height = sizeConfig.carouselItemHeight
-        if hasCarouselName {
-            height += sizeConfig.carouselNameHeight + sizeConfig.carouselNameBottomPadding
-        }
-        if hasSponsorLabel {
-            height += sizeConfig.sponsorLabelHeight + sizeConfig.sponsorLabelPadding * 2
-        }
-        if hasSponsorLogo {
-            height += sizeConfig.sponsorLogoHeight + sizeConfig.sponsorLogoPadding * 2 + sizeConfig.sponsorLogoTopSpacing
-        }
-        return height
     }
 
     /// Whether the sponsor label row has content to show (label text or top logo)
@@ -143,7 +122,7 @@ private extension TimelineFeedView {
                     Text(carouselName)
                         .font(sizeConfig.carouselNameFont.toFont())
                         .foregroundColor(sizeConfig.carouselNameColor)
-                        .frame(minHeight: sizeConfig.carouselNameHeight, alignment: .bottom)
+                        .fixedSize(horizontal: false, vertical: true)
 
                     Spacer()
 
@@ -190,6 +169,7 @@ private extension TimelineFeedView {
                         total: total
                     ))
             }
+            .frame(height: sizeConfig.carouselItemHeight)
             .coordinateSpace(name: "TimelineScrollSpace")
             .accessibilityElement(children: .contain)
             .accessibilityLabel(accessibilityText.carouselLabel)

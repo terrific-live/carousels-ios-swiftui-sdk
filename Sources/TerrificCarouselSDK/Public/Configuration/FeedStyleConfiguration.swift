@@ -58,8 +58,6 @@ public struct FeedStyleConfiguration: Equatable, Sendable, TimestampStyleProvidi
     public let carouselNameFont: CarouselFontDescriptor
     /// Color for carousel name label
     public let carouselNameColor: Color
-    /// Height of carousel name label (used for total height calculation)
-    public let carouselNameHeight: CGFloat
     /// Bottom padding below carousel name label
     public let carouselNameBottomPadding: CGFloat
     /// Horizontal padding for carousel name label
@@ -121,7 +119,6 @@ public struct FeedStyleConfiguration: Equatable, Sendable, TimestampStyleProvidi
         bottomInfoPaddingBottom: CGFloat = 12,
         carouselNameFont: CarouselFontDescriptor = .system(size: 24, weight: .bold),
         carouselNameColor: Color = .white,
-        carouselNameHeight: CGFloat = 54,
         carouselNameBottomPadding: CGFloat = 24,
         carouselNameHorizontalPadding: CGFloat = 16,
         sponsorLogoHeight: CGFloat = 30,
@@ -158,7 +155,6 @@ public struct FeedStyleConfiguration: Equatable, Sendable, TimestampStyleProvidi
         self.bottomInfoPaddingBottom = bottomInfoPaddingBottom
         self.carouselNameFont = carouselNameFont
         self.carouselNameColor = carouselNameColor
-        self.carouselNameHeight = carouselNameHeight
         self.carouselNameBottomPadding = carouselNameBottomPadding
         self.carouselNameHorizontalPadding = carouselNameHorizontalPadding
         self.sponsorLogoHeight = sponsorLogoHeight
@@ -178,6 +174,12 @@ public struct FeedStyleConfiguration: Equatable, Sendable, TimestampStyleProvidi
     }
 
     // MARK: - Computed Properties
+
+    /// Estimated height of the carousel name label, derived from the font size.
+    /// Uses standard iOS line height ratio (fontSize * 1.3, rounded up).
+    public var carouselNameHeight: CGFloat {
+        ceil(carouselNameFont.size * 1.3)
+    }
 
     /// Total height of the carousel including the name label and its padding.
     /// Use this to set fixed height for the carousel in a ScrollView.

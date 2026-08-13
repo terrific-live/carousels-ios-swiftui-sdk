@@ -68,8 +68,6 @@ public struct FeedStyleConfiguration: Equatable, Sendable, TimestampStyleProvidi
     public let sponsorLogoHeight: CGFloat
     /// Font for the sponsor label text displayed above the carousel name
     public let sponsorLabelFont: CarouselFontDescriptor
-    /// Height allocated for the sponsor label row (label + top logo)
-    public let sponsorLabelHeight: CGFloat
     /// Color for the sponsor label text
     public let sponsorLabelColor: Color
     /// Padding inside the sponsor logo banner (between logo and banner edges)
@@ -123,7 +121,6 @@ public struct FeedStyleConfiguration: Equatable, Sendable, TimestampStyleProvidi
         carouselNameHorizontalPadding: CGFloat = 16,
         sponsorLogoHeight: CGFloat = 30,
         sponsorLabelFont: CarouselFontDescriptor = .system(size: 14, weight: .regular),
-        sponsorLabelHeight: CGFloat = 24,
         sponsorLabelColor: Color = .white,
         sponsorLogoPadding: CGFloat = 8,
         sponsorLabelPadding: CGFloat = 8,
@@ -159,7 +156,6 @@ public struct FeedStyleConfiguration: Equatable, Sendable, TimestampStyleProvidi
         self.carouselNameHorizontalPadding = carouselNameHorizontalPadding
         self.sponsorLogoHeight = sponsorLogoHeight
         self.sponsorLabelFont = sponsorLabelFont
-        self.sponsorLabelHeight = sponsorLabelHeight
         self.sponsorLabelColor = sponsorLabelColor
         self.sponsorLogoPadding = sponsorLogoPadding
         self.sponsorLabelPadding = sponsorLabelPadding
@@ -179,6 +175,11 @@ public struct FeedStyleConfiguration: Equatable, Sendable, TimestampStyleProvidi
     /// Uses standard iOS line height ratio (fontSize * 1.3, rounded up).
     public var carouselNameHeight: CGFloat {
         ceil(carouselNameFont.size * 1.3)
+    }
+
+    /// Estimated height of the sponsor label row, derived from the font size.
+    public var sponsorLabelHeight: CGFloat {
+        ceil(sponsorLabelFont.size * 1.3)
     }
 
     /// Total height of the carousel including the name label and its padding.

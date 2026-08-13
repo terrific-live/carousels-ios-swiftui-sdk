@@ -205,10 +205,10 @@ private extension TimelineFeedView {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                 }
-                .frame(height: sizeConfig.sponsorLabelHeight)
+                .frame(height: sizeConfig.sponsorLabelFont.size)
             }
         }
-        .frame(height: sizeConfig.sponsorLabelHeight, alignment: .leading)
+        .fixedSize(horizontal: false, vertical: true)
         .padding(.horizontal, sizeConfig.carouselNameHorizontalPadding)
         .padding(.vertical, sizeConfig.sponsorLabelPadding)
     }

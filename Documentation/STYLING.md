@@ -122,8 +122,9 @@ Controls the horizontal carousel (feed) appearance.
 |----------|------|---------|-------------|
 | `sponsorLogoHeight` | CGFloat | 30 | Height for the sponsor logo image displayed below the carousel |
 | `sponsorLabelFont` | CarouselFontDescriptor | System 14 regular | Font for the sponsor label text above the carousel name |
-| `sponsorLabelHeight` | CGFloat | 24 | Height allocated for the sponsor label row (label + top logo) |
 | `sponsorLabelColor` | Color | .white | Color for the sponsor label text |
+
+> **Note:** The sponsor label row height is calculated automatically from the font size.
 | `sponsorLogoPadding` | CGFloat | 8 | Padding inside the sponsor logo banner (between logo and banner edges) |
 | `sponsorLabelPadding` | CGFloat | 8 | Padding inside the sponsor label row (between content and row edges) |
 | `sponsorLogoTopSpacing` | CGFloat | 8 | Spacing between carousel items and the sponsor logo banner below |
@@ -168,7 +169,7 @@ Total Height = carouselNameHeight + carouselNameBottomPadding + carouselItemHeig
 
 | Condition | Additional Height | Formula |
 |-----------|-------------------|---------|
-| Sponsor label row visible | `sponsorLabelHeight + sponsorLabelPadding * 2` | 24 + 8*2 = 40 |
+| Sponsor label row visible | `sponsorLabelHeight + sponsorLabelPadding * 2` | auto + 8*2 |
 | Sponsor logo visible | `sponsorLogoHeight + sponsorLogoPadding * 2 + sponsorLogoTopSpacing` | 30 + 8*2 + 8 = 54 |
 
 ---
